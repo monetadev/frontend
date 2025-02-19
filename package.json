@@ -1,25 +1,22 @@
 {
-  "name": "moneta_frontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "frontend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/monetadev/frontend.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/monetadev/frontend/issues"
-  },
-  "homepage": "https://github.com/monetadev/frontend#readme",
   "dependencies": {
-    "@apollo/client": "^3.13.0",
+    "@apollo/client": "^3.13.1",
     "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
     "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.1.0",
+    "vite-plugin-vue-devtools": "^7.7.2"
   }
 }

@@ -1,13 +1,6 @@
-import { createApp, h } from "vue";
-import { ApolloProvider } from "@vue/apollo-option";  // Import ApolloProvider
-import apolloClient from "./apollo/apolloClient";  // Import your Apollo Client instance
-import App from "./App.vue";
+import './assets/main.css'
 
-const app = createApp({
-  setup() {
-    return () => h(App);
-  },
-});
+import { createApp } from 'vue'
+import App from './App.vue'
 
-app.use(ApolloProvider, { defaultClient: apolloClient });  // Use ApolloProvider with the Apollo Client
-app.mount("#app");
+createApp(App).mount('#app')

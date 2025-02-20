@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+
+
+
+/* Style for the body */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;  /* Full height of the screen */
+    background-color: #f0f0f0; /* Light background color for the whole page */
+     font-family: 'Outfit', sans-serif;
+      
+      
+  }
+  
+  /* Create a box on the right side of the page */
+  .create-account {
+    position: fixed;  /* Make it stay in place as you scroll */
+    top: 0;
+    right: 0;
+    width: 50%;  /* Box covers the right half of the page */
+    height: 100%;  /* Full height of the page */
+    background-color: #22293A;  /* Blue background color */
+    color: white;  /* White text color */
+    padding: 40px;
+    box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);  /* Adds shadow on the left side of the box */
+  }
+  
+  /* Style for the content inside the box */
+  .create-account .before-form {
+    text-align: left;
+    padding-top: 10%;
+    padding-left: 10%;
+  }
+  
+  .create-account .before-form h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .create-account .before-form p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  .image{
+
+
+
+  }
+
+  

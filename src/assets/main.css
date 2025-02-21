@@ -1,5 +1,15 @@
 @import './base.css';
 
+/* Center Content Vertically and Horizontally */
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #121729;
+}
+
+/* App Container */
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -7,6 +17,7 @@
   font-weight: normal;
 }
 
+/* Links and Text Styles */
 a,
 .green {
   text-decoration: none;
@@ -21,6 +32,7 @@ a,
   }
 }
 
+/* Responsive Design */
 @media (min-width: 1024px) {
   body {
     display: flex;

@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
 
-
-
 /* Style for the body */
 body {
     margin: 0;
@@ -10,45 +8,80 @@ body {
     justify-content: flex-start;
     align-items: center;
     height: 100vh;  /* Full height of the screen */
-    background-color: #f0f0f0; /* Light background color for the whole page */
-     font-family: 'Outfit', sans-serif;
-      
-      
-  }
-  
-  /* Create a box on the right side of the page */
-  .create-account {
+    background-color: #121729; /* Dark background color for the whole page */
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Create a box on the right side of the page */
+.create-account {
     position: fixed;  /* Make it stay in place as you scroll */
     top: 0;
     right: 0;
-    width: 50%;  /* Box covers the right half of the page */
+    width: 65%;  /* Box covers the right half of the page */
     height: 100%;  /* Full height of the page */
-    background-color: #22293A;  /* Blue background color */
+    background-color: #22293A;  /* Dark background color */
     color: white;  /* White text color */
     padding: 40px;
     box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);  /* Adds shadow on the left side of the box */
-  }
-  
-  /* Style for the content inside the box */
-  .create-account .before-form {
+}
+
+/* Style for the content inside the box */
+.create-account .before-form {
     text-align: left;
     padding-top: 10%;
     padding-left: 10%;
-  }
-  
-  .create-account .before-form h1 {
+}
+
+/* Create account title */
+.create-account .before-form h1 {
     font-size: 2rem;
     margin-bottom: 10px;
-  }
-  
-  .create-account .before-form p {
+}
+
+/* Paragraph styles */
+.create-account .before-form p {
     font-size: 1rem;
     margin-bottom: 20px;
-  }
-  .image{
+}
 
+/* Hyperlink style */
+.hyperlink {
+    color: #5F98EF;
+}
 
+/* Style for the circle container to position it below the text */
+.circle-container {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    margin-top: 40px;  /* Add space below the "Already have an account?" text */
+    padding-left: 10%;
+}
 
-  }
+/* Style for the circle */
+.circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;  /* Makes the div a circle */
+    background-color: #5F98EF;  /* Circle color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;  /* Text color */
+    font-size: 24px;  /* Font size of the number */
+    font-weight: bold;
+}
 
-  
+/* Number inside the circle */
+.number {
+    display: inline-block;
+    font-size: 20px;
+}
+
+/* Remove any borders or extra space for the images */
+.create-account .image img {
+    border: none; /* Remove any border */
+    display: block; /* Removes extra space below the image */
+    width: 100%; /* Makes the image responsive */
+    height: auto; /* Maintain aspect ratio */
+}

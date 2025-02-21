@@ -1,18 +1,16 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import NavBar from './components/NavBar.vue'
-</script>
-
 <template>
+  <!-- Navigation Bar -->
   <section>
     <nav>
-      <NavBar/>
+      <NavBar />
     </nav>
   </section>
-  
 
-  <div>
+  <!-- Page Content: Show Vue Router Views -->
+  <router-view />
+
+  <!-- Default Welcome Components (Only Visible on Non-Routed Pages) -->
+  <div v-if="$route.path === '/'">
     <header>
       <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
       <div class="wrapper">
@@ -25,6 +23,12 @@ import NavBar from './components/NavBar.vue'
     </main>
   </div>
 </template>
+
+<script setup>
+import HelloWorld from './components/HelloWorld.vue';
+import TheWelcome from './components/TheWelcome.vue';
+import NavBar from './components/NavBar.vue';
+</script>
 
 <style scoped>
 header {

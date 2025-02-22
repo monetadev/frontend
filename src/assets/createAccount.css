@@ -161,6 +161,7 @@ hr {
 button {
     background-color: #5F98EF;
     color: white;
+    font-size: medium;
     padding: 14px 20px;
     margin: 8px 0;
     border: none;

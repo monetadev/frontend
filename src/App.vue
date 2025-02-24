@@ -1,60 +1,55 @@
 <template>
-  <!-- Navigation Bar -->
-  <section>
-    <nav>
-      <NavBar />
-    </nav>
-  </section>
+  <div class="app-container">
+    <!-- Sidebar (Only for Logged-In Pages) -->
+    <Sidebar v-if="isAuthenticated" />
 
-  <!-- Page Content: Show Vue Router Views -->
-  <router-view />
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Navigation Bar (Only for Logged-In Pages) -->
+      <nav v-if="isAuthenticated">
+        <NavBar />
+      </nav>
 
-  <!-- Default Welcome Components (Only Visible on Non-Routed Pages) -->
-  <div v-if="$route.path === '/'">
-    <header>
-      <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-      <div class="wrapper">
-        <HelloWorld msg="Chris!" />
-      </div>
-    </header>
-
-    <main>
-      <TheWelcome />
-    </main>
+      <!-- Dynamic Page Content -->
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script setup>
-import HelloWorld from './components/HelloWorld.vue';
-import TheWelcome from './components/TheWelcome.vue';
-import NavBar from './components/NavBar.vue';
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import NavBar from "./components/NavBar.vue";
+import Sidebar from "./components/Sidebar.vue";
+
+// Vue Router Hook to Check Current Route
+const route = useRoute();
+
+// Show Sidebar & Navbar Only for Logged-In Pages
+const isAuthenticated = computed(() => {
+  return !["/", "/reset-password", "/login"].includes(route.path);
+});
 </script>
 
 <style scoped>
-header {
-  line-height: 1.5;
+/* App Layout */
+.app-container {
+  display: flex;
+  height: 100vh;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+/* Sidebar */
+.sidebar {
+  width: 310px;
+  height: 100vh;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #121729;
+  color: white;
 }
 </style>

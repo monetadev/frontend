@@ -11,6 +11,16 @@
       <form @submit.prevent="handleLogin">
         <InputWithIcon iconName="email" label="Email" type="email" v-model="email" />
         <InputWithIcon iconName="lock" label="Password" type="password" v-model="password" />
+
+        <div class="remember-container">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" v-model="rememberMe" />
+            <span class="checkmark"></span>
+            Remember Me
+          </label>
+          <a href="#" class="forgot-password">Forgot Password?</a>
+        </div>
+
         <PrimaryButton text="Sign-In" />
         <div class="signup">
           <p>New on our platform? <a href="#">Create Account</a></p>
@@ -113,4 +123,33 @@ form {
   font-weight: 500;
   text-decoration: none;
 }
+
+.remember-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+
+.forgot-password {
+  color: #5F98EF;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: #5F98EF;
+}
+
 </style>

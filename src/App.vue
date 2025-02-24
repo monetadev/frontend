@@ -1,19 +1,19 @@
-</template>
+<script>
+import Login from "./views/Login.vue";
+import ResetPassword from "./views/ResetPassword.vue";
 
-<script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-import NavBar from "./components/NavBar.vue";
-import Sidebar from "./components/Sidebar.vue";
-
-// Vue Router Hook to Check Current Route
-const route = useRoute();
-
-// Show Sidebar & Navbar Only for Logged-In Pages
-const isAuthenticated = computed(() => {
-  return !["/", "/reset-password", "/login"].includes(route.path);
-});
+export default {
+  name: 'App',
+  components: {
+    Login,
+    ResetPassword
+  }
+}
 </script>
 
-<style scoped>
+<template>
+  <ResetPassword />
+</template>
 
+<style scoped>
+</style>

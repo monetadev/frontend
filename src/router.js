@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from "./components/Home.vue";
-import ResetPassword from './components/ResetPassword.vue'; // Update path
+import Home from "./views/Home.vue";
+import ResetPassword from './views/ResetPassword.vue'; // Update path
 
 const routes = [
   { path: "/", redirect: "/home" },

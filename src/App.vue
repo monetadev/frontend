@@ -1,19 +1,3 @@
-<template>
-  <div class="app-container">
-    <!-- Sidebar (Only for Logged-In Pages) -->
-    <Sidebar v-if="isAuthenticated" />
-
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Navigation Bar (Only for Logged-In Pages) -->
-      <nav v-if="isAuthenticated">
-        <NavBar />
-      </nav>
-
-      <!-- Dynamic Page Content -->
-      <router-view />
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -32,24 +16,4 @@ const isAuthenticated = computed(() => {
 </script>
 
 <style scoped>
-/* App Layout */
-.app-container {
-  display: flex;
-  height: 100vh;
-}
 
-/* Sidebar */
-.sidebar {
-  width: 310px;
-  height: 100vh;
-}
-
-/* Main Content */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #121729;
-  color: white;
-}
-</style>

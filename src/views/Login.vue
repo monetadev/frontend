@@ -152,4 +152,24 @@ form {
   accent-color: #5F98EF;
 }
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .login-container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .illustration-container {
+    display: none;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+  }
+}
+
 </style>

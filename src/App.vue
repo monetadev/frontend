@@ -1,11 +1,11 @@
 <script>
 import { ref } from "vue";
-import InputWithIcon from "./components/InputWithIcon.vue";
+import PrimaryButton from "./components/PrimaryButton.vue";
 
 export default {
   name: "App",
   components: {
-    InputWithIcon
+    PrimaryButton
   },
   setup() {
     const email = ref("");
@@ -16,8 +16,5 @@ export default {
 </script>
 
 <template>
-  <InputWithIcon iconName="email" label="Email" type="email" v-model="email" />
-  <InputWithIcon iconName="lock" label="Password" type="password" v-model="password" />
-
-
+  <PrimaryButton text="Sign-In" />
 </template>

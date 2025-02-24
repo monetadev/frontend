@@ -30,4 +30,14 @@ export default {
   width: 100%;
   transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
 }
+
+.primary-button:hover {
+  background-color: #4a7dd6;
+}
+
+.primary-button:active,
+.primary-button.clicked {
+  background-color: #3b6ac4;
+  transform: scale(0.97);
+}
 </style>

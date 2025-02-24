@@ -1,18 +1,11 @@
 <script>
-import Login from "./views/Login.vue";
-import ResetPassword from "./views/ResetPassword.vue";
-
 export default {
   name: 'App',
-  components: {
-    Login,
-    ResetPassword
-  }
-}
+};
 </script>
 
 <template>
-  <ResetPassword />
+  <router-view></router-view>
 </template>
 
 <style scoped>

@@ -13,7 +13,9 @@
 
         <PrimaryButton text="Send Link" />
         <div class="signup">
-          <a href="#">Back to Login</a>
+          <router-link to="/login">
+            Back to Login
+          </router-link>
         </div>
       </form>
     </div>
@@ -68,7 +70,7 @@ export default {
 }
 
 .illustration {
-  max-width: 400px;
+  max-width: 300px;
 }
 
 .form-container {

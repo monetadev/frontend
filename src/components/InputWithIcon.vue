@@ -47,7 +47,6 @@ export default {
 </script>
 
 <style scoped>
-/* Input Container */
 .input-container {
   display: flex;
   align-items: center;
@@ -61,12 +60,10 @@ export default {
   height: 56px;
 }
 
-/* Focused Border */
 .input-container.focused {
   border-color: #5F98EF;
 }
 
-/* Icon */
 .icon-wrapper {
   position: absolute;
   left: 12px;
@@ -80,7 +77,6 @@ export default {
   height: 24px;
 }
 
-/* Input Field */
 .input-field {
   flex: 1;
   width: 100%;
@@ -93,7 +89,6 @@ export default {
   height: 24px;
 }
 
-/* Floating Label */
 .input-label {
   position: absolute;
   left: 40px;
@@ -107,7 +102,6 @@ export default {
   padding: 2px 6px;
 }
 
-/* Floating Label Effect */
 .focused .input-label,
 .input-field:focus ~ .input-label,
 .input-field:not(:placeholder-shown) ~ .input-label {

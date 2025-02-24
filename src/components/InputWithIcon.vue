@@ -1,17 +1,18 @@
 <template>
   <div class="input-container" :class="{ 'focused': isFocused || modelValue }">
     <span class="icon-wrapper">
-      <BaseIcon :name="iconName" :isFocused="isFocused || modelValue" />
+      <BaseIcon :name="iconName" :isFocused="isFocused" />
     </span>
-    <label class="input-label" :class="{ 'label-up': isFocused || modelValue }">{{ label }}</label>
     <input
         :type="type"
         class="input-field"
         :value="modelValue"
+        placeholder=" "
         @input="$emit('update:modelValue', $event.target.value)"
         @focus="isFocused = true"
         @blur="isFocused = !!modelValue"
     />
+    <label class="input-label">{{ label }}</label>
   </div>
 </template>
 
@@ -46,28 +47,40 @@ export default {
 </script>
 
 <style scoped>
+/* Input Container */
 .input-container {
   display: flex;
   align-items: center;
+  position: relative;
+  width: 100%;
   border: 2px solid #686868;
   border-radius: 5px;
-  padding: 10px;
-  background-color: transparent;
-  position: relative;
+  padding: 14px 16px;
   transition: border-color 0.3s ease-in-out;
+  background: transparent;
+  height: 56px;
 }
 
+/* Focused Border */
 .input-container.focused {
   border-color: #5F98EF;
 }
 
+/* Icon */
 .icon-wrapper {
   position: absolute;
-  left: 10px;
+  left: 12px;
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
+.icon-wrapper svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Input Field */
 .input-field {
   flex: 1;
   width: 100%;
@@ -76,11 +89,11 @@ export default {
   outline: none;
   font-size: 16px;
   background: transparent;
-  color: #fff;
-  padding-top: 10px;
-  padding-bottom: 5px;
+  color: #ffffff;
+  height: 24px;
 }
 
+/* Floating Label */
 .input-label {
   position: absolute;
   left: 40px;
@@ -90,13 +103,16 @@ export default {
   color: #686868;
   transition: all 0.3s ease-in-out;
   pointer-events: none;
+  background: #22293A;
+  padding: 2px 6px;
 }
 
-.label-up {
-  top: 5px;
+/* Floating Label Effect */
+.focused .input-label,
+.input-field:focus ~ .input-label,
+.input-field:not(:placeholder-shown) ~ .input-label {
+  top: 1px;
   font-size: 12px;
   color: #5F98EF;
-  background: #fff;
-  padding: 0 5px;
 }
 </style>

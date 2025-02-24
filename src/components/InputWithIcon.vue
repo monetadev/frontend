@@ -55,7 +55,6 @@ export default {
   background-color: transparent;
   position: relative;
   transition: border-color 0.3s ease-in-out;
-  width: 300px;
 }
 
 .input-container.focused {

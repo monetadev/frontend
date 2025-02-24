@@ -20,6 +20,7 @@ export default {
 
 <style scoped>
 .primary-button {
+  font-weight: 500;
   background-color: #5F98EF;
   color: #ffffff;
   padding: 15px;

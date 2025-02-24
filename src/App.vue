@@ -1,20 +1,17 @@
 <script>
-import { ref } from "vue";
-import PrimaryButton from "./components/PrimaryButton.vue";
+import Login from "./views/Login.vue";
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    PrimaryButton
-  },
-  setup() {
-    const email = ref("");
-
-    return { email };
+    Login
   }
-};
+}
 </script>
 
 <template>
-  <PrimaryButton text="Sign-In" />
+  <Login />
 </template>
+
+<style scoped>
+</style>

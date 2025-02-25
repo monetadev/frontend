@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-      <!-- Sidebar -->
+      <!-- SideNavigation -->
       <Sidebar />
   
       <!-- Main Content -->
@@ -12,12 +12,12 @@
   </template>
   
   <script>
-  import Sidebar from "@/components/Sidebar.vue";
+  import SideNavigation from "@/components/SideNavigation.vue";
   
   export default {
     name: "Home",
     components: {
-      Sidebar,
+      Sidebar: SideNavigation,
     },
   };
   </script>

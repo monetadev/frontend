@@ -1,10 +1,10 @@
 <script>
-import NavBar from "./components/NavBar.vue";
+import SideNavigation from "./components/SideNavigation.vue";
 
 export default {
   name: 'App',
   components: {
-    NavBar
+    NavBar: SideNavigation
   }
 }
 </script>

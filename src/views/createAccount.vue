@@ -71,10 +71,13 @@
         </div>
       </form>
     </section>
-  
-    <div class="image">
+
+  <section class="Image-class">
+     <div class="image">
       <img src="../assets/3d-casual-life-smiling-young-man-with-laptop-sitting-on-floor 1.svg" alt="Guy sitting" />
     </div>
+  </section>
+   
   </template>
   
   <script>
@@ -119,29 +122,47 @@
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
   
- html,  body {
+ html, body {
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100vh;
-    background-color: #121729;
+    height: 100%; /* Ensure body and html take full height of the screen */
+    width: 100%; /* Ensure body takes full width of the screen */
+    background-color: #121729; /* Dark background color for body */
     font-family: 'Outfit', sans-serif;
-    
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
   }
-  
-  .create-account {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 65%;
-    height: 100%;
-    background-color: #22293A;
-    color: white;
-    padding: 30px;
-    box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
-  }
+ /* Styling for Image container */
+.Image-class {
+  background-color: #121729; /* Dark background color for image container */
+  position: fixed;
+  top: 0;
+  left: 0; /* Align to the left side of the screen */
+  width: 27%;  /* Set width of the image container */
+  height: 100%;
+  padding: 30px;
+  box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;  /* Ensure that any overflow is hidden */
+}
+
+/* Styling for Create Account section */
+.create-account {
+  position: fixed;
+  top: 0;
+  right: 0;  /* Align to the right side of the screen */
+  width: 65%;  /* Set width of the create account container */
+  height: 100%;
+  background-color: #22293A;
+  color: white;
+  padding: 30px;
+  box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
   
   .create-account .before-form {
     text-align: left;

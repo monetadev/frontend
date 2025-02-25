@@ -18,12 +18,15 @@
             <span class="checkmark"></span>
             Remember Me
           </label>
-          <a href="#" class="forgot-password">Forgot Password?</a>
+          <router-link to="/reset-password" class="forgot-password">
+            Forgot Password?
+          </router-link>
+
         </div>
 
         <PrimaryButton text="Sign-In" />
         <div class="signup">
-          <p>New on our platform? <a href="#">Create Account</a></p>
+          <p>New on our platform? <router-link to="/signup">Create Account</router-link></p>
         </div>
       </form>
     </div>

@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from "./components/Home.vue";
-import ResetPassword from './components/ResetPassword.vue'; // Update path
+import Dashboard from './views/Dashboard.vue';
+import ResetPassword from './views/ResetPassword.vue';
+import Login from './views/Login.vue'; // Ensure correct import path
 
 const routes = [
-  { path: "/", redirect: "/home" },
-  { path: "/home", component: Home },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/login', component: Login },
   { path: '/reset-password', component: ResetPassword }
 ];
 

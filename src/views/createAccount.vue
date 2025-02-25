@@ -30,14 +30,14 @@
       <form @submit.prevent="handleSubmit">
         <div class="container">
           <div class="form-row">
-            <InputField
+            <inputForms
               label="First Name"
               name="fname"
               v-model="formData.fname"
               required
               placeholder="First Name"
             />
-            <InputField
+            <inputForms
               label="Last Name"
               name="lname"
               v-model="formData.lname"
@@ -47,7 +47,7 @@
           </div>
   
           <div class="form-row">
-            <InputField
+            <inputForms
               label="Email"
               type="email"
               name="email"
@@ -55,7 +55,7 @@
               required
               placeholder="Enter Email"
             />
-            <InputField
+            <inputForms
               label="Password"
               type="password"
               name="password"
@@ -65,10 +65,11 @@
             />
           </div>
   
-          <CheckboxField
-            label="Remember me"
-            v-model="formData.remember"
-          />
+          <checkBox
+                label="Remember me"
+                v-model="formData.remember"
+        />
+
   
           <p>
             By creating an account you agree to our
@@ -91,15 +92,15 @@
   </template>
   
   <script>
-  import InputField from './InputField.vue';
-  import CheckboxField from './CheckboxField.vue';
-  import PrimaryButton from './PrimaryButton.vue'; // Import the PrimaryButton component
+  import inputForms from '@/components/inputForms.vue'; // Correctly import inputForms
+  import checkBox from '@/components/checkBox.vue'; // Correctly import checkBox
+  import PrimaryButton from '@/components/PrimaryButton.vue'; // Import the PrimaryButton component
   
   export default {
     components: {
-      InputField,
-      CheckboxField,
-      PrimaryButton, // Register the PrimaryButton component
+      inputForms,      // Register inputForms component
+      checkBox,        // Register checkBox component
+      PrimaryButton,   // Register PrimaryButton component
     },
     data() {
       return {

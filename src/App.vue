@@ -1,16 +1,11 @@
 <script>
-import SideNavigation from "./components/SideNavigation.vue";
-
 export default {
   name: 'App',
-  components: {
-    NavBar: SideNavigation
-  }
-}
+};
 </script>
 
 <template>
-  <NavBar />
+  <router-view></router-view>
 </template>
 
 <style scoped>

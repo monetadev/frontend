@@ -1,45 +1,42 @@
 <template>
-  <nav class="navbar">
-    <div class="logo">MonetA</div>
-    <SearchBar @search="handleSearch" />
+  <nav class="navbar" :class="{ collapsed: isSidebarCollapsed }">
+    <SearchBar />
+
     <UserMenu />
   </nav>
 </template>
 
 <script>
-import SearchBar from "./SearchBar.vue";
-import UserMenu from "./UserMenu.vue";
+import SearchBar from "@/components/SearchBar.vue";
+import UserMenu from "@/components/UserMenu.vue";
 
 export default {
   name: "NavigationBar",
-  components: {
-    SearchBar,
-    UserMenu,
+  components: { SearchBar, UserMenu },
+  props: {
+    isSidebarCollapsed: Boolean,
   },
-  methods: {
-    handleSearch(query) {
-      //backend
-    }
-  }
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #1b2233;
-  padding: 12px 24px;
+  background: #1b2233;
+  padding: 15px 20px;
+  color: white;
+  position: fixed;
+  left: 230px;
+  right: 0;
+  top: 0;
   height: 60px;
+  transition: left 0.3s ease-in-out;
   font-family: "Outfit", sans-serif;
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
+.navbar.collapsed {
+  left: 80px;
 }
 </style>

@@ -1,10 +1,15 @@
 <template>
   <div :class="['sidebar', { collapsed: isCollapsed }]">
-    <button class="toggle-button" @click="toggleSidebar">
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-        <path d="M4 12h16M4 6h16M4 18h16" stroke="white" stroke-width="2" stroke-linecap="round" />
-      </svg>
-    </button>
+    <div class="sidebar-header">
+      <button class="toggle-button" @click="toggleSidebar">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+          <path d="M4 12h16M4 6h16M4 18h16" stroke="white" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+      <transition name="fade">
+        <span v-if="!isCollapsed" class="logo">MonetA</span>
+      </transition>
+    </div>
 
     <div class="menu-container">
       <ul class="menu">
@@ -18,7 +23,7 @@
             <component :is="item.icon" :active="activeMenu === item.name" />
           </span>
           <transition name="fade">
-            <span v-if="showMenuText" class="menu-text">{{ item.name }}</span>
+            <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
           </transition>
         </li>
       </ul>
@@ -44,11 +49,12 @@ export default {
     ExploreIcon,
     SettingsIcon,
   },
+  props: {
+    isCollapsed: Boolean,
+  },
   data() {
     return {
-      isCollapsed: false,
-      showMenuText: true,
-      activeMenu: "Add Flashcards",
+      activeMenu: "Dashboard",
       menuItems: [
         { name: "Dashboard", icon: DashboardIcon },
         { name: "My Stuffs", icon: MyStuffsIcon },
@@ -61,15 +67,7 @@ export default {
   },
   methods: {
     toggleSidebar() {
-      this.isCollapsed = !this.isCollapsed;
-
-      if (this.isCollapsed) {
-        this.showMenuText = false;
-      } else {
-        setTimeout(() => {
-          this.showMenuText = true;
-        }, 200);
-      }
+      this.$emit("toggle");
     },
     setActive(menuName) {
       this.activeMenu = menuName;
@@ -85,18 +83,25 @@ export default {
   background: #1b2233;
   width: 220px;
   height: 100vh;
-  padding: 10px;
-  transition: width 0.3s ease-in-out;
-  font-family: "Outfit", sans-serif;
-  display: flex;
-  flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
+  padding: 10px;
+  transition: width 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  font-family: "Outfit", sans-serif;
 }
 
 .sidebar.collapsed {
   width: 80px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 30px;
+  gap: 10px;
 }
 
 .toggle-button {
@@ -106,9 +111,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
-  padding: 10px;
-  width: 100%;
+  width: 40px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
 }
 
 .menu-container {
@@ -163,14 +172,14 @@ export default {
   height: 40px;
 }
 
+.sidebar.collapsed .menu-text {
+  display: none;
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.2s ease-in-out;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
-}
-
-.sidebar.collapsed .menu-text {
-  display: none;
 }
 </style>

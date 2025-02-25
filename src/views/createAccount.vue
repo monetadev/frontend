@@ -75,18 +75,12 @@
             By creating an account you agree to our
             <a href="#" style="color: dodgerblue">Terms & Privacy</a>.
           </p>
-  
-          <div class="clearfix">
-            <PrimaryButton
-              text="Cancel"
-              @click="handleCancel"
-            />
             <PrimaryButton
               text="Sign Up"
               type="submit"
             />
           </div>
-        </div>
+        
       </form>
     </section>
   </template>

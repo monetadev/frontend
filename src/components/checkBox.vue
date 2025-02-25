@@ -29,10 +29,13 @@
   </script>
   
   <style scoped>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+
   .paragraph {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
+    font-family: "Outfit";
   }
   
   label {

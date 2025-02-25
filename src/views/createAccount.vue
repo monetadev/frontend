@@ -63,10 +63,11 @@
             v-model="formData.remember"
           />
   
-          <p>
+          <p class="under-CheckBox">
             By creating an account you agree to our
             <a href="#" style="color: dodgerblue">Terms & Privacy</a>.
           </p>
+
           <PrimaryButton text="Sign Up" type="submit" />
         </div>
       </form>
@@ -133,8 +134,8 @@
     justify-content: center; /* Center the content horizontally */
     align-items: center; /* Center the content vertically */
   }
- /* Styling for Image container */
-.Image-class {
+
+  .Image-class {
   background-color: #121729; /* Dark background color for image container */
   position: fixed;
   top: 0;
@@ -148,19 +149,21 @@
   align-items: center;
   overflow: hidden;  /* Ensure that any overflow is hidden */
 }
+.under-CheckBox{
+    font-family: "Outfit";
+}
 
-/* Styling for Create Account section */
 .create-account {
   position: fixed;
   top: 0;
-  right: 0;  /* Align to the right side of the screen */
-  width: 65%;  /* Set width of the create account container */
+  right: 0; 
+  width: 65%; 
   height: 100%;
   background-color: #22293A;
   color: white;
   padding: 30px;
   box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
-  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+  overflow-y: auto; 
 }
 
   

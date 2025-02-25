@@ -7,21 +7,14 @@
       </div>
   
       <div class="circle-container">
-        <!-- Circle One -->
         <div class="circle">
           <span class="number">1</span>
         </div>
-  
         <div class="line"></div>
-  
-        <!-- Circle Two -->
         <div class="circle2">
           <span class="number">2</span>
         </div>
-  
         <div class="line"></div>
-  
-        <!-- Circle Three -->
         <div class="circle3">
           <span class="number">3</span>
         </div>
@@ -66,35 +59,34 @@
           </div>
   
           <checkBox
-                label="Remember me"
-                v-model="formData.remember"
-        />
-
+            label="Remember me"
+            v-model="formData.remember"
+          />
   
           <p>
             By creating an account you agree to our
             <a href="#" style="color: dodgerblue">Terms & Privacy</a>.
           </p>
-            <PrimaryButton
-              text="Sign Up"
-              type="submit"
-            />
-          </div>
-        
+          <PrimaryButton text="Sign Up" type="submit" />
+        </div>
       </form>
     </section>
+  
+    <div class="image">
+      <img src="../assets/3d-casual-life-smiling-young-man-with-laptop-sitting-on-floor 1.svg" alt="Guy sitting" />
+    </div>
   </template>
   
   <script>
-  import inputForms from '@/components/inputForms.vue'; // Correctly import inputForms
-  import checkBox from '@/components/checkBox.vue'; // Correctly import checkBox
-  import PrimaryButton from '@/components/PrimaryButton.vue'; // Import the PrimaryButton component
+  import inputForms from '@/components/inputForms.vue';
+  import checkBox from '@/components/checkBox.vue';
+  import PrimaryButton from '@/components/PrimaryButton.vue';
   
   export default {
     components: {
-      inputForms,      // Register inputForms component
-      checkBox,        // Register checkBox component
-      PrimaryButton,   // Register PrimaryButton component
+      inputForms,
+      checkBox,
+      PrimaryButton,
     },
     data() {
       return {
@@ -127,7 +119,7 @@
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
   
-  body {
+ html,  body {
     margin: 0;
     padding: 0;
     display: flex;
@@ -136,6 +128,7 @@
     height: 100vh;
     background-color: #121729;
     font-family: 'Outfit', sans-serif;
+    
   }
   
   .create-account {
@@ -152,22 +145,25 @@
   
   .create-account .before-form {
     text-align: left;
-    padding-top: 10%;
+    padding-top: 3%;
     padding-left: 10%;
   }
   
   .create-account .before-form h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 2.5rem;
   }
   
   .create-account .before-form p {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
     font-size: 1rem;
-    margin-bottom: 20px;
   }
   
   .hyperlink {
     color: #5F98EF;
+    font-weight: 500;
   }
   
   .circle-container {
@@ -203,7 +199,13 @@
     margin-right: 20px;
   }
   
-  /* Remove old button styles */
+  .image img {
+    border: none;
+    height: auto;
+    border-radius: 10px;
+    padding-top: 10%;
+  }
+  
   button {
     background-color: #5F98EF;
     color: white;
@@ -220,18 +222,11 @@
     opacity: 1;
   }
   
-  .cancelbtn {
-    padding: 14px 20px;
-    background-color: #f44336;
-  }
-  
-  .cancelbtn, .signupbtn {
-    float: left;
-    width: 50%;
-  }
-  
   .container {
     padding: 16px;
+  }
+  .form-row{
+    padding-left: 30%;
   }
   
   .clearfix::after {

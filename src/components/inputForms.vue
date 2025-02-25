@@ -37,20 +37,33 @@
   </script>
   
   <style scoped>
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0 22px 0;
-    display: inline-block;
-    border-radius: 5px;
-    border: 1px solid #686868;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #686868;
-  }
-  
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+
+ label {
+  display: block; /* Ensure the label is block-level to sit on top of the input */
+  margin-bottom: 5px; /* Add space between label and input field */
+  font-weight: 500;
+  font-size: 16px;
+  color: white;
+  font-family: "Outfit";
+}
+
+/* Style for input fields */
+input {
+  width: 50%;  /* Set the width to 50% for a smaller input box */
+  padding: 10px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border-radius: 5px;
+  border: 1px solid #686868;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #686868;
+  box-sizing: border-box; /* Ensure padding does not affect the width */
+}
+
   input:focus {
     background-color: #ddd;
     outline: none;

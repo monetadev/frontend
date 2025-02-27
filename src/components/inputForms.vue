@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div class="input-container">
       <label :for="id"><b>{{ label }}</b></label>
       <input
-        :type="type"
-        :value="value"
-        @input="$emit('input', $event.target.value)"
-        :placeholder="placeholder"
-        :name="name"
-        :required="required"
-        :id="id"
+          :type="type"
+          :value="value"
+          @input="$emit('input', $event.target.value)"
+          :placeholder="placeholder"
+          :name="name"
+          :required="required"
+          :id="id"
       />
     </div>
   </template>
@@ -29,6 +29,11 @@
   
   <style scoped>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+
+
+    .input-container {
+      margin-bottom: 15px;
+    }
 
  label {
   display: block; /* Ensure the label is block-level to sit on top of the input */

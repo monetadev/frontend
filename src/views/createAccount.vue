@@ -19,17 +19,16 @@
         <h2>Personal Information</h2>
         <div class="form-row">
           <InputForm
-              :type="type"
-              :value="value"
-              @input="$emit('input', $event.target.value)"
-              :placeholder="placeholder"
-              :name="name"
-              :required="required"
-              :id="id"
-              />
-
-
+            label="First Name"
+            v-model="formData.firstName"
+            type="text"
+            placeholder="First Name"
+            name="firstName"
+            :required="true"
+            id="firstName"
+            />
         </div>
+
       </div>
     </div>
   </section>

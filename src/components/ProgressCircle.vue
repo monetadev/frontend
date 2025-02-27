@@ -1,5 +1,5 @@
 <template>
-  <div class="progress circle" :class="{active: isActive}">
+  <div class="progress-circle" :class="{active: isActive}">
     <span class = "number">{{ number }}</span>
   </div>
 

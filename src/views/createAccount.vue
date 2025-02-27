@@ -20,11 +20,6 @@
       </div>
     </div>
 
-    <!-- Debug info -->
-    <div style="padding-left: 10%; margin-top: 20px; color: white;">
-      Current Step: {{ currentStep }}
-    </div>
-    
     <div class="container">
       <!-- Step 1 -->
       <div v-show="currentStep === 1" class="form-step">
@@ -36,6 +31,7 @@
             placeholder="First Name" 
             class="form-input"
           />
+          <div v-if="validationErrors.fname" class="error">{{ validationErrors.fname }}</div>
         </div>
         <div class="form-row">
           <input 
@@ -44,10 +40,12 @@
             placeholder="Last Name" 
             class="form-input"
           />
+          <div v-if="validationErrors.lname" class="error">{{ validationErrors.lname }}</div>
         </div>
         <div style="text-align: center; margin-top: 20px;">
           <button 
             @click="moveToStep(2)" 
+            :disabled="!isValidStep1" 
             class="primary-button" 
             type="button"
           >
@@ -66,6 +64,7 @@
             placeholder="Email" 
             class="form-input"
           />
+          <div v-if="validationErrors.email" class="error">{{ validationErrors.email }}</div>
         </div>
         <div class="form-row">
           <input 
@@ -74,6 +73,7 @@
             placeholder="Confirm Email" 
             class="form-input"
           />
+          <div v-if="validationErrors.confirmEmail" class="error">{{ validationErrors.confirmEmail }}</div>
         </div>
         <div style="text-align: center; margin-top: 20px;">
           <button 
@@ -85,6 +85,7 @@
           </button>
           <button 
             @click="moveToStep(3)" 
+            :disabled="!isValidStep2"
             class="primary-button" 
             type="button"
           >
@@ -103,6 +104,7 @@
             placeholder="Password" 
             class="form-input"
           />
+          <div v-if="validationErrors.password" class="error">{{ validationErrors.password }}</div>
         </div>
         <div class="form-row">
           <input 
@@ -111,6 +113,7 @@
             placeholder="Confirm Password" 
             class="form-input"
           />
+          <div v-if="validationErrors.confirmPassword" class="error">{{ validationErrors.confirmPassword }}</div>
         </div>
         <div style="text-align: center; margin-top: 20px;">
           <button 
@@ -122,6 +125,7 @@
           </button>
           <button 
             @click="submitForm" 
+            :disabled="!isValidStep3"
             class="primary-button" 
             type="button"
           >
@@ -131,7 +135,6 @@
       </div>
     </div>
   </section>
-
   <section class="Image-class">
     <div class="image">
       <img src="../assets/3d-casual-life-smiling-young-man-with-laptop-sitting-on-floor 1.svg" alt="Guy sitting" />
@@ -151,21 +154,77 @@ export default {
         confirmEmail: "",
         password: "",
         confirmPassword: "",
+      },
+      validationErrors: {
+        fname: "",
+        lname: "",
+        email: "",
+        confirmEmail: "",
+        password: "",
+        confirmPassword: ""
       }
     };
   },
+  computed: {
+    isValidStep1() {
+      return this.validateStep1();
+    },
+    isValidStep2() {
+      return this.validateStep2();
+    },
+    isValidStep3() {
+      return this.validateStep3();
+    }
+  },
   methods: {
+    validateStep1() {
+      const nameRegex = /^[A-Z][a-zA-Z]*$/;  // Name must start with uppercase letter
+
+      // Check if both names are filled out and validate them
+      if (!this.formData.fname || !this.formData.lname) {
+        this.validationErrors.fname = "First name is required.";
+        this.validationErrors.lname = "Last name is required.";
+      } else {
+        this.validationErrors.fname = !nameRegex.test(this.formData.fname) ? 'First name must start with a capital letter and contain only alphabetic characters.' : '';
+        this.validationErrors.lname = !nameRegex.test(this.formData.lname) ? 'Last name must start with a capital letter and contain only alphabetic characters.' : '';
+      }
+
+      return !this.validationErrors.fname && !this.validationErrors.lname;
+    },
+    validateStep2() {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+      
+      this.validationErrors.email = !emailRegex.test(this.formData.email) ? 'Please enter a valid email.' : '';
+      this.validationErrors.confirmEmail = this.formData.email !== this.formData.confirmEmail ? 'Emails do not match.' : '';
+      
+      return !this.validationErrors.email && !this.validationErrors.confirmEmail;
+    },
+    validateStep3() {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      this.validationErrors.password = !passwordRegex.test(this.formData.password) ? 'Password must contain at least one uppercase letter, one number, and one special character.' : '';
+      this.validationErrors.confirmPassword = this.formData.password !== this.formData.confirmPassword ? 'Passwords do not match.' : '';
+      
+      return !this.validationErrors.password && !this.validationErrors.confirmPassword;
+    },
     moveToStep(step) {
-      console.log("Moving to step:", step);
-      this.currentStep = step;
+      if (step === 2 && this.validateStep1()) {
+        this.currentStep = 2;
+      } else if (step === 3 && this.validateStep2()) {
+        this.currentStep = 3;
+      }
     },
     submitForm() {
-      console.log("Form submitted:", this.formData);
-      alert("Form submitted successfully!");
+      if (this.validateStep3()) {
+        console.log("Form submitted:", this.formData);
+        alert("Form submitted successfully!");
+        this.$router.push('/login');  // Redirect to login page
+      }
     }
   }
 };
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
@@ -342,5 +401,15 @@ html, body {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
   min-width: 120px;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+.primary-button[disabled], .secondary-button[disabled] {
+  background-color: #ddd;
+  cursor: not-allowed;
 }
 </style>

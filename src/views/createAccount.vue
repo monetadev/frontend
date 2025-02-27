@@ -28,8 +28,42 @@
             id="firstName"
             />
         </div>
-
+        <div class="form-row">
+          <InputForm
+          label="Last Name"
+          v-model="formData.firstName"
+          type="text"
+          placeholder="Last Name"
+          name="lastName"
+          :required="true"
+          id="lastName"
+          />
+        </div>
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Next" @click="moveToStep(2)"/>
+        </div>
       </div>
+      <div v-if="currentStep === 2" class="form-step">
+        <h2>Email Information</h2>
+        <div class="form-row">
+          <InputForm
+          label="Email"
+          v-model="formData.email"
+          type="email"
+          placeholder="Email"
+          name="email"
+          :required="true"
+          id="email"
+          />
+        </div>
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Back"  @click="moveToStep(1)"/>
+          <SecondaryButton text="Next" @click="moveToStep(3)"/>
+        </div>
+      </div>
+      <div v-if="currentStep === 3" class="form-step"></div>
+
+
     </div>
   </section>
 
@@ -52,11 +86,25 @@ export default {
     ProgressCircle,
     ProgressLine,
   },
-  props:{
-    currentStep: {
-      type: Number,
-      required: true,
-    }
+  data() {
+    return {
+      currentStep: 1,
+      formData: {
+        fname: '',
+        lname: '',
+        email: '',
+        confirmEmail: '',
+        password: '',
+        confirmPassword: ''
+      }
+    };
+  },
+methods: {
+  moveToStep(step) {
+    this.currentStep = step;
+  },
+  submitForm() {
+  }
   }
 };
 

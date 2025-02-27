@@ -7,7 +7,7 @@
     </div>
 
     <div class="circle-container">
-      <ProgressCircle :number="1" :is-active="currentStep === 1" />
+      <ProgressCircle :number="1" :is-active="currentStep >= 1" />
       <ProgressLine :is-active="currentStep >= 2" />
       <ProgressCircle :number="2" :is-active="currentStep >= 2" />
       <ProgressLine :is-active="currentStep === 3" />
@@ -15,7 +15,7 @@
     </div>
 
     <div class="container">
-      <div v-if="currentStep === 1" class="form-steps">
+      <div v-if="currentStep === 1" class="form-step">
         <h2>Personal Information</h2>
         <div class="form-row">
           <InputForm
@@ -31,7 +31,7 @@
         <div class="form-row">
           <InputForm
           label="Last Name"
-          v-model="formData.firstName"
+          v-model="formData.lastName"
           type="text"
           placeholder="Last Name"
           name="lastName"
@@ -40,7 +40,7 @@
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Next" @click="moveToStep(2)"/>
+          <SecondaryButton text="Next" @click="moveToStep(2)" :disabled=""/>
         </div>
       </div>
       <div v-if="currentStep === 2" class="form-step">
@@ -61,9 +61,33 @@
           <SecondaryButton text="Next" @click="moveToStep(3)"/>
         </div>
       </div>
-      <div v-if="currentStep === 3" class="form-step"></div>
-
-
+      <div v-if="currentStep === 3" class="form-step">
+        <h2> Password Information</h2>
+        <div class="form-row">
+          <InputForm
+              label="Password"
+              v-model="formData.password"
+              type="password"
+              placeholder="Password"
+              name="password"
+              :required="true"
+              id="password"
+          />
+          <InputForm
+              label="Confirm Password"
+              v-model="formData.confirmPassword"
+              type="confirm password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              :required="true"
+              id="confirmPassword"
+          />
+        </div>
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Back"  @click="moveToStep(2)"/>
+          <SecondaryButton text="Submit" @click="submitForm"/>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -104,6 +128,7 @@ methods: {
     this.currentStep = step;
   },
   submitForm() {
+    alert("Form submitted!");
   }
   }
 };
@@ -188,6 +213,7 @@ html, body {
   text-align: center;
   font-weight: 500;
   margin-bottom: 30px;
+  font-family: "Outfit", sans-serif;
 }
 
 .form-row {

@@ -3,7 +3,8 @@
       <label :for="id"><b>{{ label }}</b></label>
       <input
         :type="type"
-        v-model="inputValue"
+        :value="value"
+        @input="$emit('input', $event.target.value)"
         :placeholder="placeholder"
         :name="name"
         :required="required"
@@ -22,17 +23,7 @@
       required: Boolean,
       id: String,
       value: String,
-    },
-    data() {
-      return {
-        inputValue: this.value,
-      };
-    },
-    watch: {
-      inputValue(newValue) {
-        this.$emit("input", newValue);
-      },
-    },
+    }
   };
   </script>
   

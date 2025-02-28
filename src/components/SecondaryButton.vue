@@ -6,6 +6,7 @@
 
   
   <script>
+
   export default {
     props: {
       text: {
@@ -23,7 +24,7 @@
     }
   }
   </script>
-  
+//TODO implement disabling buttons for user when import fields are empty
   <style scoped>
 .secondary-button {
   background-color: #5F98EF;
@@ -40,6 +41,8 @@
   transition: all 0.3s ease;
   outline: none;
 }
+
+
 
 .secondary-button:hover:not(.disabled) {
   background-color: #5F98EF;

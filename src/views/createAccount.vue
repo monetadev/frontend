@@ -6,93 +6,65 @@
       <p>Already have an account? <a class="hyperlink" href="#">Sign in</a></p>
     </div>
 
-    <ProgressCircle :currentStep="currentStep" />
+    <div class="circle-container">
+      <ProgressCircle :number="1" :is-active="currentStep >= 1" />
+      <ProgressLine :is-active="currentStep >= 2" />
+      <ProgressCircle :number="2" :is-active="currentStep >= 2" />
+      <ProgressLine :is-active="currentStep === 3" />
+      <ProgressCircle :number="3" :is-active="currentStep === 3" />
+    </div>
 
     <div class="container">
-      <!-- Step 1 -->
-      <transition name="fade" mode="out-in">
-        <div v-if="currentStep === 1" class="form-step">
-          <h2>Step 1: Personal Information</h2>
-          <div class="form-row">
-            <InputForm 
-              label="First Name"
-              v-model="formData.fname"
-              type="text"
-              placeholder="First Name"
-              name="fname"
-              :required="true"
-              id="fname"
-              :error="errors.fname"
+      <div v-if="currentStep === 1" class="form-step">
+        <h2>Personal Information</h2>
+        <div class="form-row">
+          <InputForm
+            label="First Name"
+            v-model="formData.firstName"
+            type="text"
+            placeholder="First Name"
+            name="firstName"
+            :required="true"
+            id="firstName"
             />
-          </div>
-          <div class="form-row">
-            <InputForm 
-              label="Last Name"
-              v-model="formData.lname"
-              type="text"
-              placeholder="Last Name"
-              name="lname"
-              :required="true"
-              id="lname"
-              :error="errors.lname"
-            />
-          </div>
-          <div style="text-align: center; margin-top: 20px;">
-            <SecondaryButton 
-              text="Next"
-              @click="moveToStep(2)"
-            />
-          </div>
         </div>
-      </transition>
-
-      <!-- Step 2 -->
-      <transition name="fade" mode="out-in">
-        <div v-if="currentStep === 2" class="form-step">
-          <h2>Step 2: Email Information</h2>
-          <div class="form-row">
-            <InputForm 
-              label="Email"
-              v-model="formData.email"
-              type="email"
-              placeholder="Email"
-              name="email"
-              :required="true"
-              id="email"
-              :error="errors.email"
-            />
-          </div>
-          <div class="form-row">
-            <InputForm 
-              label="Confirm Email"
-              v-model="formData.confirmEmail"
-              type="email"
-              placeholder="Confirm Email"
-              name="confirmEmail"
-              :required="true"
-              id="confirmEmail"
-              :error="errors.confirmEmail"
-            />
-          </div>
-          <div style="text-align: center; margin-top: 20px;">
-            <SecondaryButton 
-              text="Back"
-              @click="moveToStep(1)"
-            />
-            <SecondaryButton 
-              text="Next"
-              @click="moveToStep(3)"
-            />
-          </div>
+        <div class="form-row">
+          <InputForm
+          label="Last Name"
+          v-model="formData.lastName"
+          type="text"
+          placeholder="Last Name"
+          name="lastName"
+          :required="true"
+          id="lastName"
+          />
         </div>
-      </transition>
-
-      <!-- Step 3 -->
-      <transition name="fade" mode="out-in">
-        <div v-if="currentStep === 3" class="form-step">
-          <h2>Step 3: Password</h2>
-          <div class="form-row">
-            <InputForm 
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Next" @click="moveToStep(2)" />
+        </div>
+      </div>
+      <div v-if="currentStep === 2" class="form-step">
+        <h2>Email Information</h2>
+        <div class="form-row">
+          <InputForm
+          label="Email"
+          v-model="formData.email"
+          type="email"
+          placeholder="Email"
+          name="email"
+          :required="true"
+          id="email"
+          />
+        </div>
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Back"  @click="moveToStep(1)"/>
+          <SecondaryButton text="Next" @click="moveToStep(3)"/>
+        </div>
+      </div>
+      <div v-if="currentStep === 3" class="form-step">
+        <h2> Password Information</h2>
+        <div class="form-row">
+          <InputForm
               label="Password"
               v-model="formData.password"
               type="password"
@@ -100,33 +72,22 @@
               name="password"
               :required="true"
               id="password"
-              :error="errors.password"
-            />
-          </div>
-          <div class="form-row">
-            <InputForm 
+          />
+          <InputForm
               label="Confirm Password"
               v-model="formData.confirmPassword"
-              type="password"
+              type="confirm password"
               placeholder="Confirm Password"
               name="confirmPassword"
               :required="true"
               id="confirmPassword"
-              :error="errors.confirmPassword"
-            />
-          </div>
-          <div style="text-align: center; margin-top: 20px;">
-            <SecondaryButton 
-              text="Back"
-              @click="moveToStep(2)"
-            />
-            <SecondaryButton 
-              text="Submit"
-              @click="submitForm"
-            />
-          </div>
+          />
         </div>
-      </transition>
+        <div style="text-align: center; margin-top: 20px">
+          <SecondaryButton text="Back"  @click="moveToStep(2)"/>
+          <SecondaryButton text="Submit" @click="submitForm"/>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -141,126 +102,43 @@
 import InputForm from '@/components/inputForms.vue';
 import SecondaryButton from '@/components/SecondaryButton.vue';
 import ProgressCircle from '@/components/ProgressCircle.vue';
-
+import ProgressLine from '@/components/ProgressLine.vue';
 export default {
   components: {
     InputForm,
     SecondaryButton,
-    ProgressCircle
+    ProgressCircle,
+    ProgressLine,
   },
   data() {
     return {
       currentStep: 1,
       formData: {
-        fname: "",
-        lname: "",
-        email: "",
-        confirmEmail: "",
-        password: "",
-        confirmPassword: ""
-      },
-      errors: {
-        fname: "",
-        lname: "",
-        email: "",
-        confirmEmail: "",
-        password: "",
-        confirmPassword: ""
-      },
-      regex: {
-        name: /^[a-zA-Z]*$/,  // The * instead of + allows empty fields
-        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,  // Updated regex
-        password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+        fname: '',
+        lname: '',
+        email: '',
+        confirmEmail: '',
+        password: '',
+        confirmPassword: ''
       }
     };
   },
-  methods: {
-    moveToStep(step) {
-  console.log("Moving to step:", step);
-  
-  // Step 2: Validate Email
-  if (step === 2) {
-    const isValid = this.validateStep1();
-    console.log("Step 1 validation result:", isValid, "Errors:", this.errors.fname, this.errors.lname);
-    if (!isValid) {
-      console.log("Validation failed for step 1");
-      return;
-    }
+  // computed:{
+  //   // isStep1Valid() {
+  //   //   return this.formData.fname !== '' && this.formData.lname.trim() !== '';
+  //   // },
+  //
+  // },
+methods: {
+  moveToStep(step) {
+    this.currentStep = step;
+  },
+  submitForm() {
+    alert("Form submitted!");
   }
-  
-  // Step 2: Validate Email and Confirm Email
-  if (step === 3) {
-    const isValid = this.validateStep2();
-    console.log("Step 2 validation result:", isValid, "Errors:", this.errors.email, this.errors.confirmEmail);
-    
-    if (!isValid) {
-      console.log("Validation failed for step 2");
-      return;
-    }
-    
-    // Check if both email and confirm email are filled
-    if (!this.formData.email || !this.formData.confirmEmail) {
-      console.log("Please fill out both email and confirm email fields.");
-      this.errors.email = "Please fill out both email and confirm email fields.";
-      return; // Don't move forward if the fields are empty
-    }
-  }
-  
-  // If validation passed, move to the next step
-  this.currentStep = step;
-  console.log("Transitioned to step:", step);
-}
-,
-    
-    validateStep1() {
-      console.log("Validating Step 1:", this.formData.fname, this.formData.lname);
-      this.errors.fname = this.regex.name.test(this.formData.fname) ? "" : "First name must only contain letters.";
-      this.errors.lname = this.regex.name.test(this.formData.lname) ? "" : "Last name must only contain letters.";
-      console.log("Validation errors:", this.errors);
-      
-      // Check if the error strings are empty (validation passed)
-      return this.errors.fname === "" && this.errors.lname === "";
-    },
-    
-    validateStep2() {
-      // Validate email format and check if it's empty
-      if (!this.formData.email) {
-        this.errors.email = "Please enter a valid email.";
-      } else {
-        this.errors.email = this.regex.email.test(this.formData.email) ? "" : "Please enter a valid email.";
-      }
-
-      // Validate confirm email match
-      if (this.formData.email && this.formData.confirmEmail) {
-        this.errors.confirmEmail = this.formData.email === this.formData.confirmEmail ? "" : "Emails must match.";
-      }
-      
-      // Log email and confirm email values for debugging
-      console.log('Email:', this.formData.email);
-      console.log('Confirm Email:', this.formData.confirmEmail);
-      
-      // Check if the error strings are empty (validation passed)
-      return this.errors.email === "" && this.errors.confirmEmail === "";
-    },
-    
-    validateStep3() {
-      this.errors.password = this.regex.password.test(this.formData.password) ? "" : "Password must be at least 8 characters long and contain both letters and numbers.";
-      this.errors.confirmPassword = this.formData.password === this.formData.confirmPassword ? "" : "Passwords must match.";
-      
-      // Check if the error strings are empty (validation passed)
-      return this.errors.password === "" && this.errors.confirmPassword === "";
-    },
-    
-    submitForm() {
-      if (!this.validateStep3()) {
-        console.log("Validation failed for step 3");
-        return;
-      }
-      console.log("Form submitted:", this.formData);
-      alert("Form submitted successfully!");
-    }
   }
 };
+
 </script>
 
 <style scoped>
@@ -341,46 +219,20 @@ html, body {
   text-align: center;
   font-weight: 500;
   margin-bottom: 30px;
+  font-family: "Outfit", sans-serif;
 }
 
 .form-row {
   margin-bottom: 20px;
 }
 
-.form-input {
-  width: 100%;
-  padding: 12px;
-  background-color: #2c3548;
-  color: white;
-  border: 1px solid #3a4560;
-  border-radius: 4px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 16px;
+.circle-container {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-top: 40px;
+  padding-left: 10%;
 }
 
-.form-input::placeholder {
-  color: #8a929e;
-}
 
-.secondary-button {
-  background-color: transparent;
-  color: white;
-  border: 2px solid #5F98EF;
-  font-size: medium;
-  padding: 12px 20px;
-  margin: 8px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 500;
-  min-width: 120px;
-}
-
-/* Fade Transition */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
 </style>

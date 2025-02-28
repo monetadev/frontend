@@ -40,7 +40,7 @@
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Next" @click="moveToStep(2)" :disabled=""/>
+          <SecondaryButton text="Next" @click="moveToStep(2)" />
         </div>
       </div>
       <div v-if="currentStep === 2" class="form-step">
@@ -123,6 +123,12 @@ export default {
       }
     };
   },
+  // computed:{
+  //   // isStep1Valid() {
+  //   //   return this.formData.fname !== '' && this.formData.lname.trim() !== '';
+  //   // },
+  //
+  // },
 methods: {
   moveToStep(step) {
     this.currentStep = step;

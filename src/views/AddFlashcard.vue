@@ -59,12 +59,13 @@ export default {
   transition: margin-left 0.3s ease-in-out;
   margin-left: 250px;
   display: flex;
-  width: 100%;
+  width: calc(100% - 250px);
   padding-top: 80px;
 }
 
 .main-content.collapsed {
   margin-left: 80px;
+  width: calc(100% - 80px);
 }
 
 .content-wrapper {
@@ -72,7 +73,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px;
 }
 
 .content-container {
@@ -81,7 +82,7 @@ export default {
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 900px;
+  max-width: 1000px;
   text-align: center;
   display: flex;
   flex-direction: column;

@@ -18,7 +18,7 @@ export default {
 .progress-line{
   width: 200px;
   height: 2px;
-  background-color: #333;
+  background-color: #121729;
   margin-left: 20px;
   margin-right: 20px;
   transition: background-color 0.3s ease;

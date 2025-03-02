@@ -13,6 +13,14 @@
             <img src="@/assets/book.svg" class="page-icon" alt="Book Icon" />
           </div>
 
+          <div class="progress-container">
+            <ProgressCircle :number="1" :isActive="true" subText="Upload" />
+            <ProgressLine :isActive="true" />
+            <ProgressCircle :number="2" :isActive="false" subText="Review" />
+            <ProgressLine :isActive="false" />
+            <ProgressCircle :number="3" :isActive="false" subText="Organize" />
+          </div>
+
         </div>
 
       </div>
@@ -120,6 +128,14 @@ export default {
 .page-icon {
   width: 170px;
   height: 110px;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 30px 0;
 }
 
 </style>

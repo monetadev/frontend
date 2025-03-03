@@ -1,4 +1,4 @@
-<template>
+<template xmlns="http://www.w3.org/1999/html">
   <div class="page">
     <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
     <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
@@ -15,11 +15,12 @@
 
           <div class="progress-container">
             <ProgressCircle :number="1" :isActive="true" subText="Upload" />
-            <ProgressLine :isActive="true" />
+            <ProgressLine :isActive="false" />
             <ProgressCircle :number="2" :isActive="false" subText="Review" />
             <ProgressLine :isActive="false" />
             <ProgressCircle :number="3" :isActive="false" subText="Organize" />
           </div>
+          <UploadBox/>
 
         </div>
 
@@ -33,6 +34,7 @@ import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import ProgressCircle from "@/components/ProgressCircle.vue";
 import ProgressLine from "@/components/ProgressLine.vue";
+import UploadBox from "@/components/UploadBox.vue";
 
 export default {
   name: "AddFlashcard",
@@ -41,6 +43,7 @@ export default {
     ProgressCircle,
     SidebarNavigation,
     NavigationBar,
+    UploadBox
   },
   data() {
     return {

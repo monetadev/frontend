@@ -21,7 +21,9 @@
             <ProgressCircle :number="3" :isActive="false" subText="Organize" />
           </div>
           <UploadBox/>
-
+          <div class="button-container">
+            <PrimaryButton text="Generate" />
+          </div>
         </div>
 
       </div>
@@ -35,15 +37,17 @@ import NavigationBar from "@/components/TopNavigation.vue";
 import ProgressCircle from "@/components/ProgressCircle.vue";
 import ProgressLine from "@/components/ProgressLine.vue";
 import UploadBox from "@/components/UploadBox.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
 
 export default {
   name: "AddFlashcard",
   components: {
+    PrimaryButton,
     ProgressLine,
     ProgressCircle,
     SidebarNavigation,
     NavigationBar,
-    UploadBox
+    UploadBox,
   },
   data() {
     return {
@@ -141,4 +145,16 @@ export default {
   margin: 30px 0;
 }
 
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.button-container >>> .primary-button {
+  width: 30%;
+  max-width: 200px;
+}
 </style>

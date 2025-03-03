@@ -181,4 +181,9 @@ h2 {
 .browse-btn:hover {
   background: #4a7dd6;
 }
+
+.upload-box.drag-over {
+  border-color: #88b6ff;
+  background-color: #1a2233;
+}
 </style>

@@ -1,9 +1,9 @@
 <template>
   <div class="user-menu" @click="toggleMenu">
-    <div class="avatar">JD</div>
+    <div class="avatar">{{ avatarInitials }}</div>
     <div class="user-info">
-      <p class="name">John Doe</p>
-      <p class="username">@_john.doe1337</p>
+      <p class="name">{{ fullName }}</p>
+      <p class="username">{{ usernameText }}</p>
     </div>
 
     <ul v-if="showMenu" class="dropdown-menu">
@@ -13,26 +13,56 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "UserMenu",
-  data() {
-    return {
-      showMenu: false
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.showMenu = !this.showMenu;
-    },
-    goToSettings() {
-      this.showMenu = false;
-    },
-    logout() {
-      this.showMenu = false;
-    }
+<script setup>
+import { ref, computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { ME_QUERY } from "@/graphql/auth.js";
+
+const { result, loading, error } = useQuery(ME_QUERY);
+
+const user = computed(() => result.value?.me);
+
+const avatarInitials = computed(() => {
+  if (loading.value) return "";
+  if (error.value) return "";
+  if (user.value) {
+    const firstInitial = user.value.firstName ? user.value.firstName.charAt(0) : '';
+    const lastInitial = user.value.lastName ? user.value.lastName.charAt(0) : '';
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   }
-};
+  return "";
+});
+
+const fullName = computed(() => {
+  if (loading.value) return "Loading...";
+  if (error.value) return "Error";
+  if (user.value) {
+    return `${user.value.firstName} ${user.value.lastName}`;
+  }
+  return "Guest";
+});
+
+const usernameText = computed(() => {
+  if (loading.value) return "";
+  if (error.value) return "";
+  if (user.value) {
+    return `@${user.value.username}`;
+  }
+  return "";
+});
+
+const showMenu = ref(false);
+function toggleMenu() {
+  showMenu.value = !showMenu.value;
+}
+function goToSettings() {
+  showMenu.value = false;
+  // TODO: Implement settings logic
+}
+function logout() {
+  showMenu.value = false;
+  // TODO: Implement logout logic
+}
 </script>
 
 <style scoped>

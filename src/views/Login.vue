@@ -9,7 +9,7 @@
       <p class="subtitle">Sign in to your account and start your learning adventure.</p>
 
       <form @submit.prevent="handleLogin">
-        <InputWithIcon iconName="email" label="Email" type="email" v-model="email" />
+        <InputWithIcon iconName="user" label="Username" type="text" v-model="username" />
         <InputWithIcon iconName="lock" label="Password" type="password" v-model="password" />
 
         <div class="remember-container">
@@ -21,39 +21,45 @@
           <router-link to="/reset-password" class="forgot-password">
             Forgot Password?
           </router-link>
-
         </div>
 
         <PrimaryButton text="Sign-In" />
         <div class="signup">
-          <p>New on our platform? <router-link to="/signup">Create Account</router-link></p>
+          <p>
+            New on our platform? <router-link to="/signup">Create Account</router-link>
+          </p>
         </div>
       </form>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { useRouter } from 'vue-router';
 import InputWithIcon from "@/components/InputWithIcon.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
+import { LOGIN_USER } from '@/graphql/auth';
 
-export default {
-  name: "Login",
-  components: {
-    InputWithIcon,
-    PrimaryButton
-  },
-  data() {
-    return {
-      email: "",
-      password: "",
-      rememberMe: false,
+const username = ref('');
+const password = ref('');
+const rememberMe = ref(false);
+const router = useRouter();
+
+const { mutate: loginMutate } = useMutation(LOGIN_USER);
+
+const handleLogin = async () => {
+  try {
+    const variables = {
+      username: username.value,
+      password: password.value
     };
-  },
-  methods: {
-    handleLogin() {
-      console.log("Logging in with", { email: this.email, password: this.password, rememberMe: this.rememberMe });
-    }
+    const result = await loginMutate(variables);
+    console.log("Login successful:", result.data.login);
+    await router.push('/dashboard');
+  } catch (error) {
+    console.error("Login error:", error);
   }
 };
 </script>

@@ -4,13 +4,15 @@ import ResetPassword from './views/ResetPassword.vue';
 import Login from './views/Login.vue';
 import createAccount  from './views/createAccount.vue';
 import AddFlashcard  from './views/AddFlashcard.vue';
+import flash  from './components/GeneratedFlashcard.vue';
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
   { path: '/login', component: Login },
   { path: '/reset-password', component: ResetPassword },
   {path: '/signup', component: createAccount},
-  {path: '/add-flashcard', component: AddFlashcard}
+  {path: '/add-flashcard', component: AddFlashcard},
+  {path: '/flash', component: flash}
 ];
 
 const router = createRouter({

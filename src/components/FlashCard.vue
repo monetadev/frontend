@@ -2,10 +2,10 @@
     <div class="flashcard" @click="flip">
       <div class="flashcard-inner" :class="{ 'flipped': isFlipped }">
         <div class="flashcard-front">
-          <div class="content">{{ frontContent }}</div>
+          <div class="content">{{ term }}</div>
         </div>
         <div class="flashcard-back">
-          <div class="content">{{ backContent }}</div>
+          <div class="content">{{ definiton }}</div>
         </div>
       </div>
     </div>
@@ -15,11 +15,11 @@
   export default {
     name: 'FlashCard',
     props: {
-      frontContent: {
+      term: {
         type: String,
         default: ''
       },
-      backContent: {
+      definiton: {
         type: String,
         default: ''
       }

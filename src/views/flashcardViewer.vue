@@ -9,8 +9,8 @@
 
         <div class="flashcards-container">
           <FlashCard
-            frontContent="What is an Atom?"
-            backContent="The smallest unit of matter."
+            term="What is an Atom?"
+            definiton="The smallest unit of matter."
           />
         </div>
 

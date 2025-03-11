@@ -3,7 +3,10 @@
     <div class="before-form">
       <h1>Create Account</h1>
       <p>The ultimate study experience. Sign up for free!</p>
-      <p>Already have an account? <a class="hyperlink" href="#">Sign in</a></p>
+      <p>
+        Already have an account?
+        <router-link to="/login" class="hyperlink">Sign in</router-link>
+      </p>
     </div>
 
     <div class="circle-container">
@@ -19,24 +22,24 @@
         <h2>Personal Information</h2>
         <div class="form-row">
           <InputForm
-            label="First Name"
-            v-model="formData.firstName"
-            type="text"
-            placeholder="First Name"
-            name="firstName"
-            :required="true"
-            id="firstName"
-            />
+              label="First Name"
+              v-model="formData.fname"
+              type="text"
+              placeholder="First Name"
+              name="firstName"
+              :required="true"
+              id="firstName"
+          />
         </div>
         <div class="form-row">
           <InputForm
-          label="Last Name"
-          v-model="formData.lastName"
-          type="text"
-          placeholder="Last Name"
-          name="lastName"
-          :required="true"
-          id="lastName"
+              label="Last Name"
+              v-model="formData.lname"
+              type="text"
+              placeholder="Last Name"
+              name="lastName"
+              :required="true"
+              id="lastName"
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
@@ -47,22 +50,22 @@
         <h2>Email Information</h2>
         <div class="form-row">
           <InputForm
-          label="Email"
-          v-model="formData.email"
-          type="email"
-          placeholder="Email"
-          name="email"
-          :required="true"
-          id="email"
+              label="Email"
+              v-model="formData.email"
+              type="email"
+              placeholder="Email"
+              name="email"
+              :required="true"
+              id="email"
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Back"  @click="moveToStep(1)"/>
-          <SecondaryButton text="Next" @click="moveToStep(3)"/>
+          <SecondaryButton text="Back" @click="moveToStep(1)" />
+          <SecondaryButton text="Next" @click="moveToStep(3)" />
         </div>
       </div>
       <div v-if="currentStep === 3" class="form-step">
-        <h2> Password Information</h2>
+        <h2>Password Information</h2>
         <div class="form-row">
           <InputForm
               label="Password"
@@ -76,7 +79,7 @@
           <InputForm
               label="Confirm Password"
               v-model="formData.confirmPassword"
-              type="confirm password"
+              type="password"
               placeholder="Confirm Password"
               name="confirmPassword"
               :required="true"
@@ -84,8 +87,8 @@
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Back"  @click="moveToStep(2)"/>
-          <SecondaryButton text="Submit" @click="submitForm"/>
+          <SecondaryButton text="Back" @click="moveToStep(2)" />
+          <SecondaryButton text="Submit" @click="submitForm" />
         </div>
       </div>
     </div>
@@ -98,47 +101,64 @@
   </section>
 </template>
 
-<script>
+<script setup>
+import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMutation } from '@vue/apollo-composable';
 import InputForm from '@/components/inputForms.vue';
 import SecondaryButton from '@/components/SecondaryButton.vue';
 import ProgressCircle from '@/components/ProgressCircle.vue';
 import ProgressLine from '@/components/ProgressLine.vue';
-export default {
-  components: {
-    InputForm,
-    SecondaryButton,
-    ProgressCircle,
-    ProgressLine,
-  },
-  data() {
-    return {
-      currentStep: 1,
-      formData: {
-        fname: '',
-        lname: '',
-        email: '',
-        confirmEmail: '',
-        password: '',
-        confirmPassword: ''
-      }
-    };
-  },
-  // computed:{
-  //   // isStep1Valid() {
-  //   //   return this.formData.fname !== '' && this.formData.lname.trim() !== '';
-  //   // },
-  //
-  // },
-methods: {
-  moveToStep(step) {
-    this.currentStep = step;
-  },
-  submitForm() {
-    alert("Form submitted!");
-  }
-  }
+import { REGISTER_USER } from '@/graphql/auth';
+
+const router = useRouter();
+const currentStep = ref(1);
+const formData = reactive({
+  // TODO: Adjust to properly take username and email. For now, email response is stored as a username.
+  fname: '',
+  lname: '',
+  email: '',
+  confirmEmail: '',
+  password: '',
+  confirmPassword: ''
+});
+
+const { mutate: registerMutate } = useMutation(REGISTER_USER);
+
+const moveToStep = (step) => {
+  currentStep.value = step;
 };
 
+const submitForm = async () => {
+  if (formData.email !== formData.confirmEmail) {
+    alert("Email and Confirm Email do not match!");
+    return;
+  }
+  // TODO: Refactor such that only the validated password gets sent to the backend, not with confirmPassword
+  if (formData.password !== formData.confirmPassword) {
+    alert("Password and Confirm Password do not match!");
+    return;
+  }
+
+  const input = {
+    username: formData.email,
+    email: formData.email,
+    firstName: formData.fname,
+    lastName: formData.lname,
+    password: formData.password,
+    confirmPassword: formData.confirmPassword
+  };
+
+  try {
+    const result = await registerMutate({ input });
+    console.log("Registration successful:", result.data.register);
+    // Optionally update a global auth state here (e.g., via Pinia)
+    await router.push('/dashboard'); // Redirect to a protected route
+  } catch (error) {
+    console.error("Registration error:", error);
+    alert("Registration failed. Please try again.");
+  }
+};
 </script>
 
 <style scoped>

@@ -34,6 +34,7 @@ export default {
   height: 60px;
   transition: left 0.3s ease-in-out;
   font-family: "Outfit", sans-serif;
+  z-index: 1000;
 }
 
 .navbar.collapsed {

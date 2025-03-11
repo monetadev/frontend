@@ -14,15 +14,29 @@
           </div>
 
           <div class="progress-container">
-            <ProgressCircle :number="1" :isActive="true" subText="Upload" />
-            <ProgressLine :isActive="false" />
-            <ProgressCircle :number="2" :isActive="false" subText="Review" />
-            <ProgressLine :isActive="false" />
-            <ProgressCircle :number="3" :isActive="false" subText="Organize" />
+            <ProgressCircle :number="1" :isActive="progressStep >= 1" subText="Upload" />
+            <ProgressLine :isActive="progressStep >= 2" />
+            <ProgressCircle :number="2" :isActive="progressStep >= 2" subText="Review" />
+            <ProgressLine :isActive="progressStep >= 3" />
+            <ProgressCircle :number="3" :isActive="progressStep >= 3" subText="Organize" />
           </div>
-          <UploadBox/>
+
+          <UploadBox v-if="progressStep === 1" />
+
+          <div v-if="progressStep === 2" class="flashcard-container">
+            <Flashcard
+                v-for="(card, index) in flashcards"
+                :key="index"
+                :number="index + 1"
+                :question="card.question"
+                :answer="card.answer"
+                @accept="handleAccept"
+                @reject="handleReject"
+            />
+          </div>
+
           <div class="button-container">
-            <PrimaryButton text="Generate" />
+            <PrimaryButton text="Generate"  @click="goToReview" />
           </div>
         </div>
 
@@ -52,12 +66,18 @@ export default {
   data() {
     return {
       isSidebarCollapsed: false,
+      progressStep: 1,
     };
   },
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+    goToReview() {
+      if (this.progressStep === 1) {
+        this.progressStep = 2;
+      }
+    }
   },
 };
 </script>

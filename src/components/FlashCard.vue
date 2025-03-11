@@ -1,83 +1,90 @@
 <template>
-    <div class="flashcard" :class="{ flipped: isFlipped }" @click="flipCard">
-        <div class="flashcard-inner">
-            <div class="flashcard-front">
-                <slot name="front" v-if="!frontContent">{{ frontContent }}</slot>
-            </div>
-            <div class="flashcard-back">
-                <slot name="back" v-if="!backContent">{{ backContent }}</slot>
-            </div>
+    <div class="flashcard" @click="flip">
+      <div class="flashcard-inner" :class="{ 'flipped': isFlipped }">
+        <div class="flashcard-front">
+          <div class="content">{{ frontContent }}</div>
         </div>
+        <div class="flashcard-back">
+          <div class="content">{{ backContent }}</div>
+        </div>
+      </div>
     </div>
-</template>
-
-<script>
-export default {
+  </template>
+  
+  <script>
+  export default {
     name: 'FlashCard',
     props: {
-        frontContent: {
-            type: String,
-            default: ''
-        },
-        backContent: {
-            type: String,
-            default: ''
-        }
+      frontContent: {
+        type: String,
+        default: ''
+      },
+      backContent: {
+        type: String,
+        default: ''
+      }
     },
     data() {
-        return {
-            isFlipped: false
-        };
+      return {
+        isFlipped: false
+      }
     },
     methods: {
-        flipCard() {
-            this.isFlipped = !this.isFlipped;
-        }
+      flip() {
+        this.isFlipped = !this.isFlipped;
+      }
     }
-};
-</script>
-
-<style scoped>
-.flashcard {
+  };
+  </script>
+  
+  <style scoped>
+  .flashcard {
     perspective: 1000px;
     width: 1071px;
     height: 584.44px;
     margin: auto;
     cursor: pointer;
-    border-radius: 50px;
-    border: 1px solid #000;
-    background: var(--Black, #121729);
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-}
-
-.flashcard-inner {
+  }
+  
+  .flashcard-inner {
     position: relative;
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.6s;
+    transition: transform 0.8s;
     transform-style: preserve-3d;
-}
-
-.flashcard.flipped .flashcard-inner {
+  }
+  
+  .flashcard-inner.flipped {
     transform: rotateY(180deg);
-}
-
-.flashcard-front,
-.flashcard-back {
+  }
+  
+  .flashcard-front,
+  .flashcard-back {
     position: absolute;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    color: white;  
-    display: flex; 
-    align-items: center; 
+    border-radius: 50px;
+    border: 1px solid #000;
+    background: var(--Black, #121729);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  }
+  
+  .content {
+    color: white;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 20px; 
-}
-
-.flashcard-back {
+    width: 100%;
+    height: 100%;
+    font-size: 2rem;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+  }
+  
+  .flashcard-back {
     transform: rotateY(180deg);
-}
-
-</style>
+  }
+  </style>

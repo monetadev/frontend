@@ -1,4 +1,4 @@
-<template xmlns="http://www.w3.org/1999/html">
+<template>
   <div class="page">
     <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
     <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
@@ -36,10 +36,9 @@
           </div>
 
           <div class="button-container">
-            <PrimaryButton text="Generate"  @click="goToReview" />
+            <PrimaryButton text="Generate" @click="goToReview" />
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -52,6 +51,7 @@ import ProgressCircle from "@/components/ProgressCircle.vue";
 import ProgressLine from "@/components/ProgressLine.vue";
 import UploadBox from "@/components/UploadBox.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
+import Flashcard from "@/components/GeneratedFlashcard.vue";
 
 export default {
   name: "AddFlashcard",
@@ -62,11 +62,13 @@ export default {
     SidebarNavigation,
     NavigationBar,
     UploadBox,
+    Flashcard,
   },
   data() {
     return {
       isSidebarCollapsed: false,
       progressStep: 1,
+      flashcards: [],
     };
   },
   methods: {
@@ -76,9 +78,29 @@ export default {
     goToReview() {
       if (this.progressStep === 1) {
         this.progressStep = 2;
+        this.flashcards = [
+          {
+            question: "What is atomic theory?",
+            answer: "A theoretical model stating that atoms are tiny, submicroscopic particles that make up all chemical substances and everything in the macroscopic world.",
+          },
+          {
+            question: "What does the plum pudding model show?",
+            answer: "An atom is a ball of positively charged material with negatively charged particles floating around inside.",
+          },
+          {
+            question: "What did Lavoisier contribute toward the Atomic Theory?",
+            answer: "Proposed the Law of Conservation of Matter and created the metric system.",
+          },
+        ];
       }
+    },
+    handleAccept(number) {
+      //backend
+    },
+    handleReject(number) {
+      //backend
     }
-  },
+  }
 };
 </script>
 
@@ -163,6 +185,19 @@ export default {
   justify-content: center;
   width: 100%;
   margin: 30px 0;
+}
+
+.flashcard-container {
+  background: #121729;
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 90%;
+  gap: 20px;
+
 }
 
 .button-container {

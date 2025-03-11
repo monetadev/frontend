@@ -3,8 +3,18 @@
     <div class="number-container" @mouseover="showEdit = true" @mouseleave="showEdit = false">
       <span v-if="!showEdit" class="number">{{ number }}</span>
       <button v-if="showEdit" class="edit-button" @click="$emit('edit', number)">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
-          <path d="M3 17.25V21h3.75l11.02-11.02-3.75-3.75L3 17.25zM21.71 4.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        <svg viewBox="0 0 90 90" width="30" height="30" fill="white">
+          <g id="icomoon-ignore">
+            <line fill="#FFFFFF" stroke="#449FDB" x1="0" y1="0" x2="0" y2="0"/>
+          </g>
+          <path fill="#FFFFFF" d="M17.304,59.457c-0.135,0.135-0.249,0.291-0.336,0.459L5.412,82.08c-0.378,0.727-0.243,1.611,0.336,2.193
+	c0.36,0.356,0.84,0.549,1.326,0.549c0.294,0,0.594-0.066,0.87-0.213l22.158-11.56c0.168-0.084,0.321-0.2,0.459-0.336l3.099-3.099
+	L20.403,56.361L17.304,59.457z"/>
+          <path fill="#FFFFFF" d="M82.563,7.452c-3.539-3.546-10.4-2.865-14.696,1.437l-5.043,5.04l-3.978-3.978
+	C58.494,9.6,58.02,9.402,57.521,9.402s-0.975,0.195-1.322,0.549L33.657,32.493c-0.732,0.732-0.732,1.92,0,2.652
+	c0.366,0.366,0.846,0.552,1.326,0.552s0.96-0.187,1.323-0.552l21.209-21.213l2.655,2.655L23.046,53.712l13.257,13.254l37.128-37.119
+	c0.731,0.732,1.571,0.732,2.307,0c0.734-0.732-0.348-1.917-0.348-2.649v-0.006l5.385-5.043C85.23,17.697,86.221,11.115,82.563,7.452
+	z"/>
         </svg>
       </button>
     </div>
@@ -172,12 +182,12 @@ button {
 }
 
 .approve {
-  background: #5cb85c;
+  background: #6B9B4F;
   border-radius: 20px 0 20px 0px;
 }
 
 .reject {
-  background: #d9534f;
+  background: #CD5951;
   border-radius: 20px 0 20px 0px;
 }
 </style>

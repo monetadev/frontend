@@ -2,7 +2,7 @@
   <div class="flashcard">
     <div class="number-container" @mouseover="showEdit = true" @mouseleave="showEdit = false">
       <span v-if="!showEdit" class="number">{{ number }}</span>
-      <button v-if="showEdit" class="edit-button" @click="$emit('edit', number)">
+      <button v-if="showEdit" class="edit-button" @click="openEditModal">
         <svg viewBox="0 0 90 90" width="30" height="30" fill="white">
           <g id="icomoon-ignore">
             <line fill="#FFFFFF" stroke="#449FDB" x1="0" y1="0" x2="0" y2="0"/>
@@ -39,12 +39,26 @@
         </svg>
       </button>
     </div>
+
+
+    <EditFlashcardModal
+        :isOpen="isEditModalOpen"
+        :question="question"
+        :answer="answer"
+        @save="updateFlashcard"
+        @close="isEditModalOpen = false"
+    />
   </div>
 </template>
 
 <script>
+import EditFlashcardModal from './EditFlashcardModal.vue';
+
 export default {
   name: "Flashcard",
+  components: {
+    EditFlashcardModal
+  },
   props: {
     number: Number,
     question: String,
@@ -54,12 +68,20 @@ export default {
     return {
       showEdit: false,
       isApproved: false,
+      isEditModalOpen: false
     };
   },
   methods: {
     toggleApproval(status) {
       this.isApproved = status;
       this.$emit(status ? "approve" : "reject", this.number);
+    },
+    openEditModal() {
+      this.isEditModalOpen = true;
+    },
+    updateFlashcard(updatedData) {
+      this.$emit("update", { number: this.number, ...updatedData });
+      this.isEditModalOpen = false;
     }
   }
 };

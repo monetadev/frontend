@@ -87,6 +87,7 @@ export default {
   align-items: center;
   backdrop-filter: blur(10px);
   transition: opacity 0.3s ease-in-out;
+  z-index: 1000;
 }
 
 .modal-content {

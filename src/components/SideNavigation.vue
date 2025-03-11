@@ -7,7 +7,7 @@
         </svg>
       </button>
       <transition name="fade">
-        <span v-if="!isCollapsed" class="logo">MonetA</span>
+        <span v-if="!isCollapsed" class="logo">Moneta</span>
       </transition>
     </div>
 

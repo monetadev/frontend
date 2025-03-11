@@ -23,6 +23,10 @@
 
           <UploadBox v-if="progressStep === 1" />
 
+          <div  v-if="progressStep === 1" class="button-container">
+            <PrimaryButton text="Generate" @click="goToReview" />
+          </div>
+
           <div v-if="progressStep === 2" class="flashcard-container">
             <Flashcard
                 v-for="(card, index) in flashcards"
@@ -35,8 +39,14 @@
             />
           </div>
 
-          <div class="button-container">
-            <PrimaryButton text="Generate" @click="goToReview" />
+          <div  v-if="progressStep === 2" class="button-container">
+            <PrimaryButton text="Organize" @click="goToOrganize" />
+          </div>
+
+          <div v-if="progressStep === 3" class="organize-section">
+
+
+
           </div>
         </div>
       </div>
@@ -69,6 +79,29 @@ export default {
       isSidebarCollapsed: false,
       progressStep: 1,
       flashcards: [],
+      selectedInstitution: null,
+      selectedCourse: null,
+      searchInstitution: "",
+      searchCourse: "",
+      courseCode: "",
+      isPrivate: true,
+      showDropdown: null,
+      institutions: [
+        "Farmingdale State College",
+        "Stonybrook University",
+        "New York University",
+        "Yale University"
+      ],
+      courses: [
+        "BIO101",
+        "CHEM 130",
+        "CHEM 101",
+        "CSC 343",
+        "MATH 201",
+        "PHY 102"
+      ],
+      filteredInstitutions: [],
+      filteredCourses: []
     };
   },
   methods: {
@@ -91,15 +124,50 @@ export default {
             question: "What did Lavoisier contribute toward the Atomic Theory?",
             answer: "Proposed the Law of Conservation of Matter and created the metric system.",
           },
+          {
+            question: "What does the Law of Conservation of Matter state?",
+            answer: "Matter cannot be created or destroyed. It can only be converted into other matter.",
+          },
         ];
       }
     },
+
     handleAccept(number) {
       //backend
     },
     handleReject(number) {
       //backend
+    },
+    goToOrganize() {
+      this.progressStep = 3;
+    },
+    toggleDropdown(type) {
+      this.showDropdown = this.showDropdown === type ? null : type;
+    },
+    selectInstitution(institution) {
+      this.selectedInstitution = institution;
+      this.searchInstitution = institution;
+      this.showDropdown = null;
+    },
+    selectCourse(course) {
+      this.selectedCourse = course;
+      this.searchCourse = course;
+      this.showDropdown = null;
+    },
+    filterInstitutions() {
+      this.filteredInstitutions = this.institutions.filter(inst =>
+          inst.toLowerCase().includes(this.searchInstitution.toLowerCase())
+      );
+    },
+    filterCourses() {
+      this.filteredCourses = this.courses.filter(course =>
+          course.toLowerCase().includes(this.searchCourse.toLowerCase())
+      );
     }
+  },
+  mounted() {
+    this.filteredInstitutions = [...this.institutions];
+    this.filteredCourses = [...this.courses];
   }
 };
 </script>
@@ -212,4 +280,5 @@ export default {
   width: 30%;
   max-width: 200px;
 }
+
 </style>

@@ -6,6 +6,7 @@ import createAccount  from './views/createAccount.vue';
 import AddFlashcard  from './views/AddFlashcard.vue';
 import flash  from './components/GeneratedFlashcard.vue';
 import Settings from './views/Settings.vue';
+import Set from './views/flashsetViewer.vue';
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -14,7 +15,10 @@ const routes = [
   {path: '/signup', component: createAccount},
   {path: '/add-flashcard', component: AddFlashcard},
   {path: '/flash', component: flash},
+  {path: '/set', component: Set},
+
   { path: '/settings', component: Settings}
+
 ];
 
 const router = createRouter({

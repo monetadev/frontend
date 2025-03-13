@@ -55,19 +55,12 @@
     data() {
       return {
         isSidebarCollapsed: false,
-        mode: 'dark'
+        
       };
     },
     methods: {
       toggleSidebar() {
         this.isSidebarCollapsed = !this.isSidebarCollapsed;
-      },
-        changeStyle () {
-      if (this.mode === 'dark') {
-        this.mode = 'light'
-      } else {
-        this.mode = 'dark'
-      }
       },
     },
   };

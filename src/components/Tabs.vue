@@ -73,10 +73,7 @@
   .tab-buttons button:hover {
     border-bottom: 2px solid #5F98EF; 
   }
-  
-  .tab-content {
-    padding: 1rem;
-  }
+
   
   .fade-enter-active, .fade-leave-active {
     transition: opacity 0.5s;

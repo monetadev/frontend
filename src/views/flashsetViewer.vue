@@ -20,14 +20,15 @@
           <setBar />  
 
         </div>
+        
 
 
         <div class='wrapper'>
     <tabs :mode="mode">
-      <tab title="Flashcard Sets">Contents</tab>
-      <tab title="Practice Test">Contents</tab>
-      <tab title="Study Guides">Contents</tab>
-      <tab title="Expert solutions">Contents</tab>
+      <tab title="Flashcard Sets">Contents1</tab>
+      <tab title="Practice Test">Contents2</tab>
+      <tab title="Study Guides">COntents3</tab>
+      <tab title="Expert solutions">Contents4</tab>
     </tabs>
   </div>
 
@@ -69,7 +70,6 @@
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
-  /* Ensures sidebar doesn't overlap content */
   .flashset-set-viewer {
     display: flex;
     background-color: #22293A;
@@ -77,34 +77,30 @@
     font-family: "Outfit", sans-serif;
   }
   
-  /* Make sidebar fixed so it stays in place */
   .SidebarNavigation {
     position: fixed;
     left: 0;
     top: 0;
-    width: 250px; /* Adjust to match sidebar width */
+    width: 250px;
     height: 100vh;
-    z-index: 50; /* Lower than main content */
+    z-index: 50; 
     background-color: #22293A;
   }
   
-  /* Push main content to the right */
   .main-content {
-    margin-left: 250px; /* Adjust to match sidebar width */
+    margin-left: 250px; 
     flex: 1;
     transition: margin-left 0.3s ease-in-out;
     position: relative;
-    z-index: 100; /* Higher than sidebar */
+    z-index: 100; 
     padding: 20px;
-    margin-top: 60px; /* Added space to prevent overlap with the navigation bar */
+    margin-top: 60px; 
   }
   
-  /* Adjust when sidebar is collapsed */
   .main-content.collapsed {
-    margin-left: 80px; /* Adjust for collapsed state */
+    margin-left: 80px; 
   }
   
-  /* Fix the visibility issue */
   .Top {
     display: flex;
     justify-content: space-between;
@@ -117,19 +113,20 @@
     z-index: 110; 
   }
   
-  /* Ensure text is visible */
   .Top h1 {
     font-size: 2rem;
     font-weight: bold;
     padding: 10px;
     color: white;
   }
-  .nav{
-    padding-left: 1%
-    ;
-  }
+
   .Search_Bar{
-    padding-left: 5%;
+    padding-left: 2%;
   }
+  .wrapper{
+    padding-left: 2%;
+    padding-top: 5%;
+  }
+  
   </style>
   

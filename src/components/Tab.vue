@@ -12,6 +12,7 @@
         default: "Tab"
       }
     },
+
     data() {
       return {
         isActive: false
@@ -31,15 +32,15 @@
     min-height: 400px;
     border-radius: 10px;
   }
-  
   .tabs__light .tab {
     background-color: #fff;
     color: rgb(255, 255, 255);
   }
-  
-  .tabs__dark .tab {
-    background-color: #555;
-    color: #eee;
+  .tab-content {
+    color: #fff;
+    font-family: "OUtFit", sans-serif;
   }
+  
+
   </style>
   

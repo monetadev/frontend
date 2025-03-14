@@ -22,7 +22,7 @@
               <Panel number="10" username="chris" title="OS Quiz 2" />
             </div>
             <div class="panel-wrapper">
-              <Panel number="22" username="Gagn" title="AI & Machine Learing" />
+              <Panel number="22" username="Gagan" title="AI & Machine Learing" />
             </div>
             <div class="divide">
               <divider time="Last week"/>

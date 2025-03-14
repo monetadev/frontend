@@ -48,8 +48,8 @@
   
   .tab-buttons {
     display: flex;
-    justify-content: flex-start; /* Align tabs to the left */
-    margin-bottom: 0; /* No margin between buttons */
+    justify-content: flex-start; 
+    margin-bottom: 0; 
   }
   
   .tab-buttons button {

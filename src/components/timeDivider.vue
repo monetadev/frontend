@@ -1,6 +1,7 @@
 <template>
     <div class="time-divider">
-        <span>{{ time }}</span>
+        <!-- datetime -->
+        <span>{{ time }}</span> 
         <hr />
     </div>
 </template>

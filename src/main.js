@@ -4,6 +4,7 @@ import apolloClient from './plugins/apollo';
 import { DefaultApolloClient } from '@vue/apollo-composable';
 import App from './App.vue';
 import router from './router.js'; // Import the router
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const app = createApp({
     setup() {

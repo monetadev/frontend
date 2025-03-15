@@ -15,7 +15,7 @@
       
       <div class="icon-container">
         <div class="prev-next">
-          <PrevIcon active @click="prevCard"/>
+          <PrevIcon active :disabled="currIndex === 0" @click="prevCard"/>     
           <counterDisplay :current="currIndex+1" :total="flashcards.length" />
           <NextIcon active @click="nextCard"/>
         </div>
@@ -102,16 +102,17 @@ export default {
       this.transitionName = 'slide-left';
     },
 
-  prevCard(){
-    this.prevIndex = this.currIndex;
+    prevCard() {
+  // Save the current index as the previous index before changing the current index
+  this.prevIndex = this.currIndex;
 
-    if(this.currIndex > 0){
-      this.currIndex--;
-    } else {
-      this.currIndex = this.flashcards.length - 1;
-    }
-    this.transitionName = 'slide-right';
-  },
+  if (this.currIndex > 0) {
+    this.currIndex--;  // Move to the previous card
+  } else {
+    this.currIndex = this.flashcards.length - 1;  // Go to the last card if at the start
+  }
+  this.transitionName = 'slide-right';  // Set the transition
+},
   shuffleCards() {
       const shuffled = [...this.flashcards];
       for (let i = shuffled.length - 1; i > 0; i--) {

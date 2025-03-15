@@ -1,9 +1,9 @@
 <template>
     <div class="settings-wrapper">
-      <SideNavigation />
-      <div class="settings-main">
-        <TopNavigation />
-        <div class="settings-content-wrapper">
+      <SideNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
+      <div class="settings-main":class="{ 'collapsed': isSidebarCollapsed }">
+        <TopNavigation :isSidebarCollapsed="isSidebarCollapsed" />
+        <div class="settings-content-wrapper" :class="{ 'collapsed': isSidebarCollapsed }">
           <!-- Settings Sidebar -->
           <aside class="settings-sidebar">
             <h2 class="settings-title">Settings</h2>
@@ -252,6 +252,8 @@
       
        isDarkMode: true, // Default mode is light mode
 
+       isSidebarCollapsed: false,
+
     };
 
     
@@ -273,7 +275,11 @@
     if (file) {
       this.user.profilePicture = URL.createObjectURL(file); // Show preview of selected image
     }
-  }
+  },
+
+  toggleSidebar() {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    }
 
     
 
@@ -318,6 +324,12 @@
     margin-left: 450px; /* Move it further right */
     max-width: 1000px; /* Limit the settings page width */
   }
+
+  .settings-content-wrapper.collapsed {
+    transition: margin-left 0.3s ease-in-out;
+    margin-left: 300px; /* Adjusted margin when sidebar is collapsed */
+  }
+
   
   /* Sidebar Styling */
   .settings-sidebar {

@@ -5,32 +5,30 @@
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
       <div class="content">
   
-        <FlashcardTitle title="Biology" />
+        <FlashcardTitle :title="currentDeck.title" />
 
-        <div class="flashcards-container">
-          <FlashCard
-            term="What is an Atom?"
-            definiton="The smallest unit of matter."
-          />
-        </div>
-
-      </div>
+        <transitionName :name="transitionName">
+          <div class="flashcard-wrapper" :key="currIndex">
+            <FlashCard :term="currentFlashcard.term" :definition="currentFlashcard.definition" />
+          </div>
+        </transitionName>
       
       <div class="icon-container">
         <div class="prev-next">
-          <PrevIcon active />
-          <counterDisplay :current="1" :total="10" />
-          <NextIcon active />
+          <PrevIcon active @click="prevCard"/>
+          <counterDisplay :current="currIndex+1" :total="flashcards.length" />
+          <NextIcon active @click="nextCard"/>
         </div>
 
         <div class="full-screen-container">
-              <shuffle active />
+              <shuffle active @click="shuffleCards" />
               <PlayButtonIcon active />
               <FullScreenIcon active />
         </div>
       </div> 
     </div>
   </div> 
+</div>
 </template>
 
 <script>
@@ -102,8 +100,8 @@ export default {
         this.currIndex = 0;
       }
       this.transitionName = 'slide-left';
-    }
-  },
+    },
+
   prevCard(){
     this.prevIndex = this.currIndex;
 
@@ -123,6 +121,7 @@ export default {
       this.flashcards = shuffled;
       this.currentIndex = 0;
     }
+},
 };
 </script>
 

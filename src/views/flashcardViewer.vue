@@ -7,11 +7,11 @@
   
         <FlashcardTitle :title="currentDeck.title" />
 
-        <transitionName :name="transitionName">
+        <transition :name="transitionName">
           <div class="flashcard-wrapper" :key="currIndex">
-            <FlashCard :term="currentFlashcard.term" :definition="currentFlashcard.definition" />
+            <FlashCard :term="currentFlashcard.term" :definiton="currentFlashcard.definition" />
           </div>
-        </transitionName>
+        </transition>
       
       <div class="icon-container">
         <div class="prev-next">
@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     currentFlashcard() {
-      return this.flashcards[this.currentIndex] || { term: "", definition: "" };
+      return this.flashcards[this.currIndex] || { term: "", definition: "" };
     },
   },
   methods: {
@@ -119,7 +119,7 @@ export default {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
       this.flashcards = shuffled;
-      this.currentIndex = 0;
+      this.currIndex = 0;
     }
 },
 };
@@ -146,34 +146,73 @@ export default {
   padding-top: 5%;
   color: white;
   padding-left: 1%;
+  position: relative;
+  overflow: hidden;
+  height: 100%; /* Ensure content area has full height */
+}
+
+/* Flashcard container needs proper positioning */
+.flashcard-wrapper {
+  position: absolute;
+  width: 100%;
+  z-index: 5; /* Set z-index to ensure visibility */
+  top: 100px; /* Adjust this value to position below controls */
+  padding-top: 70px;
+}
+
+/* Transition styles for sliding cards */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.5s ease;
+}
+
+.slide-left-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
 }
 
 .icon-container {
   display: flex;
-  top: 10px; 
-  left: 20px; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-top: 20px; 
-  padding-left: 42%; 
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-left: 500px;
+  padding-top: 600px;
+  position: relative;
+  z-index: 10; /* Keep controls above flashcards */
+
 }
 
 .prev-next,
 .full-screen-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   gap: 50px;
+  padding-left: 75px;
 }
 
 .prev-next svg,
 .full-screen-container svg {
   width: 40px;
-  height: 40px; 
+  height: 40px;
 }
 
 .full-screen-container {
-  margin-left: auto; 
+  margin-left: auto;
   padding-right: 20%;
 }
 

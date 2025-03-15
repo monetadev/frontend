@@ -93,7 +93,36 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+    nextCard(){
+      this.prevIndex = this.currIndex;
+
+      if(this.currIndex < this.flashcards.length - 1){
+        this.currIndex++;
+      } else {
+        this.currIndex = 0;
+      }
+      this.transitionName = 'slide-left';
+    }
   },
+  prevCard(){
+    this.prevIndex = this.currIndex;
+
+    if(this.currIndex > 0){
+      this.currIndex--;
+    } else {
+      this.currIndex = this.flashcards.length - 1;
+    }
+    this.transitionName = 'slide-right';
+  },
+  shuffleCards() {
+      const shuffled = [...this.flashcards];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      this.flashcards = shuffled;
+      this.currentIndex = 0;
+    }
 };
 </script>
 

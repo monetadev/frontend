@@ -108,9 +108,14 @@ export default {
 
   if (this.currIndex > 0) {
     this.currIndex--;  // Move to the previous card
+    console.log(this.currIndex);
   } else {
-    this.currIndex = this.flashcards.length - 1;  // Go to the last card if at the start
+    this.currIndex = this.flashcards.length-1; 
+    console.log(this.currIndex);
+    // Go to the last card if at the start
   }
+  console.log(this.currIndex);
+
   this.transitionName = 'slide-right';  // Set the transition
 },
   shuffleCards() {

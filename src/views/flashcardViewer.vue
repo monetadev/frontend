@@ -7,28 +7,34 @@
   
         <FlashcardTitle :title="currentDeck.title" />
 
-        <transition :name="transitionName">
-          <div class="flashcard-wrapper" :key="currIndex">
-            <FlashCard :term="currentFlashcard.term" :definiton="currentFlashcard.definition" />
-          </div>
-        </transition>
+        <div class="flashcard-container">
+          <FlashCard 
+            :term="currentFlashcard.term" 
+            :definition="currentFlashcard.definition" 
+            ref="flashcard"
+          />
+        </div>
       
-      <div class="icon-container">
-        <div class="prev-next">
-          <PrevIcon active :disabled="currIndex === 0" @click="prevCard"/>     
-          <counterDisplay :current="currIndex+1" :total="flashcards.length" />
-          <NextIcon active @click="nextCard"/>
-        </div>
+        <div class="icon-container">
+          <div class="prev-next">
+            <PrevIcon 
+              active 
+              :disabled="currIndex === 0" 
+              @click="prevCardDebounced"
+            />     
+            <counterDisplay :current="currIndex+1" :total="flashcards.length" />
+            <NextIcon active @click="nextCardDebounced"/>
+          </div>
 
-        <div class="full-screen-container">
-              <shuffle active @click="shuffleCards" />
-              <PlayButtonIcon active />
-              <FullScreenIcon active />
-        </div>
-      </div> 
-    </div>
-  </div> 
-</div>
+          <div class="full-screen-container">
+            <shuffle active @click="shuffleCards" />
+            <PlayButtonIcon active />
+            <FullScreenIcon active />
+          </div>
+        </div> 
+      </div>
+    </div> 
+  </div>
 </template>
 
 <script>
@@ -60,15 +66,9 @@ export default {
   data() {
     return {
       isSidebarCollapsed: true,
-      currIndex : 0,
-      prevIndex:0, 
-      transitionName: 'slide-left',
-
-      currentDeck:{
-        id : 1,
-        title: "Biology",
-      },
-      flashcards:[
+      currIndex: 0,
+      isNavigating: false, 
+      flashcards: [
         {id: 1, term: "What is an Atom?", definition: "The smallest unit of matter."},
         {id: 2, term: "What is a Molecule?", definition: "A group of atoms bonded together."},
         {id: 3, term: "What is a Cell?", definition: "The basic unit of life."},
@@ -78,8 +78,11 @@ export default {
         {id: 7, term: "What is an Organism?", definition: "An individual living thing."},
         {id: 8, term: "What is a Population?", definition: "A group of organisms of the same species that live in the same area."},
         {id: 9, term: "What is a Community?", definition: "All the populations of different species that live in the same area."},
-        
-      ]
+      ],
+      currentDeck: {
+        id: 1,
+        title: "Biology",
+      }
     };
   },
   computed: {
@@ -91,34 +94,48 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
-    nextCard(){
-      this.prevIndex = this.currIndex;
 
-      if(this.currIndex < this.flashcards.length - 1){
+    //These Debounce Methods Prevent Spamming the Next and Previous Buttons
+    
+    nextCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
+      
+      this.nextCard();
+      
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
+    
+    prevCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
+      
+      this.prevCard();
+      
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
+    
+    //Methods for Navigation
+    nextCard() {
+      if (this.currIndex < this.flashcards.length - 1) {
         this.currIndex++;
       } else {
         this.currIndex = 0;
       }
-      this.transitionName = 'slide-left';
     },
-
     prevCard() {
-  // Save the current index as the previous index before changing the current index
-  this.prevIndex = this.currIndex;
-
-  if (this.currIndex > 0) {
-    this.currIndex--;  // Move to the previous card
-    console.log(this.currIndex);
-  } else {
-    this.currIndex = this.flashcards.length-1; 
-    console.log(this.currIndex);
-    // Go to the last card if at the start
-  }
-  console.log(this.currIndex);
-
-  this.transitionName = 'slide-right';  // Set the transition
-},
-  shuffleCards() {
+      if (this.currIndex > 0) {
+        this.currIndex--;
+      } else {
+        this.currIndex = this.flashcards.length - 1;
+      }
+    },
+    
+    shuffleCards() {
       const shuffled = [...this.flashcards];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -127,7 +144,7 @@ export default {
       this.flashcards = shuffled;
       this.currIndex = 0;
     }
-},
+  },
 };
 </script>
 
@@ -153,53 +170,23 @@ export default {
   color: white;
   padding-left: 1%;
   position: relative;
-  overflow: hidden;
-  height: 100%; /* Ensure content area has full height */
+  height: 100%;
 }
 
-/* Flashcard container needs proper positioning */
-.flashcard-wrapper {
-  position: absolute;
-  width: 100%;
-  z-index: 5; /* Set z-index to ensure visibility */
-  top: 100px; /* Adjust this value to position below controls */
-  padding-top: 70px;
-}
-
-/* Transition styles for sliding cards */
-.slide-left-enter-active,
-.slide-left-leave-active,
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.5s ease;
-}
-
-.slide-left-enter-from {
-  transform: translateX(100%);
-}
-
-.slide-left-leave-to {
-  transform: translateX(-100%);
-}
-
-.slide-right-enter-from {
-  transform: translateX(-100%);
-}
-
-.slide-right-leave-to {
-  transform: translateX(100%);
+.flashcard-container {
+  margin-top: 20px;
+  position: relative;
+  z-index: 5;
 }
 
 .icon-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 5px;
   padding-left: 500px;
-  padding-top: 600px;
-  position: relative;
-  z-index: 10; /* Keep controls above flashcards */
-
+  padding-top: 30px;
+  z-index: 10;
 }
 
 .prev-next,

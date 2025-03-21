@@ -5,32 +5,36 @@
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
       <div class="content">
   
-        <FlashcardTitle title="Biology" />
+        <FlashcardTitle :title="currentDeck.title" />
 
-        <div class="flashcards-container">
-          <FlashCard
-            term="What is an Atom?"
-            definiton="The smallest unit of matter."
+        <div class="flashcard-container">
+          <FlashCard 
+            :term="currentFlashcard.term" 
+            :definition="currentFlashcard.definition" 
+            ref="flashcard"
           />
         </div>
-
-      </div>
       
-      <div class="icon-container">
-        <div class="prev-next">
-          <PrevIcon active />
-          <counterDisplay :current="1" :total="10" />
-          <NextIcon active />
-        </div>
+        <div class="icon-container">
+          <div class="prev-next">
+            <PrevIcon 
+              active 
+              :disabled="currIndex === 0" 
+              @click="prevCardDebounced"
+            />     
+            <counterDisplay :current="currIndex+1" :total="flashcards.length" />
+            <NextIcon active @click="nextCardDebounced"/>
+          </div>
 
-        <div class="full-screen-container">
-              <shuffle active />
-              <PlayButtonIcon active />
-              <FullScreenIcon active />
-        </div>
-      </div> 
-    </div>
-  </div> 
+          <div class="full-screen-container">
+            <shuffle active @click="shuffleCards" />
+            <PlayButtonIcon active />
+            <FullScreenIcon active />
+          </div>
+        </div> 
+      </div>
+    </div> 
+  </div>
 </template>
 
 <script>
@@ -62,12 +66,84 @@ export default {
   data() {
     return {
       isSidebarCollapsed: true,
+      currIndex: 0,
+      isNavigating: false, 
+      flashcards: [
+        {id: 1, term: "What is an Atom?", definition: "The smallest unit of matter."},
+        {id: 2, term: "What is a Molecule?", definition: "A group of atoms bonded together."},
+        {id: 3, term: "What is a Cell?", definition: "The basic unit of life."},
+        {id: 4, term: "What is a Tissue?", definition: "A group of cells that work together to perform a specific function."},
+        {id: 5, term: "What is an Organ?", definition: "A group of tissues that work together to perform a specific function."},
+        {id: 6, term: "What is an Organ System?", definition: "A group of organs that work together to perform a specific function."},
+        {id: 7, term: "What is an Organism?", definition: "An individual living thing."},
+        {id: 8, term: "What is a Population?", definition: "A group of organisms of the same species that live in the same area."},
+        {id: 9, term: "What is a Community?", definition: "All the populations of different species that live in the same area."},
+      ],
+      currentDeck: {
+        id: 1,
+        title: "Biology",
+      }
     };
+  },
+  computed: {
+    currentFlashcard() {
+      return this.flashcards[this.currIndex] || { term: "", definition: "" };
+    },
   },
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+
+    //These Debounce Methods Prevent Spamming the Next and Previous Buttons
+    
+    nextCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
+      
+      this.nextCard();
+      
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
+    
+    prevCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
+      
+      this.prevCard();
+      
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
+    
+    //Methods for Navigation
+    nextCard() {
+      if (this.currIndex < this.flashcards.length - 1) {
+        this.currIndex++;
+      } else {
+        this.currIndex = 0;
+      }
+    },
+    prevCard() {
+      if (this.currIndex > 0) {
+        this.currIndex--;
+      } else {
+        this.currIndex = this.flashcards.length - 1;
+      }
+    },
+    
+    shuffleCards() {
+      const shuffled = [...this.flashcards];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      this.flashcards = shuffled;
+      this.currIndex = 0;
+    }
   },
 };
 </script>
@@ -93,34 +169,43 @@ export default {
   padding-top: 5%;
   color: white;
   padding-left: 1%;
+  position: relative;
+  height: 100%;
+}
+
+.flashcard-container {
+  margin-top: 20px;
+  position: relative;
+  z-index: 5;
 }
 
 .icon-container {
   display: flex;
-  top: 10px; 
-  left: 20px; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-top: 20px; 
-  padding-left: 42%; 
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+  padding-left: 500px;
+  padding-top: 30px;
+  z-index: 10;
 }
 
 .prev-next,
 .full-screen-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   gap: 50px;
+  padding-left: 75px;
 }
 
 .prev-next svg,
 .full-screen-container svg {
   width: 40px;
-  height: 40px; 
+  height: 40px;
 }
 
 .full-screen-container {
-  margin-left: auto; 
+  margin-left: auto;
   padding-right: 20%;
 }
 

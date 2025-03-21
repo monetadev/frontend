@@ -1,3 +1,27 @@
-body {
-    background-color: #121729;
+/* src/assets/main.css */
+:root {
+    /* Default/dark theme */
+    --bg-primary: #121729;
+    --bg-secondary: #22293A;
+    --bg-tertiary: #2b364f;
+    --text-primary: #ffffff;
+    --border-color: #3b3e56;
+    --input-bg: #121729;
+    --sidebar-active: #5f98ef;
+    --button-bg: #2a335a;
+    --button-hover: #5f98ef;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+.light-theme {
+    --bg-primary: #f5f7fa;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #eaeef3;
+    --text-primary: #333333;
+    --border-color: #d1d9e6;
+    --input-bg: #ffffff;
+    --sidebar-active: #4169e1;
+    --button-bg: #e0e7ff;
+    --button-hover: #4169e1;
+    --shadow-color: rgba(0, 0, 0, 0.1);
 }

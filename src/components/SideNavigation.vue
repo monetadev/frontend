@@ -13,19 +13,26 @@
 
     <div class="menu-container">
       <ul class="menu">
-        <li
+        <!-- Replace li with router-link -->
+        <router-link
             v-for="item in menuItems"
             :key="item.name"
-            :class="{ active: activeMenu === item.name }"
-            @click="setActive(item.name)"
+            :to="item.path"
+            custom
+            v-slot="{ navigate, isActive }"
         >
-          <span class="icon">
-            <component :is="item.icon" :active="activeMenu === item.name" />
-          </span>
-          <transition name="fade">
-            <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
-          </transition>
-        </li>
+          <li
+              :class="{ active: isActive || activeMenu === item.name }"
+              @click="setActive(item.name, navigate)"
+          >
+            <span class="icon">
+              <component :is="item.icon" :active="isActive || activeMenu === item.name" />
+            </span>
+            <transition name="fade">
+              <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
+            </transition>
+          </li>
+        </router-link>
       </ul>
     </div>
   </div>
@@ -56,12 +63,12 @@ export default {
     return {
       activeMenu: "Dashboard",
       menuItems: [
-        { name: "Dashboard", icon: DashboardIcon },
-        { name: "My Stuffs", icon: MyStuffsIcon },
-        { name: "Add Flashcards", icon: FlashcardsIcon },
-        { name: "Quizzes", icon: QuizzesIcon },
-        { name: "Explore", icon: ExploreIcon },
-        { name: "Settings", icon: SettingsIcon },
+        { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
+        { name: "My Stuffs", icon: MyStuffsIcon, path: "/mystuffs" },
+        { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
+        { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
+        { name: "Explore", icon: ExploreIcon, path: "/explore" },
+        { name: "Settings", icon: SettingsIcon, path: "/settings" },
       ],
     };
   },
@@ -69,10 +76,27 @@ export default {
     toggleSidebar() {
       this.$emit("toggle");
     },
-    setActive(menuName) {
+    // Modified to use the navigate function from router-link
+    setActive(menuName, navigate) {
       this.activeMenu = menuName;
+      navigate(); // This uses Vue Router's built-in navigation
     },
   },
+  // Add this lifecycle hook to set the active menu based on current route
+  mounted() {
+    // Get the current route path
+    const currentPath = this.$router.currentRoute.value.path;
+
+    // Find the menu item that matches the current route
+    const currentMenu = this.menuItems.find(item =>
+        currentPath.startsWith(item.path)
+    );
+
+    // If found, set it as active
+    if (currentMenu) {
+      this.activeMenu = currentMenu.name;
+    }
+  }
 };
 </script>
 

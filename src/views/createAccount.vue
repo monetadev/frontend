@@ -11,10 +11,8 @@
 
     <div class="circle-container">
       <ProgressCircle :number="1" :is-active="currentStep >= 1" />
-      <ProgressLine :is-active="currentStep >= 2" />
-      <ProgressCircle :number="2" :is-active="currentStep >= 2" />
-      <ProgressLine :is-active="currentStep === 3" />
-      <ProgressCircle :number="3" :is-active="currentStep === 3" />
+      <ProgressLine :is-active="currentStep === 2" />
+      <ProgressCircle :number="2" :is-active="currentStep === 2" />
     </div>
 
     <div class="container">
@@ -22,8 +20,30 @@
         <h2>Personal Information</h2>
         <div class="form-row">
           <InputForm
+              label="Username"
+              v-model="usernameInput"
+              type="text"
+              placeholder="Username"
+              name="username"
+              :required="true"
+              id="username"
+          />
+        </div>
+        <div class="form-row">
+          <InputForm
+              label="Email"
+              v-model="emailInput"
+              type="text"
+              placeholder="Email"
+              name="email"
+              :required="true"
+              id="email"
+          />
+        </div>
+        <div class="form-row">
+          <InputForm
               label="First Name"
-              v-model="formData.fname"
+              v-model="firstnameInput"
               type="text"
               placeholder="First Name"
               name="firstName"
@@ -34,7 +54,7 @@
         <div class="form-row">
           <InputForm
               label="Last Name"
-              v-model="formData.lname"
+              v-model="lastnameInput"
               type="text"
               placeholder="Last Name"
               name="lastName"
@@ -42,44 +62,29 @@
               id="lastName"
           />
         </div>
+
         <div style="text-align: center; margin-top: 20px">
           <SecondaryButton text="Next" @click="moveToStep(2)" />
         </div>
       </div>
       <div v-if="currentStep === 2" class="form-step">
-        <h2>Email Information</h2>
-        <div class="form-row">
-          <InputForm
-              label="Email"
-              v-model="formData.email"
-              type="email"
-              placeholder="Email"
-              name="email"
-              :required="true"
-              id="email"
-          />
-        </div>
-        <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Back" @click="moveToStep(1)" />
-          <SecondaryButton text="Next" @click="moveToStep(3)" />
-        </div>
-      </div>
-      <div v-if="currentStep === 3" class="form-step">
         <h2>Password Information</h2>
         <div class="form-row">
           <InputForm
               label="Password"
-              v-model="formData.password"
+              v-model="passwordInput"
               type="password"
               placeholder="Password"
               name="password"
               :required="true"
               id="password"
           />
+        </div>
+        <div class="form-row">
           <InputForm
               label="Confirm Password"
-              v-model="formData.confirmPassword"
-              type="password"
+              v-model="confirmPasswordInput"
+              type="confirmPassword"
               placeholder="Confirm Password"
               name="confirmPassword"
               :required="true"
@@ -87,7 +92,7 @@
           />
         </div>
         <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Back" @click="moveToStep(2)" />
+          <SecondaryButton text="Back" @click="moveToStep(1)" />
           <SecondaryButton text="Submit" @click="submitForm" />
         </div>
       </div>
@@ -113,48 +118,60 @@ import { REGISTER_USER } from '@/graphql/auth';
 
 const router = useRouter();
 const currentStep = ref(1);
-const formData = reactive({
-  // TODO: Adjust to properly take username and email. For now, email response is stored as a username.
-  fname: '',
-  lname: '',
-  email: '',
-  confirmEmail: '',
-  password: '',
-  confirmPassword: ''
-});
+const usernameInput = ref('');
+const emailInput = ref('');
+const firstnameInput = ref('');
+const lastnameInput = ref('');
+const passwordInput = ref('');
+const confirmPasswordInput = ref('');
+
+// const formData = reactive({
+//   // TODO: Adjust to properly take username and email. For now, email response is stored as a username.
+//   fname: '',
+//   lname: '',
+//   email: '',
+//   username: '',
+//   password: '',
+//   confirmPassword: ''
+// });
 
 const { mutate: registerMutate } = useMutation(REGISTER_USER);
 
 const moveToStep = (step) => {
+  // TODO: Insert toast for step 1...
   currentStep.value = step;
 };
 
 const submitForm = async () => {
-  if (formData.email !== formData.confirmEmail) {
-    alert("Email and Confirm Email do not match!");
-    return;
-  }
+
   // TODO: Refactor such that only the validated password gets sent to the backend, not with confirmPassword
-  if (formData.password !== formData.confirmPassword) {
+  if (passwordInput.value !== confirmPasswordInput.value) {
     alert("Password and Confirm Password do not match!");
     return;
   }
 
   const input = {
-    username: formData.email,
-    email: formData.email,
-    firstName: formData.fname,
-    lastName: formData.lname,
-    password: formData.password,
-    confirmPassword: formData.confirmPassword
+    username: usernameInput.value,
+    email: emailInput.value,
+    firstName: firstnameInput.value,
+    lastName: lastnameInput.value,
+    password: passwordInput.value,
   };
 
   try {
+
+    //TODO: Display loading 'alert' here
+
     const result = await registerMutate({ input });
+
+    // TODO: Display successful login message
     console.log("Registration successful:", result.data.register);
+
     // Optionally update a global auth state here (e.g., via Pinia)
     await router.push('/dashboard'); // Redirect to a protected route
   } catch (error) {
+
+    // TODO: Insert toast here....
     console.error("Registration error:", error);
     alert("Registration failed. Please try again.");
   }

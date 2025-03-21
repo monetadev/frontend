@@ -15,6 +15,9 @@
 <script>
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 export default {
   name: "Dashboard",
@@ -31,6 +34,9 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+
+
+
   },
 };
 </script>

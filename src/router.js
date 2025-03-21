@@ -18,7 +18,8 @@ const routes = [
   {path: '/flash', component: flash},
   {path: '/set', component: Set},
   {path: '/view', component: View},
-  { path: '/settings', component: Settings}
+  { path: '/settings', component: Settings},
+  { path: '/', component: Dashboard },
 
 ];
 

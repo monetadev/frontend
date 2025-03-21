@@ -17,10 +17,14 @@
 import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { ME_QUERY } from "@/graphql/auth.js";
+import {useRouter} from "vue-router";
 
 const { result, loading, error } = useQuery(ME_QUERY);
 
 const user = computed(() => result.value?.me);
+
+const router = useRouter();
+
 
 const avatarInitials = computed(() => {
   if (loading.value) return "";
@@ -52,17 +56,25 @@ const usernameText = computed(() => {
 });
 
 const showMenu = ref(false);
+
 function toggleMenu() {
   showMenu.value = !showMenu.value;
 }
+
+//route to settings
 function goToSettings() {
   showMenu.value = false;
-  // TODO: Implement settings logic
+  router.push('/settings');
 }
+
 function logout() {
   showMenu.value = false;
-  // TODO: Implement logout logic
+  // TODO: Implement logout logic (JWT cookie management)
+
+  //navigate to login screen
+  router.push('/login');
 }
+
 </script>
 
 <style scoped>

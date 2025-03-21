@@ -41,7 +41,7 @@
             <h2 class="section-title">{{ getTitle }}</h2>
   
             <div v-if="activeTab === 'account'" class="settings-section">
-              <h2>Account Settings</h2>
+              <h2>Edit Account Settings?</h2>
 
               
               <!-- Profile Picture Section -->
@@ -90,18 +90,20 @@
               </div>
 
 
-              <!-- Timezone -->
+              <!-- Creation Date -->
               <div class="input-group">
-                <label>Timezone:</label>
-                <select v-model="user.timezone" class="input-field">
-                  <option value="GMT-5">Eastern Time (GMT-5)</option>
-                  <option value="GMT-8">Pacific Time (GMT-8)</option>
-                  <option value="GMT+1">Central European Time (GMT+1)</option>
-                </select>
+                <label>Creation Date:</label>
+                <input type="text" :value= "formattedCreationDate" class="read-only-field" readonly/>
+              </div>
+
+              <!-- LastUpdated -->
+              <div class="input-group">
+                <label>Last Updated:</label>
+                <input type="text" :value= "formattedLastUpdated" class="read-only-field" readonly/>
               </div>
 
               <!-- Save Button -->
-              <button class="save-button" @click="saveAccountSettings">Save Changes</button>
+              <button class="save-button" @click="handleUserUpdated" :disabled="!isUserDataLoaded">Save Changes</button>
             </div>
 
   
@@ -127,18 +129,21 @@
  
             </div>
 
-            
+
+
             <div v-if="activeTab === 'theme'" class="settings-section">
               <h2>Theme Settings</h2>
               <p>Change Your Theme!</p>
-              
-              <!-- Theme Toggle Switch -->
+
+              <!-- Theme Toggle Switch - Composition API -->
               <label class="theme-switch">
-                <input type="checkbox" v-model="isDarkMode" @change="toggleTheme">
+                <input type="checkbox" v-model="themeStore.isDarkMode" @change="toggleTheme">
                 <span class="slider"></span>
               </label>
-              
-              <p>Current Mode: <strong>{{ isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
+
+              <p>Current Mode: <strong>{{ themeStore.isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
+              <!-- OR for Options API: -->
+              <!-- <p>Current Mode: <strong>{{ isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p> -->
             </div>
             
             <!-- Deleted Notifications to save for later
@@ -213,80 +218,176 @@
       </div>
     </div>
   </template>
-  
-  <script>
-  import SideNavigation from "@/components/SideNavigation.vue";
-  import TopNavigation from "@/components/TopNavigation.vue";
 
-  
-  
-  
-  export default {
-  components: {
-    SideNavigation,
-    TopNavigation,
-  },
-  data() {
-    return {
-      
-      activeTab: 'account',
-      user: {
-      profilePicture: "https://cdn2.momjunction.com/wp-content/uploads/2019/07/Whatsapp-DP-Images-For-Boys-1.jpg.avif", // Placeholder image URL
-      firstname: "John",
-      lastname: "Doe",
-      username: "johndoe123",
-      email: "john.doe@example.com",
-      bio: "Passionate developer, coffee lover, and tech enthusiast.",
-      language: "en",
-      timezone: "GMT-5",
-    },
+<script setup>
+import { useThemeStore } from "@/stores/themeStore";
+import SideNavigation from "@/components/SideNavigation.vue";
+import TopNavigation from "@/components/TopNavigation.vue";
+import { ref, reactive, computed, watch } from 'vue';
+import {useMutation, useQuery} from '@vue/apollo-composable';
+import {UPDATE_USER, ME_QUERY} from "@/graphql/auth.js"
+import apolloClient from '../plugins/apollo.js';
 
-    //  notifications: { email: true },
-      users: [
-        { uuid: "123", username: "johndoe", email: "john@example.com", dateCreated: "2024-01-01", lastUpdated: "2024-03-01", roles: ["Admin"] },
-        { uuid: "456", username: "janedoe", email: "jane@example.com", dateCreated: "2023-11-15", lastUpdated: "2024-02-20", roles: ["User"] }
-      ],
-      roleOptions: ["Admin", "Editor", "User"],
-      selectedRoles: {},
 
-      
-       isDarkMode: true, // Default mode is light mode
+// execute graphql 'me' query to retrieve current user data
+const { result, loading, error } = useQuery(ME_QUERY);
 
-       isSidebarCollapsed: false,
+// //fetched the current user
+// const queriedUser = computed(() => result.value?.me);
 
-    };
+//update user details
+const { mutate: updateUser } = useMutation(UPDATE_USER);
 
-    
+// Use the theme store
+const themeStore = useThemeStore();
 
-  },
-  methods: {
-    
-    updateUserRole(uuid) {
-      const newRole = this.selectedRoles[uuid];
-      const user = this.users.find(user => user.uuid === uuid);
-      
-      if (user) {
-        user.roles = [newRole]; // Replace existing role
+// Reactive state
+const activeTab = ref('account');
+const isSidebarCollapsed = ref(false);
+
+
+// Add this to your component's computed properties
+const formattedLastUpdated = computed(() => {
+  if (!user.lastUpdated) return '';
+  return user.lastUpdated.split('T')[0]; // Shows "2025-03-20"
+});
+
+// Add this to your component's computed properties
+const formattedCreationDate = computed(() => {
+  if (!user.creationDate) return '';
+  return user.creationDate.split('T')[0]; // Shows "2025-03-20"
+});
+
+const user = reactive({
+  profilePicture: "https://cdn2.momjunction.com/wp-content/uploads/2019/07/Whatsapp-DP-Images-For-Boys-1.jpg.avif",
+  firstname: "",
+  lastname: "",
+  username: "",
+  email: "",
+  bio: "Passionate developer, coffee lover, and tech enthusiast.",
+  language: "en",
+  creationDate: "",
+  lastUpdated: "",
+});
+
+// Add this computed property
+const isUserDataLoaded = computed(() => {
+  return !loading.value && result.value?.me?.id;
+});
+
+// Watch for query results and update user data
+watch(() => result.value?.me, (userData) => {
+  if (userData) {
+    user.firstname = userData.firstName;
+    user.lastname = userData.lastName;
+    user.username = userData.username;
+    user.email = userData.email;
+    user.creationDate = userData.creationDate;
+    user.lastUpdated = userData.lastUpdated;
+  }
+}, { immediate: true });
+
+const users = ref([
+  { uuid: "123", username: "johndoe", email: "john@example.com", dateCreated: "2024-01-01", lastUpdated: "2024-03-01", roles: ["Admin"] },
+  { uuid: "456", username: "janedoe", email: "jane@example.com", dateCreated: "2023-11-15", lastUpdated: "2024-02-20", roles: ["User"] }
+]);
+
+const roleOptions = ref(["Admin", "Moderator", "User"]);
+const selectedRoles = ref({});
+
+// Computed properties
+const getTitle = computed(() => {
+  return activeTab.value.charAt(0).toUpperCase() + activeTab.value.slice(1) + ' Settings';
+});
+
+// Methods
+function toggleSidebar() {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+}
+
+function toggleTheme() {
+  themeStore.toggleTheme();
+}
+
+function updateUserRole(uuid) {
+  const newRole = selectedRoles.value[uuid];
+  const user = users.value.find(user => user.uuid === uuid);
+
+  if (user) {
+    user.roles = [newRole];
+  }
+}
+
+
+
+function uploadProfilePicture(event) {
+  const file = event.target.files[0];
+  if (file) {
+    user.profilePicture = URL.createObjectURL(file);
+  }
+}
+
+const handleUserUpdated = async () => {
+  try {
+
+    //used to retrieve the UUID for the currently logged-in user
+    const userId = result.value?.me;
+
+    //calling updateUser query
+    await apolloClient.mutate({
+      mutation: UPDATE_USER,
+      variables: {
+        id: userId.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstname,
+        lastName: user.lastname
+      },
+
+      //update apollo client cache
+      update: (cache, { data }) => {
+        const updatedUser = data.updateUser;
+
+        cache.writeQuery({
+          query: ME_QUERY,
+          data:{
+            me:{
+              ...result.value.me,
+              firstName: updatedUser.firstName,
+              lastName: updatedUser.lastName,
+              username: updatedUser.username,
+              email: updatedUser.email,
+              lastUpdated: updatedUser.lastUpdated
+            }
+          }
+        })
       }
-    },
+    });
+    alert("User updated successfully.");
+  }
+  catch (error) {
 
-    uploadProfilePicture(event) {
-    const file = event.target.files[0];
-    if (file) {
-      this.user.profilePicture = URL.createObjectURL(file); // Show preview of selected image
-    }
-  },
-
-  toggleSidebar() {
-      this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    }
-
-    
+    // TODO: Handle exceptions thrown
+    //graphql mutation failed
+    console.log(error);
 
   }
-};
+}
 
-  </script>
+// TODO: Implement password changing mutation
+// const changePassword() = async () => {
+//   try{
+//
+//
+//
+//     // TODO: Display successful message
+//     alert('Password changed successfully!');
+//   }
+//   catch (error) {
+//
+//   }
+// }
+</script>
 
   
 
@@ -303,8 +404,8 @@
   .settings-wrapper {
     display: flex;
     height: 100vh;
-    background: #121729; /* Back ground color */
-    color: white;
+    background: var(--bg-primary);
+    color: var(--text-primary);
   }
   
   /* Main Content Area */
@@ -335,7 +436,7 @@
   .settings-sidebar {
     width: 240px; /* Reduced sidebar width */
     min-width: 220px;
-    background: #22293A; /* Sidebar background color */
+    background: var(--bg-secondary);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
@@ -375,7 +476,7 @@
   }
   
   .settings-sidebar li.active {
-    background: #5f98ef;  /* When button is clicked */
+    background: var(--sidebar-active);
   }
   
   /* Settings Content */
@@ -383,7 +484,7 @@
   .settings-content {
     flex: 1;
     padding: 30px;
-    background: #22293A; /* Main Content background color */
+    background: var(--bg-secondary);
     border-radius: 12px;
     margin-left: 50px; /* Increase space between sidebar and content */
     max-width: 800px; /* Limit content width */
@@ -401,7 +502,7 @@
   
   /* Individual Setting Sections */
   .settings-section {
-    background:  #121729;
+    background: var(--bg-primary);
     padding: 30px;
     border-radius: 12px;
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
@@ -423,9 +524,9 @@
     width: 95%;
     padding: 12px;
     border-radius: 8px;
-    border: 2px solid #31406d; /* Adds a border */ /* Another Color: #4a5f9e */
-    background: #121729;
-    color: white;
+    border: 2px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
     font-size: 16px;
     outline: none; /* Removes default outline */
     transition: border 0.3s;
@@ -435,11 +536,20 @@
     border-color: #5f98ef; /* Changes border color when input is focused   */ 
 }
 
+.display-field {
+  width: 95%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 16px;
+}
 
 
 
-  
-  /* Save Button */
+
+/* Save Button */
   .save-button {
     background: #2a335a;
     color: white;
@@ -610,8 +720,19 @@ input:checked + .slider:before {
   border-color: #5f98ef;
 }
 
-
-
+.read-only-field {
+  /* Just copy all properties from input-field */
+  width: 95%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: var(--input-bg); /* Change this if you want a different background */
+  color: var(--text-primary);
+  font-size: 16px;
+  outline: none;
+  /* Optional: add a subtle visual cue that it's read-only */
+  cursor: not-allowed;
+}
 
 
 
@@ -623,8 +744,6 @@ input:checked + .slider:before {
 
   */
 
-
-  
   </style>
   
 

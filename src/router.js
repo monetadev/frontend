@@ -8,6 +8,7 @@ import flash  from './components/GeneratedFlashcard.vue';
 import Settings from './views/Settings.vue';
 import Set from './views/flashsetViewer.vue';
 import View from './views/flashcardViewer.vue';
+import Create from './views/createSet.vue';
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -18,7 +19,8 @@ const routes = [
   {path: '/flash', component: flash},
   {path: '/set', component: Set},
   {path: '/view', component: View},
-  { path: '/settings', component: Settings}
+  { path: '/settings', component: Settings},
+  {path: '/create', component: Create}
 
 ];
 

@@ -1,6 +1,5 @@
 <template>
     <div class="input-container">
-      <label :for="id"><b>{{ label }}</b></label>
       <input
           :type="type"
           :value="value"
@@ -35,18 +34,9 @@
       margin-bottom: 15px;
     }
 
- label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  font-size: 16px;
-  color: white;
-  font-family: "Outfit";
-}
-
 
 input {
-  width: 50%;
+  width: 130%;
   background-color: #585858;
   padding: 10px;
   margin: 5px 0 22px 0;

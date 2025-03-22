@@ -13,7 +13,6 @@
           
           <div class="input-forms-container">
             <createForm
-              label="Title"
               v-model="formData.title"
               type="text"
               placeholder="Give your flashcard set a title"
@@ -84,7 +83,7 @@
   }
   
   .input-forms-container {
-    padding-left: 10%;
+    padding-left: 12%;
     padding-right: 10%;
     margin-top: 20px;
     width: 100%;

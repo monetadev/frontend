@@ -17,7 +17,8 @@ const routes = [
   {path: '/add-flashcard', component: AddFlashcard},
   {path: '/flash', component: flash},
   {path: '/set', component: Set},
-  {path: '/view', component: View},
+  {path: '/view/:id', component: View},
+  {path: '/view', redirect: '/set'}, // Redirect old path to sets
   { path: '/settings', component: Settings},
   { path: '/', component: Dashboard },
 

@@ -56,9 +56,13 @@ const handleLogin = async () => {
       password: password.value
     };
     const result = await loginMutate(variables);
+
+    //TODO: Implement login successful screen
     console.log("Login successful:", result.data.login);
     await router.push('/dashboard');
   } catch (error) {
+
+    //TODO: Implement alert here + clear username + password field
     console.error("Login error:", error);
   }
 };

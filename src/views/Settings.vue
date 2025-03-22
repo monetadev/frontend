@@ -21,13 +21,6 @@
                 <i class="fas fa-moon"></i>
                 <span>Theme</span>
               </li>
-              
-              <!--Deleted Notifications to save for later
-              <li :class="{ active: activeTab === 'notifications' }" @click="activeTab = 'notifications'">
-                <i class="fas fa-bell"></i>
-                <span>Notifications</span>
-              </li>
-              -->
 
               <li :class="{ active: activeTab === 'admin' }" @click="activeTab = 'admin'">
               <i class="fas fa-tools"></i>
@@ -135,15 +128,12 @@
               <h2>Theme Settings</h2>
               <p>Change Your Theme!</p>
 
-              <!-- Theme Toggle Switch - Composition API -->
               <label class="theme-switch">
                 <input type="checkbox" v-model="themeStore.isDarkMode" @change="toggleTheme">
                 <span class="slider"></span>
               </label>
 
               <p>Current Mode: <strong>{{ themeStore.isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
-              <!-- OR for Options API: -->
-              <!-- <p>Current Mode: <strong>{{ isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p> -->
             </div>
             
             <!-- Deleted Notifications to save for later
@@ -157,31 +147,65 @@
 
             <div v-if="activeTab === 'admin'" class="settings-section">
             <h2>Admin Settings</h2>
-            <div class="table-container">
-              <!-- Users Table -->
-              <table class="admin-table">
-                <thead>
+              <div class="table-container">
+                <!-- Loading indicator -->
+                <div v-if="usersLoading && !paginatedUsers.length" class="loading-indicator">
+                  Loading users...
+                </div>
+
+                <!-- Error display -->
+                <div v-if="usersError" class="error-message">
+                  Error loading users: {{ usersError.message }}
+                </div>
+
+                <!-- Users Table -->
+                <table v-if="paginatedUsers.length" class="admin-table">
+                  <thead>
                   <tr>
-                    <th>Uuid</th>
+                    <th>ID</th>
                     <th>Username</th>
                     <th>Email</th>
                     <th>Date Created</th>
                     <th>Last Updated</th>
                     <th>Roles</th>
                   </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="user in users" :key="user.uuid">
-                    <td>{{ user.uuid }}</td>
+                  </thead>
+                  <tbody>
+                  <tr v-for="user in paginatedUsers" :key="user.id">
+                    <td>{{ user.id }}</td>
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.dateCreated }}</td>
-                    <td>{{ user.lastUpdated }}</td>
-                    <td>{{ user.roles.join(', ') }}</td>
+                    <td>{{ user.creationDate.split('T')[0] }}</td>
+                    <td>{{ user.lastUpdated?.split('T')[0] || '—' }}</td>
+                    <td>{{ user.roles.map(role => role.name).join(', ') }}</td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
+                  </tbody>
+                </table>
+
+                <!-- Pagination controls -->
+                <div v-if="paginatedUsers.length" class="pagination-controls">
+                  <button
+                      @click="prevPage"
+                      :disabled="pageInfo.currentPage <= 0"
+                      class="pagination-button"
+                  >
+                    Previous
+                  </button>
+
+                  <span class="page-info">
+      Page {{ pageInfo.currentPage + 1 }} of {{ pageInfo.totalPages }}
+      ({{ pageInfo.totalElements }} total users)
+    </span>
+
+                  <button
+                      @click="nextPage"
+                      :disabled="pageInfo.currentPage >= pageInfo.totalPages - 1"
+                      class="pagination-button"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
 
             <!-- Roles Management -->
             <h2>Role Management</h2>
@@ -225,9 +249,52 @@ import SideNavigation from "@/components/SideNavigation.vue";
 import TopNavigation from "@/components/TopNavigation.vue";
 import { ref, reactive, computed, watch } from 'vue';
 import {useMutation, useQuery} from '@vue/apollo-composable';
-import {UPDATE_USER, ME_QUERY} from "@/graphql/auth.js"
+import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS} from "@/graphql/auth.js"
 import apolloClient from '../plugins/apollo.js';
 
+const currentPage = ref(0);
+const pageSize = ref(10);
+
+const {
+  result: usersResult,
+  loading: usersLoading,
+  error: usersError
+} = useQuery(
+    FIND_ALL_USERS,
+    () => ({
+      page: currentPage.value,
+      size: pageSize.value
+    }),
+    {
+      fetchPolicy: 'cache-and-network'
+    }
+);
+
+// Parse the results
+const paginatedUsers = computed(() => {
+  return usersResult.value?.findAllUsers?.items || [];
+});
+
+const pageInfo = computed(() => {
+  return usersResult.value?.findAllUsers?.pageInfo || {
+    currentPage: 0,
+    totalPages: 0,
+    totalElements: 0
+  };
+});
+
+// Pagination control methods
+function nextPage() {
+  if (currentPage.value < pageInfo.value.totalPages - 1) {
+    currentPage.value++;
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 0) {
+    currentPage.value--;
+  }
+}
 
 // execute graphql 'me' query to retrieve current user data
 const { result, loading, error } = useQuery(ME_QUERY);
@@ -246,13 +313,12 @@ const activeTab = ref('account');
 const isSidebarCollapsed = ref(false);
 
 
-// Add this to your component's computed properties
 const formattedLastUpdated = computed(() => {
   if (!user.lastUpdated) return '';
   return user.lastUpdated.split('T')[0]; // Shows "2025-03-20"
 });
 
-// Add this to your component's computed properties
+
 const formattedCreationDate = computed(() => {
   if (!user.creationDate) return '';
   return user.creationDate.split('T')[0]; // Shows "2025-03-20"
@@ -363,6 +429,8 @@ const handleUserUpdated = async () => {
         })
       }
     });
+
+    //TODO: Display successful message
     alert("User updated successfully.");
   }
   catch (error) {
@@ -732,6 +800,53 @@ input:checked + .slider:before {
   outline: none;
   /* Optional: add a subtle visual cue that it's read-only */
   cursor: not-allowed;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 10px;
+  background: #22293A;
+  border-radius: 8px;
+}
+
+.pagination-button {
+  background: #2a335a;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: #5f98ef;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: white;
+  font-weight: bold;
+}
+
+.loading-indicator, .error-message {
+  padding: 20px;
+  text-align: center;
+  background: #22293A;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  color: #ff6b6b;
 }
 
 

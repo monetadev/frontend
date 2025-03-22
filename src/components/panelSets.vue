@@ -32,12 +32,8 @@
           title: this.title,
           number: this.number
         });
-        this.$router.push(`/view`);
-        /*
-        TODO: I will need to work with backend to have id of the specifc flashcard set route you to the specific flashcard View page
-        */
-
-        // this.$router.push(`/view/${this.uuuid}`);
+        // Route to the flashcard viewer with the set ID
+        this.$router.push(`/view/${this.id}`);
       }
     }
   };

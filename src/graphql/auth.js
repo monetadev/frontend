@@ -51,20 +51,114 @@ export const UPDATE_USER = gql`
     }
 `;
 
-// export const FIND_ALL_USERS = gql`
-//     query FindAllUsers ($page: Int!, $size: Int!){
-//         findAllUsers(page: $page, size: $size) {
-//             items{
-//
-//             }
-//             pageInfo{
-//
-//             }
-//         }
-//     }
-// `;
+export const FIND_ALL_USERS = gql`
+    query FindAllUsers ($page: Int!, $size: Int!){
+        findAllUsers(page: $page, size: $size) {
+            items{
+                id
+                username
+                email
+                firstName
+                lastName
+                creationDate
+                lastUpdated
+                roles{
+                    id
+                    name
+                }
+            }
+            pageInfo{
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
 
+export const GET_ALL_MY_SETS = gql`
+    query Me {
+        me{
+            flashcardSets{
+                author{
+                    id
+                    username
+                }
+                creationDate
+                title
+                description
+                flashcards{
+                    id
+                    term
+                    definition
+                    updatedAt
+                }
+            }
+        }
+    }
+`;
 
+export const GET_FLASHCARD_SET_BY_ID = gql`
+    query findFlashcardSetByID($id: UUID!){
+        findFlashcardSetById(id: $id) {
+            id
+            title
+            description
+            author{
+                username
+            }
+            flashcards{
+                id
+                term
+                definition
+                position
+            }
+        }
+    }
+`;
+
+//Uses default pagination values (page 0, size 10)
+export const GET_ROLES = gql`
+    query roles {
+        roles{
+            items{
+                id
+                name
+                privileges{
+                    id
+                    name
+                }
+            }
+            pageInfo{
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+//Custom pagination values
+
+export const GET_ROLES_PAGINATED = gql`
+    query GetRolesPaginated($page: Int, $size: Int) {
+        roles(page: $page, size: $size) {
+            items {
+                id
+                name
+                privileges {
+                    id
+                    name
+                }
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
 
 
 // export const CHANGE_PASSWORD = gql`

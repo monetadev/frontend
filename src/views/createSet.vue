@@ -10,7 +10,10 @@
               <Saved text="Saved" :show="true" />
             </div>
           </div>
-          
+          <div class = "button-container">
+            <sButton text="Create" />
+            <sButton text="Clear" />
+          </div>
           <div class="input-forms-container">
             <createForm
               v-model="formData.title"
@@ -20,6 +23,25 @@
               :required="true"
               id="title"
             />
+            <createForm
+              v-model="formData.description"
+              type="text"
+              placeholder="Description"
+              name="description"
+              :required="false"
+              id="description"
+            />
+          </div>
+          <div class="create-Panels">
+            <createPanel :number="1"  @update-flashcard="handleFlashcardUpdate" 
+            />
+            <createPanel :number="2"  @update-flashcard="handleFlashcardUpdate" 
+            />
+            <createPanel :number="3"  @update-flashcard="handleFlashcardUpdate" 
+            />
+            <createPanel :number="4"  @update-flashcard="handleFlashcardUpdate" 
+            />
+            <addCard @add-card="handleAddCard" />
           </div>
         </div>
       </div>
@@ -31,9 +53,11 @@
   import SideNavigation from '@/components/SideNavigation.vue';
   import TopNavigation from '@/components/TopNavigation.vue';
   import Saved from '@/components/saved.vue';
-  import InputForms from '@/components/inputForms.vue';
+  import sButton from '@/components/SecondaryButton.vue'
   import createForm from '@/components/createForm.vue';
   import FCTitle from '@/components/FlashcardTitle.vue';
+  import createPanel from '@/components/createPanel.vue';
+  import addCard from '@/components/addCardCreate.vue';
   
   const isSidebarCollapsed = ref(true);
   const show = ref(false);
@@ -46,6 +70,14 @@
   function toggleSidebar() {
     isSidebarCollapsed.value = !isSidebarCollapsed.value;
     console.log("Sidebar toggled:", isSidebarCollapsed.value);
+  }
+  function handleFlashcardUpdate(flashcardData){
+    // Handle the updated flashcard data
+    console.log(flashcardData); // Contains {term, definition, position}
+  }
+  function handleAddCard(){
+    // Add a new flashcard panel
+    console.log("Add a new flashcard panel");
   }
   </script>
   
@@ -89,7 +121,16 @@
     width: 100%;
     max-width: 800px;
   }
-  
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    padding-right: 6%;
+  }
+  .create-Panels {
+    margin-top: 20px;
+    padding-left: 12%;
+  }
   @media (max-width: 768px) {
     .header-container {
       flex-direction: column;

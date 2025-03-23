@@ -217,6 +217,7 @@
   <script>
   import SideNavigation from "@/components/SideNavigation.vue";
   import TopNavigation from "@/components/TopNavigation.vue";
+  import eventBus from '../eventBus';
 
   
   
@@ -279,7 +280,15 @@
 
   toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    }
+    },
+
+  saveAccountSettings() {
+    eventBus.emit('toast', {
+      msg: 'Settings saved!',
+      type: 'success',
+      duration: 3000
+    })
+  }
 
     
 

@@ -15,7 +15,6 @@ const routes = [
   { path: '/reset-password', component: ResetPassword },
   {path: '/signup', component: createAccount},
   {path: '/add-flashcard', component: AddFlashcard},
-  {path: '/flash', component: flash},
   {path: '/set', component: Set},
   {path: '/view', component: View},
   { path: '/settings', component: Settings}

@@ -1,5 +1,6 @@
 <template>
   <div :class="['mode-box', { selected: isSelected }]" @click="$emit('click')">
+    <component :is="iconComponent" :active="isSelected" />
     <span>{{ label }}</span>
   </div>
 </template>

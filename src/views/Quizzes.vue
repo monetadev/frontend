@@ -18,11 +18,11 @@
                 v-for="mode in modes"
                 :key="mode.label"
                 :label="mode.label"
+                :iconComponent="mode.iconComponent"
                 :isSelected="selectedMode === mode.label"
                 @click="selectedMode = mode.label"
             />
           </div>
-
 
 
         </div>
@@ -36,6 +36,9 @@ import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import ModeSelectionBox from "@/components/ModeSelectionBox.vue";
+import MultipleChoiceIcon from "@/components/icons/MultipleChoiceIcon.vue";
+import TrueFalseIcon from "@/components/icons/TrueFalseIcon.vue";
+import OneWordIcon from "@/components/icons/OneWordIcon.vue";
 export default {
   name: "Quizzes",
   components: {
@@ -43,6 +46,9 @@ export default {
     NavigationBar,
     PrimaryButton,
     ModeSelectionBox,
+    MultipleChoiceIcon,
+    TrueFalseIcon,
+    OneWordIcon,
   },
   data() {
     return {
@@ -55,9 +61,9 @@ export default {
       questionCount: 10,
       reviewMode: false,
       modes: [
-        { label: "Multiple Choice", },
-        { label: "True/False",},
-        { label: "One-word", },
+        { label: "Multiple Choice", iconComponent: MultipleChoiceIcon },
+        { label: "True/False", iconComponent: TrueFalseIcon },
+        { label: "One-word", iconComponent: OneWordIcon },
       ],
     };
   },

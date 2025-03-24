@@ -13,6 +13,15 @@
             <img src="@/assets/book.svg" class="page-icon" alt="Book Icon" />
           </div>
 
+          <div class="modes">
+            <ModeSelectionBox
+                v-for="mode in modes"
+                :key="mode.label"
+                :label="mode.label"
+                :isSelected="selectedMode === mode.label"
+                @click="selectedMode = mode.label"
+            />
+          </div>
 
 
 
@@ -26,13 +35,14 @@
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-
+import ModeSelectionBox from "@/components/ModeSelectionBox.vue";
 export default {
   name: "Quizzes",
   components: {
     SidebarNavigation,
     NavigationBar,
     PrimaryButton,
+    ModeSelectionBox,
   },
   data() {
     return {
@@ -44,7 +54,11 @@ export default {
       lockedNav: false,
       questionCount: 10,
       reviewMode: false,
-
+      modes: [
+        { label: "Multiple Choice", },
+        { label: "True/False",},
+        { label: "One-word", },
+      ],
     };
   },
   methods: {

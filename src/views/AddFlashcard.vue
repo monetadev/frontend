@@ -45,8 +45,66 @@
 
           <div v-if="progressStep === 3" class="organize-section">
 
+            <div class="form-group">
+              <label>Institution</label>
+              <input
+                  type="text"
+                  v-model="searchInstitution"
+                  @focus="toggleDropdown('institution')"
+                  @input="filterInstitutions"
+                  placeholder="Search Institution"
+              />
+              <ul v-if="showDropdown === 'institution'" class="dropdown">
+                <li
+                    v-for="(institution, index) in filteredInstitutions"
+                    :key="index"
+                    @click="selectInstitution(institution)"
+                >
+                  {{ institution }}
+                </li>
+              </ul>
+            </div>
 
+            <div class="form-group">
+              <label>Course</label>
+              <input
+                  type="text"
+                  v-model="searchCourse"
+                  @focus="toggleDropdown('course')"
+                  @input="filterCourses"
+                  placeholder="Search Course"
+              />
+              <ul v-if="showDropdown === 'course'" class="dropdown">
+                <li
+                    v-for="(course, index) in filteredCourses"
+                    :key="index"
+                    @click="selectCourse(course)"
+                >
+                  {{ course }}
+                </li>
+              </ul>
+            </div>
 
+            <div class="form-group">
+              <label>Title</label>
+              <input
+                  type="text"
+                  v-model="courseCode"
+                  placeholder="Enter Title for Flashcard Set"
+              />
+            </div>
+
+            <div class="form-group privacy-toggle">
+              <label>Privacy</label>
+              <label class="custom-switch">
+                <input type="checkbox" v-model="isPrivate" />
+                <span class="custom-slider">{{ isPrivate ? 'Private' : 'Public' }}</span>
+              </label>
+            </div>
+
+          </div>
+          <div  v-if="progressStep === 3" class="button-container">
+            <PrimaryButton text="Save" @click="saveFlashCards" />
           </div>
         </div>
       </div>
@@ -90,7 +148,18 @@ export default {
         "Farmingdale State College",
         "Stonybrook University",
         "New York University",
-        "Yale University"
+        "Yale University",
+        "Columbia University",
+        "Cornell University",
+        "Princeton University",
+        "Harvard University",
+        "Massachusetts Institute of Technology",
+        "University of Pennsylvania",
+        "Boston University",
+        "Syracuse University",
+        "University at Buffalo",
+        "Binghamton University",
+        "Hofstra University",
       ],
       courses: [
         "BIO101",
@@ -98,7 +167,32 @@ export default {
         "CHEM 101",
         "CSC 343",
         "MATH 201",
-        "PHY 102"
+        "PHY 102",
+        "ENG 101",
+        "PSY 110",
+        "SOC 210",
+        "HIS 105",
+        "ART 100",
+        "CSC 101",
+        "MATH 130",
+        "BIO 202",
+        "CHEM 240",
+        "PHY 201",
+        "CSC 212",
+        "PHIL 101",
+        "ECO 102",
+        "MUS 105",
+        "CSC 410",
+        "MATH 301",
+        "BIO 150",
+        "AST 100",
+        "CHM 120",
+        "CSC 230",
+        "ENG 205",
+        "PSY 250",
+        "HIS 210",
+        "CSC 350",
+        "PHY 301",
       ],
       filteredInstitutions: [],
       filteredCourses: []
@@ -279,6 +373,98 @@ export default {
 .button-container >>> .primary-button {
   width: 30%;
   max-width: 200px;
+}
+.organize-section {
+  background: #121729;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: "Outfit", sans-serif;
+  color: #fff;
+}
+
+
+.form-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+  gap: 20px;
+}
+
+.form-group label {
+  width: 120px;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.privacy-toggle .toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 20px;
+}
+
+
+.form-group input {
+  flex-grow: 1;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 16px;
+  font-family: "Outfit", sans-serif;
+  background-color: #252939;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #5F98EF;
+}
+
+
+.dropdown {
+  background: #252939;
+  color: #fff;
+  border-radius: 8px;
+  margin-top: 8px;
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  border: 1px solid #444;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown li {
+  padding: 15px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: "Outfit", sans-serif;
+}
+
+.dropdown li:hover {
+  background: #5F98EF;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  width: 100%;
 }
 
 </style>

@@ -1,123 +1,144 @@
 <template>
-    <div class="createPanel">
-      <div class="header">
-        <div class="left-section">
-          <span class="number">{{ number }}</span>
-        </div>
+  <div class="createPanel">
+    <div class="header">
+      <div class="left-section">
+        <span class="number">{{ number }}</span>
       </div>
-      <hr class="divider">
-      
-      <div class="content">
-        <div class="flashcard-content">
-          <div class="term-section">
-            <div class="form__group field">
-              <input 
-                type="input" 
-                class="form__field" 
-                placeholder="Term" 
-                required="" 
-                v-model="flashcard.term"
-                @input="updateFlashcard"
-              >
-              <label for="term" class="form__label">Term</label>
-            </div>
+      <div class="delete-section" @click="$emit('delete-panel', number)">
+        <span class="delete-icon">×</span>
+      </div>
+    </div>
+    <hr class="divider">
+    
+    <div class="content">
+      <div class="flashcard-content">
+        <div class="term-section">
+          <div class="form__group field">
+            <input 
+              type="input" 
+              class="form__field" 
+              placeholder="Term" 
+              required="" 
+              v-model="flashcard.term"
+              @input="updateFlashcard"
+            >
+            <label for="term" class="form__label">Term</label>
           </div>
-          <div class="definition-section">
-            <div class="form__group field">
-              <input 
-                type="input" 
-                class="form__field" 
-                placeholder="Definition" 
-                required="" 
-                v-model="flashcard.definition"
-                @input="updateFlashcard"
-              >
-              <label for="definition" class="form__label">Definition</label>
-            </div>
+        </div>
+        <div class="definition-section">
+          <div class="form__group field">
+            <input 
+              type="input" 
+              class="form__field" 
+              placeholder="Definition" 
+              required="" 
+              v-model="flashcard.definition"
+              @input="updateFlashcard"
+            >
+            <label for="definition" class="form__label">Definition</label>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "createPanel",
-    props: {
-      number: {
-        type: Number,
-        required: true
-      },
-      id: {
-        type: [Number, String],
-        default: null
-      }
+  </div>
+</template>
+
+<script>
+export default {
+  name: "createPanel",
+  props: {
+    number: {
+      type: Number,
+      required: true
     },
-    data() {
-      return {
-        flashcard: {
-          term: '',
-          definition: '',
-          position: this.number || 1
-        }
-      };
-    },
-    methods: {
-      updateFlashcard() {
-        // Update position in case number prop changed
-        this.flashcard.position = this.number || 1;
-        // Emit an event with the updated flashcard data that matches the GraphQL input structure
-        this.$emit('update-flashcard', {
-          term: this.flashcard.term,
-          definition: this.flashcard.definition,
-          position: this.flashcard.position
-        });
-      }
+    id: {
+      type: [Number, String],
+      default: null
     }
-  };
-  </script>
-  
-  <style scoped>
-  @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
-  
-  .createPanel {
-    position: relative;
-    width: 90%;
-    height: auto;
-    min-height: 120px;
-    background-color: #1b2233;
-    border-radius: 20px;
-    padding: 20px;
-    color: white;
-    font-family: "Outfit", sans-serif;
-    margin-bottom: 15px;
+  },
+  data() {
+    return {
+      flashcard: {
+        term: '',
+        definition: '',
+        position: this.number || 1
+      }
+    };
+  },
+  methods: {
+    updateFlashcard() {
+      // Update position in case number prop changed
+      this.flashcard.position = this.number || 1;
+      this.$emit('update-flashcard', {
+        term: this.flashcard.term,
+        definition: this.flashcard.definition,
+        position: this.flashcard.position
+      });
+    }
   }
+};
+</script>
   
-  .header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
-  
-  .left-section {
-    display: flex;
-    align-items: center;
-  }
-  
-  .number {
-    font-size: 24px;
-    font-weight: 500;
-    color: #ffffff;
-    background-color: #1b2233;
-  }
-  
-  .divider {
-    width: 100%;
-    border: none;
-    height: 1px;
-    background-color: #3a4257;
-    margin: 0 0 15px 0;
-  }
+<style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+
+.createPanel {
+  position: relative;
+  width: 90%;
+  height: auto;
+  min-height: 120px;
+  background-color: #1b2233;
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+  font-family: "Outfit", sans-serif;
+  margin-bottom: 15px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.number {
+  font-size: 16px;
+  font-weight: 500;
+  color: #b8c4e0;
+  background-color: #1b2233;
+}
+
+.delete-section {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.delete-icon {
+  font-size: 24px;
+  color: #ff4d4d;
+  transition: color 0.2s ease;
+}
+
+.delete-icon:hover {
+  color: #ff1a1a;
+}
+
+.divider {
+  width: 100%;
+  border: none;
+  height: 1px;
+  background-color: #3a4257;
+  margin: 0 0 15px 0;
+}
   
   .content {
     padding: 10px 0;

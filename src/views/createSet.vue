@@ -10,10 +10,10 @@
             <Saved text="Saved" :show="showSaved" />
           </div>
         </div>
-        <div class="button-container">
+        <!-- <div class="button-container">
           <sButton text="Create" />
           <sButton text="Clear" />
-        </div>
+        </div> -->
         <div class="input-forms-container">
           <createForm
             v-model="formData.title"
@@ -33,15 +33,18 @@
           />
         </div>
         <div class="create-Panels">
-          <!-- Dynamic panels rendered based on flashcardsCount -->
           <createPanel 
             v-for="i in flashcardsCount" 
             :key="i" 
             :number="i" 
             @update-flashcard="handleFlashcardUpdate"
+            @delete-panel="handleDeletePanel"
           />
-          <!-- Add Card button -->
           <addCard @add-card="handleAddCard" />
+        </div>
+        <div class="button-container">
+          <sButton text="Create" />
+          <sButton text="Clear" />
         </div>
       </div>
     </div>
@@ -67,8 +70,8 @@ const formData = ref({
   description: ''
 });
 
-// Start with 3 flashcards
-const flashcardsCount = ref(3);
+
+const flashcardsCount = ref(4);
 const flashcardsData = ref([]);
 
 // Methods
@@ -78,14 +81,11 @@ function toggleSidebar() {
 }
 
 function handleFlashcardUpdate(flashcardData) {
-  // Store or update the flashcard data
   const existingIndex = flashcardsData.value.findIndex(card => card.position === flashcardData.position);
   
   if (existingIndex !== -1) {
-    // Update existing card
     flashcardsData.value[existingIndex] = flashcardData;
   } else {
-    // Add new card data
     flashcardsData.value.push(flashcardData);
   }
   
@@ -93,9 +93,22 @@ function handleFlashcardUpdate(flashcardData) {
 }
 
 function handleAddCard() {
-  // Increment the flashcard count to add a new panel
   flashcardsCount.value++;
   console.log("Added new card. Total cards:", flashcardsCount.value);
+}
+
+function handleDeletePanel(position) {
+  if (flashcardsCount.value > 1) {
+    flashcardsCount.value--;
+
+    flashcardsData.value = flashcardsData.value.filter(card => card.position !== position);
+
+    flashcardsData.value.forEach((card, index) => {
+      card.position = index + 1;
+    });
+
+    console.log("Deleted panel. Remaining cards:", flashcardsData.value);
+  }
 }
 </script>
 

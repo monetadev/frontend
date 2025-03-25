@@ -16,7 +16,7 @@ const routes = [
   {path: '/signup', component: createAccount},
   {path: '/add-flashcard', component: AddFlashcard},
   { path: '/quizzes', component: Quizzes},
-  {path: '/set', component: Set},
+  {path: '/my-stuffs', component: Set},
   {path: '/view', component: View},
   { path: '/settings', component: Settings}
 

@@ -65,7 +65,7 @@ export default {
   },
   data() {
     return {
-      isSidebarCollapsed: true,
+      isSidebarCollapsed: false,
       currIndex: 0,
       isNavigating: false, 
       flashcards: [

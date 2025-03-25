@@ -13,19 +13,24 @@
 
     <div class="menu-container">
       <ul class="menu">
-        <li
+        <router-link
             v-for="item in menuItems"
             :key="item.name"
-            :class="{ active: activeMenu === item.name }"
-            @click="setActive(item.name)"
+            :to="item.path"
+            class="menu-link"
         >
-          <span class="icon">
-            <component :is="item.icon" :active="activeMenu === item.name" />
-          </span>
-          <transition name="fade">
-            <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
-          </transition>
-        </li>
+          <li
+              :class="{ active: $route.path === item.path }"
+              @click="setActive(item.name)"
+          >
+      <span class="icon">
+        <component :is="item.icon" :active="activeMenu === item.name" />
+      </span>
+            <transition name="fade">
+              <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
+            </transition>
+          </li>
+        </router-link>
       </ul>
     </div>
   </div>
@@ -56,12 +61,12 @@ export default {
     return {
       activeMenu: "Dashboard",
       menuItems: [
-        { name: "Dashboard", icon: DashboardIcon },
-        { name: "My Stuffs", icon: MyStuffsIcon },
-        { name: "Add Flashcards", icon: FlashcardsIcon },
-        { name: "Quizzes", icon: QuizzesIcon },
-        { name: "Explore", icon: ExploreIcon },
-        { name: "Settings", icon: SettingsIcon },
+        { name: "Dashboard", icon: DashboardIcon, path: "/dashboard"  },
+        { name: "My Stuffs", icon: MyStuffsIcon, path: "/my-stuffs" },
+        { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard"},
+        { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes"  },
+        { name: "Explore", icon: ExploreIcon, path: "/view"  },
+        { name: "Settings", icon: SettingsIcon, path: "/settings"  },
       ],
     };
   },
@@ -176,10 +181,13 @@ export default {
   display: none;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s ease-in-out;
+.menu-link {
+  text-decoration: none;
+  display: block;
 }
-.fade-enter, .fade-leave-to {
-  opacity: 0;
+.menu-link:visited,
+.menu-link:link {
+  color: inherit;
 }
+
 </style>

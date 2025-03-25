@@ -40,7 +40,7 @@
             <input type="number" v-model.number="timeLimit" min="1" />
           </div>
 
-
+          <ToggleSwitch label="Locked Navigation" v-model="lockedNav" />
 
 
         </div>

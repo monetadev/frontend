@@ -115,6 +115,7 @@ import SecondaryButton from '@/components/SecondaryButton.vue';
 import ProgressCircle from '@/components/ProgressCircle.vue';
 import ProgressLine from '@/components/ProgressLine.vue';
 import { REGISTER_USER } from '@/graphql/auth';
+import eventBus from "@/eventBus.js";
 
 const router = useRouter();
 const currentStep = ref(1);
@@ -137,16 +138,57 @@ const confirmPasswordInput = ref('');
 
 const { mutate: registerMutate } = useMutation(REGISTER_USER);
 
+const isSubmitting = ref(false);
+
 const moveToStep = (step) => {
+
+  //Making sure the user inputs a correct
+  let message = '';
+
+  if(usernameInput.value === '') {
+    message = 'Username is required\n';
+  }
+
+  if(emailInput.value === ''){
+    message += 'Email is required\n';
+  }
+
+  if(firstnameInput.value === ''){
+    message += 'First Name is required\n';
+  }
+
+  if(lastnameInput.value === ''){
+    message += 'Last Name is required';
+  }
+
+  if(!(message === '')){
+    alert(message)
+    message = '';
+    return
+  }
+
+
   // TODO: Insert toast for step 1...
   currentStep.value = step;
 };
 
+function toastFunction(message, type) {
+  eventBus.emit('toast', {
+    msg: message,
+    type: type,
+    duration: 3000
+  })
+}
+
+
 const submitForm = async () => {
+
+  if(isSubmitting.value) return;
+  isSubmitting.value = true;
 
   // TODO: Refactor such that only the validated password gets sent to the backend, not with confirmPassword
   if (passwordInput.value !== confirmPasswordInput.value) {
-    alert("Password and Confirm Password do not match!");
+   toastFunction("Password and Confirm Password do not match!", "error");
     return;
   }
 
@@ -160,12 +202,10 @@ const submitForm = async () => {
 
   try {
 
-    //TODO: Display loading 'alert' here
-
     const result = await registerMutate({ input });
 
     // TODO: Display successful login message
-    console.log("Registration successful:", result.data.register);
+    toastFunction("Account successfully created!", "success");
 
     // Optionally update a global auth state here (e.g., via Pinia)
     await router.push('/dashboard'); // Redirect to a protected route
@@ -173,7 +213,10 @@ const submitForm = async () => {
 
     // TODO: Insert toast here....
     console.error("Registration error:", error);
-    alert("Registration failed. Please try again.");
+    toastFunction("Invalid Password. Please try again.", "error");
+  }
+  finally{
+    isSubmitting.value = false;
   }
 };
 </script>

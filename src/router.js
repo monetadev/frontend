@@ -13,12 +13,14 @@ const routes = [
   { path: '/dashboard', component: Dashboard },
   { path: '/login', component: Login },
   { path: '/reset-password', component: ResetPassword },
-  {path: '/signup', component: createAccount},
-  {path: '/add-flashcard', component: AddFlashcard},
-  {path: '/flash', component: flash},
-  {path: '/set', component: Set},
-  {path: '/view/:id', component: View},
-  {path: '/view', redirect: '/set'}, // Redirect old path to sets
+  { path: '/signup', component: createAccount},
+  { path: '/add-flashcard', component: AddFlashcard},
+  { path: '/flash', component: flash},
+  { path: '/myLibrary', component: Set},
+  { path: '/set', component: Set},
+  { path: '/view/:id', component: View, props: true },
+  { path: '/view', component: View, props: true},
+  // {path: '/view', redirect: '/myLibrary'}, // Redirect old path to sets
   { path: '/settings', component: Settings},
   { path: '/', component: Dashboard },
 

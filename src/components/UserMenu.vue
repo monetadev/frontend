@@ -18,6 +18,7 @@ import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { ME_QUERY } from "@/graphql/auth.js";
 import {useRouter} from "vue-router";
+import apolloClient from "@/plugins/apollo.js";
 
 const { result, loading, error } = useQuery(ME_QUERY);
 
@@ -71,8 +72,10 @@ function logout() {
   showMenu.value = false;
   // TODO: Implement logout logic (JWT cookie management)
 
-  //navigate to login screen
-  router.push('/login');
+  apolloClient.clearStore().then(() => {
+    //navigate to log-in screen after clearing apollo cache
+    router.push('/login');
+  })
 }
 
 </script>

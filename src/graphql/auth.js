@@ -80,6 +80,7 @@ export const GET_ALL_MY_SETS = gql`
     query Me {
         me{
             flashcardSets{
+                id
                 author{
                     id
                     username
@@ -104,6 +105,7 @@ export const GET_FLASHCARD_SET_BY_ID = gql`
             id
             title
             description
+            creationDate
             author{
                 username
             }
@@ -160,6 +162,20 @@ export const GET_ROLES_PAGINATED = gql`
     }
 `;
 
+
+export const ASSIGN_ROLE_TO_USER = gql`
+    mutation AssignRoleToUser($userId: UUID!, $roleId: UUID!) {
+        assignRoleToUser(userId: $userId, roleId: $roleId) {
+            id
+            username
+            creationDate
+            roles {
+                id
+                name
+            }
+        }
+    }
+`;
 
 // export const CHANGE_PASSWORD = gql`
 //     mutation ChangePassword($oldPassword: String!, $newPassword: String!) {

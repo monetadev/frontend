@@ -102,7 +102,7 @@ export default {
 .dropdown-control {
   display: flex;
   align-items: center;
-  background: #2f3a52;
+  background: #121729;
   border-radius: 10px;
   padding: 14px 16px;
   position: relative;
@@ -125,7 +125,7 @@ export default {
   top: 100%;
   left: 0;
   width: 100%;
-  background: #1f2a3c;
+  background: #121729;
   border-radius: 10px;
   margin-top: 6px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);

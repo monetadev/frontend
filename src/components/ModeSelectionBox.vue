@@ -17,7 +17,7 @@ export default {
 
 <style scoped>
 .mode-box {
-  background: #2f3a52;
+  background: #121729;
   border-radius: 12px;
   padding: 20px;
   flex: 1;

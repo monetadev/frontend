@@ -10,7 +10,7 @@
               <h1>Test Your Knowledge</h1>
               <p>Choose a flashcard set to start your quiz and challenge yourself!</p>
             </div>
-            <img src="@/assets/book.svg" class="page-icon" alt="Book Icon" />
+            <img src="@/assets/quizzes.png" class="page-icon" alt="Book Icon" />
           </div>
 
           <div class="modes">
@@ -42,7 +42,15 @@
 
           <ToggleSwitch label="Locked Navigation" v-model="lockedNav" />
 
+          <div class="number-input-row">
+            <label>Number of Questions</label>
+            <input type="number" v-model.number="questionCount" min="1" />
+          </div>
 
+          <ToggleSwitch label="Review Mode" v-model="reviewMode" />
+          <div class="button-container">
+            <PrimaryButton text="Start Quiz" @click="goToQuiz" />
+          </div>
         </div>
       </div>
     </div>
@@ -78,11 +86,11 @@ export default {
       isSidebarCollapsed: false,
       selectedMode: null,
       selectedSet: null,
-      timeEnabled: false,
+      timeEnabled: true,
       timeLimit: 10,
       lockedNav: false,
       questionCount: 10,
-      reviewMode: false,
+      reviewMode: true,
       modes: [
         { label: "Multiple Choice", iconComponent: MultipleChoiceIcon },
         { label: "True/False", iconComponent: TrueFalseIcon },
@@ -165,7 +173,7 @@ export default {
 
 .page-icon {
   width: 170px;
-  height: 110px;
+  height: 180px;
 }
 
 .modes {
@@ -177,7 +185,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #2f3a52;
+  background: #121729;
   padding: 14px 20px;
   border-radius: 10px;
   font-family: 'Outfit', sans-serif;
@@ -202,9 +210,57 @@ export default {
   border: none;
   font-size: 15px;
   font-family: inherit;
-  background-color: #1f2a3c;
+  background-color: #252939;
   color: white;
   text-align: right;
 }
 
+.number-input-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #121729;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.number-input-row label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.number-input-row input {
+  width: 100px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 15px;
+  font-family: inherit;
+  background-color: #252939;
+  color: white;
+  text-align: right;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.number-input-row input:focus {
+  border-color: #5f98ef;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(95, 152, 239, 0.3);
+}
+
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.button-container >>> .primary-button {
+  width: 30%;
+  max-width: 200px;
+}
 </style>

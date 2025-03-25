@@ -24,6 +24,12 @@
             />
           </div>
 
+          <FilterableDropdown
+              label="Choose Flashcard Set"
+              :options="flashcardSets"
+              v-model="selectedSet"
+          />
+
 
         </div>
       </div>
@@ -39,6 +45,7 @@ import ModeSelectionBox from "@/components/ModeSelectionBox.vue";
 import MultipleChoiceIcon from "@/components/icons/MultipleChoiceIcon.vue";
 import TrueFalseIcon from "@/components/icons/TrueFalseIcon.vue";
 import OneWordIcon from "@/components/icons/OneWordIcon.vue";
+import FilterableDropdown from "@/components/FilterableDropdown.vue";
 export default {
   name: "Quizzes",
   components: {
@@ -49,6 +56,7 @@ export default {
     MultipleChoiceIcon,
     TrueFalseIcon,
     OneWordIcon,
+    FilterableDropdown
   },
   data() {
     return {
@@ -64,6 +72,12 @@ export default {
         { label: "Multiple Choice", iconComponent: MultipleChoiceIcon },
         { label: "True/False", iconComponent: TrueFalseIcon },
         { label: "One-word", iconComponent: OneWordIcon },
+      ],
+      flashcardSets: [
+        "Bio 129 Chapter 2",
+        "CHEM 139 Chapter 3",
+        "Math 142 Chapter 1",
+        "CSC 339 Quiz 2",
       ],
     };
   },

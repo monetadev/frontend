@@ -64,7 +64,7 @@ export default {
       activeMenu: "Dashboard",
       menuItems: [
         { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
-        { name: "My Sets", icon: MyStuffsIcon, path: "/set" },
+        { name: "My Sets", icon: MyStuffsIcon, path: "/myLibrary" },
         { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
         { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
         { name: "Explore", icon: ExploreIcon, path: "/explore" },

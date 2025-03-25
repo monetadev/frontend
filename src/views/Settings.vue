@@ -76,13 +76,6 @@
                 <input type="email" v-model="user.email" class="input-field" />
               </div>
 
-              <!-- Bio -->
-              <div class="input-group">
-                <label>Bio:</label>
-                <textarea v-model="user.bio" class="input-field"></textarea>
-              </div>
-
-
               <!-- Creation Date -->
               <div class="input-group">
                 <label>Creation Date:</label>
@@ -251,6 +244,7 @@ import { ref, reactive, computed, watch } from 'vue';
 import {useMutation, useQuery} from '@vue/apollo-composable';
 import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS} from "@/graphql/auth.js"
 import apolloClient from '../plugins/apollo.js';
+import eventBus from "@/eventBus.js";
 
 const currentPage = ref(0);
 const pageSize = ref(10);
@@ -393,6 +387,14 @@ function uploadProfilePicture(event) {
   }
 }
 
+function toastFunction(message, type) {
+  eventBus.emit('toast', {
+    msg: message,
+    type: type,
+    duration: 3000
+  })
+}
+
 const handleUserUpdated = async () => {
   try {
 
@@ -430,14 +432,12 @@ const handleUserUpdated = async () => {
       }
     });
 
-    //TODO: Display successful message
-    alert("User updated successfully.");
+    toastFunction("Settings saved!", 'success');
   }
   catch (error) {
 
-    // TODO: Handle exceptions thrown
     //graphql mutation failed
-    console.log(error);
+    toastFunction("Error while saving user", "error");
 
   }
 }
@@ -449,10 +449,10 @@ const handleUserUpdated = async () => {
 //
 //
 //     // TODO: Display successful message
-//     alert('Password changed successfully!');
+//     toastFunction("Password updated successfully!", "success");
 //   }
 //   catch (error) {
-//
+//    toastFunction("Error while updating password.", "error");
 //   }
 // }
 </script>

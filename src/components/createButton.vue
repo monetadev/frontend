@@ -1,15 +1,11 @@
 <template>
-  <button
-      class="secondary-button"
-      :type="type"
-      :disabled="disabled"
-      @click.stop.prevent="$emit('click', $event)"
-  >
+  <button class="create-button" @click="$emit('click')">
     {{ text }}
   </button>
 </template>
 
 <script>
+
 export default {
   props: {
     text: {
@@ -26,48 +22,48 @@ export default {
     }
   }
 }
+
+//TODO:  implement disabling buttons for user when import fields are empty
 </script>
-//TODO implement disabling buttons for user when import fields are empty
-  <style scoped>
-.secondary-button {
+<style scoped>
+.create-button {
   background-color: #5F98EF;
   color: white;
   border: 2px solid #5F98EF;
-  font-size: 16px;
-  padding: 12px 24px;
+  font-size: 24px;
+  padding: 2px 10px;
   margin: 8px;
   cursor: pointer;
   border-radius: 6px;
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  min-width: 120px;
+  min-width: 30px;
   transition: all 0.3s ease;
   outline: none;
 }
 
 
-
-.secondary-button:hover:not(.disabled) {
+.create-button:hover:not(.disabled) {
   background-color: #5F98EF;
   color: white;
   border-color: #5F98EF;
   box-shadow: 0px 4px 12px rgba(95, 152, 239, 0.3);
 }
 
-.secondary-button:focus:not(.disabled) {
+.create-button:focus:not(.disabled) {
   border-color: #4a7dd6;
   box-shadow: 0px 0px 0px 3px rgba(95, 152, 239, 0.4);
 }
 
-.secondary-button:active:not(.disabled) {
+.create-button:active:not(.disabled) {
   background-color: #4a7dd6;
   transform: scale(0.98);
 }
-.secondary-button:disabled {
+.create-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: #8a8a8a;
   color: #8a8a8a;
 }
 
-  </style>
+</style>

@@ -13,7 +13,7 @@
       <div class="footer-section">
         <h3>Company</h3>
         <ul>
-          <li><a href="https://github.com/monetadev">About Us</a></li>
+          <li><a href="https://github.com/monetadev" target ="_blank">About Us</a></li>
         </ul>
       </div>
       
@@ -39,8 +39,7 @@
     <div class="footer-bottom">
       <p>© {{ currentYear }} Moneta. License TBD.</p>
       <div class="social-icons">
-        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://x.com/JohnDoe1494410" target= "_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
         <a href="https://github.com/monetadev" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
       </div>
     </div>

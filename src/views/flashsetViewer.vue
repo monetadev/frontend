@@ -67,9 +67,9 @@
               No flashcard sets found. Create your first set!
             </div>
           </tab>
-          <tab title="Practice Test (Not Working ATM)">Contents2</tab>
-          <tab title="Study Guides (Not Working ATM)">Contents3</tab>
-          <tab title="Expert solutions (Not Working ATM)">Contents4</tab>
+          <tab title="Practice Test">Contents2</tab>
+          <tab title="Study Guides">Contents3</tab>
+          <tab title="Expert solutions">Contents4</tab>
         </tabs>
       </div>
     </div>

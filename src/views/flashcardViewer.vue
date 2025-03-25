@@ -4,58 +4,43 @@
     <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
       <div class="content">
-        <!-- Loading state -->
-        <div v-if="loading" class="loading">Loading flashcards...</div>
 
-        <!-- Error state -->
-        <div v-else-if="error" class="error">{{ error.message }}</div>
+        <FlashcardTitle :title="currentDeck.title" />
 
-        <!-- Content when loaded -->
-        <template v-else-if="flashcards.length > 0">
-          <FlashcardTitle :title="currentDeck.title" />
+        <div class="flashcard-container">
+          <FlashCard
+              :term="currentFlashcard.term"
+              :definition="currentFlashcard.definition"
+              ref="flashcard"
+          />
+        </div>
 
-          <div class="flashcard-container">
-            <FlashCard
-                :term="currentFlashcard.term"
-                :definition="currentFlashcard.definition"
-                ref="flashcard"
+        <div class="icon-container">
+          <div class="prev-next">
+            <PrevIcon
+                active
+                :disabled="currIndex === 0"
+                @click="prevCardDebounced"
             />
+            <counterDisplay :current="currIndex+1" :total="flashcards.length" />
+            <NextIcon active @click="nextCardDebounced"/>
           </div>
 
-          <div class="icon-container">
-            <div class="prev-next">
-              <PrevIcon
-                  active
-                  :disabled="currIndex === 0"
-                  @click="prevCardDebounced"
-              />
-              <counterDisplay :current="currIndex+1" :total="flashcards.length" />
-              <NextIcon active @click="nextCardDebounced"/>
-            </div>
-
-            <div class="full-screen-container">
-              <shuffle active @click="shuffleCards" />
-              <PlayButtonIcon active />
-              <FullScreenIcon active />
-            </div>
+          <div class="full-screen-container">
+            <shuffle active @click="shuffleCards" />
+            <PlayButtonIcon active />
+            <FullScreenIcon active />
           </div>
-        </template>
-        
-        <!-- No flashcards state -->
-        <div v-else-if="!loading && !error" class="no-flashcards">
-          This flashcard set has no cards.
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watchEffect } from 'vue';
+<script>
 import { useRoute } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_FLASHCARD_SET_BY_ID} from "@/graphql/auth.js";
-
+import { GET_FLASHCARD_SET_BY_ID } from "@/graphql/auth.js";
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import FlashCard from "@/components/FlashCard.vue";
@@ -67,107 +52,153 @@ import PlayButtonIcon from "@/components/icons/playButton.vue";
 import counterDisplay from "@/components/icons/counterDisplay.vue";
 import shuffle from "@/components/icons/shuffle.vue";
 
-// Get the flashcard set ID from route params
-const route = useRoute();
-const flashcardSetId = computed(() => route.params.id);
+export default {
+  name: "Dashboard",
+  components: {
+    SidebarNavigation,
+    FlashCard,
+    NavigationBar,
+    FlashcardTitle,
+    NextIcon,
+    PrevIcon,
+    FullScreenIcon,
+    PlayButtonIcon,
+    counterDisplay,
+    shuffle,
+  },
+  setup() {
+    const route = useRoute();
+    const flashcardSetId = route.params.id;
 
-// State
-const isSidebarCollapsed = ref(true);
-const currIndex = ref(0);
-const isNavigating = ref(false);
-const shuffledIndexes = ref([]);
+    console.log('Viewing flashcard set with ID:', flashcardSetId);
 
-// Fetch the flashcard set with GraphQL
-const { result, loading, error } = useQuery(GET_FLASHCARD_SET_BY_ID, () => ({
-  id: flashcardSetId.value
-}), {
-  enabled: computed(() => !!flashcardSetId.value), // Only run query when ID is available
-  fetchPolicy: 'network-only' // Always fetch from network
-});
+    // If we have an ID, fetch the data
+    let flashcardSet = null;
 
-// Initialize shuffledIndexes when flashcards are loaded
-watchEffect(() => {
-  if (flashcards.value.length > 0) {
-    shuffledIndexes.value = Array.from(
-        { length: flashcards.value.length },
-        (_, i) => i
-    );
-    // Reset current index when loading a new set
-    currIndex.value = 0;
-  }
-});
+    if (flashcardSetId) {
+      const { result, loading, error } = useQuery(
+          GET_FLASHCARD_SET_BY_ID,
+          { id: flashcardSetId }
+      );
 
-// Computed properties
-const currentDeck = computed(() => {
-  return result.value?.findFlashcardSetById || { title: 'Loading...' };
-});
+      // Make this data available to the template
+      flashcardSet = { result, loading, error };
+    }
 
-const flashcards = computed(() => {
-  return result.value?.findFlashcardSetById?.flashcards || [];
-});
+    return {
+      flashcardSetId,
+      flashcardSet
+    };
+  },
+  data() {
+    return {
+      isSidebarCollapsed: true,
+      currIndex: 0,
+      shuffledCards: [], // To store shuffled cards
+      isShuffled: false, // Track shuffle state
+      isNavigating: false,
+      fallbackFlashcards: [
+        {id: 1, term: "What is an Atom?", definition: "The smallest unit of matter."},
+        {id: 2, term: "What is a Molecule?", definition: "A group of atoms bonded together."},
+        {id: 3, term: "What is a Cell?", definition: "The basic unit of life."},
+        {id: 4, term: "What is a Tissue?", definition: "A group of cells that work together to perform a specific function."},
+        {id: 5, term: "What is an Organ?", definition: "A group of tissues that work together to perform a specific function."},
+        {id: 6, term: "What is an Organ System?", definition: "A group of organs that work together to perform a specific function."},
+        {id: 7, term: "What is an Organism?", definition: "An individual living thing."},
+        {id: 8, term: "What is a Population?", definition: "A group of organisms of the same species that live in the same area."},
+        {id: 9, term: "What is a Community?", definition: "All the populations of different species that live in the same area."},
+      ],
+      fallbackDeck: {
+        id: 1,
+        title: "Biology",
+      }
 
-const currentFlashcard = computed(() => {
-  if (flashcards.value.length === 0) return { term: "", definition: "" };
+    };
+  },
+  computed: {
+    // Use GraphQL data if available, otherwise fallback
+    flashcards() {
 
-  const index = shuffledIndexes.value[currIndex.value] || 0;
-  return flashcards.value[index] || { term: "", definition: "" };
-});
+      if (this.isShuffled) return this.shuffledCards;
 
-// Methods
-function toggleSidebar() {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value;
-}
+      if (this.flashcardSetId && this.flashcardSet?.result?.value?.findFlashcardSetById?.flashcards) {
+        return this.flashcardSet.result.value.findFlashcardSetById.flashcards;
+      }
+      return this.fallbackFlashcards;
+    },
+    currentDeck() {
+      if (this.flashcardSetId && this.flashcardSet?.result?.value?.findFlashcardSetById) {
+        return this.flashcardSet.result.value.findFlashcardSetById;
+      }
+      return this.fallbackDeck;
+    },
+    currentFlashcard() {
+      return this.flashcards[this.currIndex] || { term: "", definition: "" };
+    },
+  },
 
-function nextCardDebounced() {
-  if (isNavigating.value || flashcards.value.length === 0) return;
-  isNavigating.value = true;
+  methods: {
+    toggleSidebar() {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    },
 
-  nextCard();
+    //These Debounce Methods Prevent Spamming the Next and Previous Buttons
 
-  setTimeout(() => {
-    isNavigating.value = false;
-  }, 300);
-}
+    nextCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
 
-function prevCardDebounced() {
-  if (isNavigating.value || flashcards.value.length === 0) return;
-  isNavigating.value = true;
+      this.nextCard();
 
-  prevCard();
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
 
-  setTimeout(() => {
-    isNavigating.value = false;
-  }, 300);
-}
+    prevCardDebounced() {
+      if (this.isNavigating) return;
+      this.isNavigating = true;
 
-function nextCard() {
-  if (currIndex.value < shuffledIndexes.value.length - 1) {
-    currIndex.value++;
-  } else {
-    currIndex.value = 0;
-  }
-}
+      this.prevCard();
 
-function prevCard() {
-  if (currIndex.value > 0) {
-    currIndex.value--;
-  } else {
-    currIndex.value = shuffledIndexes.value.length - 1;
-  }
-}
+      setTimeout(() => {
+        this.isNavigating = false;
+      }, 300);
+    },
 
-function shuffleCards() {
-  // Create a copy of indexes array and shuffle it
-  const indexes = [...shuffledIndexes.value];
+    //Methods for Navigation
+    nextCard() {
+      if (this.currIndex < this.flashcards.length - 1) {
+        this.currIndex++;
+      } else {
+        this.currIndex = 0;
+      }
+    },
+    prevCard() {
+      if (this.currIndex > 0) {
+        this.currIndex--;
+      } else {
+        this.currIndex = this.flashcards.length - 1;
+      }
+    },
 
-  for (let i = indexes.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
-  }
+    shuffleCards() {
+      // Get current cards (whether from API or fallback)
+      const currentCards = [...this.flashcards];
 
-  shuffledIndexes.value = indexes;
-  currIndex.value = 0;
-}
+      // Fisher-Yates shuffle algorithm
+      for (let i = currentCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+      }
+
+      // Set shuffled state
+      this.shuffledCards = currentCards;
+      this.isShuffled = true;
+      this.currIndex = 0;
+    }
+  },
+};
 </script>
 
 <style scoped>
@@ -236,16 +267,4 @@ function shuffleCards() {
   cursor: pointer;
   fill: #F9F9F9;
 }
-
-.loading, .error, .no-flashcards {
-  text-align: center;
-  padding: 50px;
-  font-size: 18px;
-  color: white;
-}
-
-.error {
-  color: #ff6b6b;
-}
 </style>
-

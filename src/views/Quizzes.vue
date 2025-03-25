@@ -30,6 +30,18 @@
               v-model="selectedSet"
           />
 
+          <ToggleSwitch
+              label="Set Time Limit"
+              v-model="timeEnabled"
+          />
+
+          <div v-if="timeEnabled" class="time-limit-input">
+            <label>Time Limit (Minutes)</label>
+            <input type="number" v-model.number="timeLimit" min="1" />
+          </div>
+
+
+
 
         </div>
       </div>
@@ -46,6 +58,8 @@ import MultipleChoiceIcon from "@/components/icons/MultipleChoiceIcon.vue";
 import TrueFalseIcon from "@/components/icons/TrueFalseIcon.vue";
 import OneWordIcon from "@/components/icons/OneWordIcon.vue";
 import FilterableDropdown from "@/components/FilterableDropdown.vue";
+import ToggleSwitch from "@/components/ToggleSwitch.vue";
+
 export default {
   name: "Quizzes",
   components: {
@@ -56,7 +70,8 @@ export default {
     MultipleChoiceIcon,
     TrueFalseIcon,
     OneWordIcon,
-    FilterableDropdown
+    FilterableDropdown,
+    ToggleSwitch,
   },
   data() {
     return {
@@ -157,6 +172,39 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 15px;
+}
+.time-limit-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2f3a52;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.time-limit-input input:focus {
+  border-color: #5f98ef;
+  outline: none;
+}
+
+.time-limit-input label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.time-limit-input input {
+  width: 100px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-family: inherit;
+  background-color: #1f2a3c;
+  color: white;
+  text-align: right;
 }
 
 </style>

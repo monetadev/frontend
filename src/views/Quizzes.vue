@@ -87,7 +87,7 @@ export default {
       selectedMode: null,
       selectedSet: null,
       timeEnabled: true,
-      timeLimit: 10,
+      timeLimit: 20,
       lockedNav: false,
       questionCount: 10,
       reviewMode: true,

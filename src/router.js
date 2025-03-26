@@ -7,7 +7,9 @@ import AddFlashcard  from './views/AddFlashcard.vue';
 import Settings from './views/Settings.vue';
 import Set from './views/flashsetViewer.vue';
 import View from './views/flashcardViewer.vue';
-import Quizzes from "./views/Quizzes.vue";
+
+=======
+
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -18,7 +20,8 @@ const routes = [
   { path: '/quizzes', component: Quizzes},
   {path: '/my-stuffs', component: Set},
   {path: '/view', component: View},
-  { path: '/settings', component: Settings}
+  { path: '/settings', component: Settings},
+  {path: '/create', component: Create}
 
 ];
 

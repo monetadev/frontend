@@ -1,5 +1,12 @@
 <template>
+
+  
   <div class="user-menu" @click="toggleMenu">
+
+   <div class ='create set' @click.stop="toggleCreatePopup" >
+      <createButton text="+" @click="" />
+    </div> 
+
     <div class="avatar">{{ avatarInitials }}</div>
     <div class="user-info">
       <p class="name">{{ fullName }}</p>
@@ -10,13 +17,35 @@
       <li @click="goToSettings">Account Settings</li>
       <li @click="logout">Logout</li>
     </ul>
+
+    <div v-if="showCreatePopup" class="create-popup">
+      <div class="popup-header">
+        <h3>Create New</h3>
+        <button class="close-btn" @click.stop="showCreatePopup = false">×</button>
+      </div>
+      <div class="popup-options">
+        <div class="popup-option" @click="generateFlashcard">
+          <span class="option-icon">🤖</span>
+          <span class="option-text">Generate Flashcard</span>
+        </div>
+        <div class="popup-option" @click="createFlashcard">
+          <span class="option-icon">✏️</span>
+          <span class="option-text">Create Flashcard</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Overlay to close popup when clicking outside -->
+    <div v-if="showCreatePopup" class="popup-overlay" @click.stop="showCreatePopup = false"></div>
   </div>
 </template>
 
 <script setup>
+import createButton from '@/components/createButton.vue';
 import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { ME_QUERY } from "@/graphql/auth.js";
+import router from '@/router';
 
 const { result, loading, error } = useQuery(ME_QUERY);
 
@@ -52,8 +81,30 @@ const usernameText = computed(() => {
 });
 
 const showMenu = ref(false);
+const showCreatePopup = ref(false);
+
 function toggleMenu() {
   showMenu.value = !showMenu.value;
+}
+function toggleCreatePopup(event) {
+  event.stopPropagation();
+  showCreatePopup.value = !showCreatePopup.value;
+  // Close menu if open
+  if (showMenu.value) showMenu.value = false;
+}
+
+function generateFlashcard() {
+  showCreatePopup.value = false;
+  // TODO: Implement generate flashcard logic
+  console.log("Generate flashcard");
+  router.push('/add-flashcard');
+}
+
+function createFlashcard() {
+  showCreatePopup.value = false;
+  // TODO: Implement create flashcard logic
+  console.log("Create flashcard");
+  router.push('/create')
 }
 function goToSettings() {
   showMenu.value = false;
@@ -74,6 +125,11 @@ function logout() {
   cursor: pointer;
   position: relative;
   font-family: "Outfit", sans-serif;
+}
+
+.create-set {
+  margin-right: 15px;
+  cursor: pointer;
 }
 
 .avatar {
@@ -119,6 +175,7 @@ function logout() {
   padding: 8px;
   width: 160px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .dropdown-menu li {
@@ -131,5 +188,81 @@ function logout() {
 .dropdown-menu li:hover {
   background: #5F98EF;
   border-radius: 4px;
+}
+
+/* Popup styles */
+.create-popup {
+  position: absolute;
+  
+  top: 50px;
+  right: 0;
+  background: #1b2233;
+  border-radius: 8px;
+  padding: 15px;
+  width: 220px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.popup-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 16px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: white;
+}
+
+.popup-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popup-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: white;
+}
+
+.popup-option:hover {
+  background: #5F98EF;
+}
+
+.option-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.option-text {
+  font-size: 14px;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
 }
 </style>

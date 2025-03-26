@@ -13,21 +13,23 @@
 
     <div class="menu-container">
       <ul class="menu">
-        <!-- Replace li with router-link -->
-        <router-link
-            v-for="item in menuItems"
-            :key="item.name"
-            :to="item.path"
-            custom
-            v-slot="{ navigate, isActive }"
-        >
-          <li
-              :class="{ active: isActive || activeMenu === item.name }"
-              @click="setActive(item.name, navigate)"
-          >
-            <span class="icon">
-              <component :is="item.icon" :active="isActive || activeMenu === item.name" />
-            </span>
+<router-link
+    v-for="item in menuItems"
+    :key="item.name"
+    :to="item.path"
+    custom
+    v-slot="{ navigate, isActive }"
+>
+  <li
+      :class="{ active: isActive || activeMenu === item.name }"
+      @click="setActive(item.name, navigate)"
+  >
+    <span class="icon">
+      <component :is="item.icon" :active="isActive || activeMenu === item.name" />
+    </span>
+  </li>
+</router-link>
+
             <transition name="fade">
               <span v-if="!isCollapsed" class="menu-text">{{ item.name }}</span>
             </transition>
@@ -63,12 +65,15 @@ export default {
     return {
       activeMenu: "Dashboard",
       menuItems: [
-        { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
-        { name: "My Sets", icon: MyStuffsIcon, path: "/myLibrary" },
-        { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
-        { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
-        { name: "Explore", icon: ExploreIcon, path: "/explore" },
-        { name: "Settings", icon: SettingsIcon, path: "/settings" },
+const menuItems = [
+    { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
+    { name: "My Stuffs", icon: MyStuffsIcon, path: "/my-stuffs" }, // Using "/my-stuffs" from main
+    { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
+    { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
+    { name: "Explore", icon: ExploreIcon, path: "/explore" }, // Keeping "/explore" from apollo-base
+    { name: "Settings", icon: SettingsIcon, path: "/settings" }
+];
+
       ],
     };
   },
@@ -200,10 +205,13 @@ export default {
   display: none;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s ease-in-out;
+.menu-link {
+  text-decoration: none;
+  display: block;
 }
-.fade-enter, .fade-leave-to {
-  opacity: 0;
+.menu-link:visited,
+.menu-link:link {
+  color: inherit;
 }
+
 </style>

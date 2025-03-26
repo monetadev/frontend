@@ -11,7 +11,7 @@
         </span>
         <input
             type="text"
-            placeholder="Search for Science Sets"
+            placeholder="Search for Sets with my Library"
             v-model="query"
             @input="handleInput"
         />

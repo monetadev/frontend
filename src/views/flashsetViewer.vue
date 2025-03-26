@@ -5,7 +5,7 @@
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
       <div class="Top">
         <div class="my-Stuffs">
-          <h1>My Stuffs</h1>
+          <h1>My Sets</h1>
         </div>
       </div>
       <div class="Search_Bar">
@@ -14,43 +14,70 @@
       <div class='wrapper'>
         <tabs :mode="mode">
           <tab title="Flashcard Sets" class="panel-container">
+            <!-- Loading state -->
+            <div v-if="loading">Loading your flashcard sets...</div>
 
-            <div class="divide">
-              <divider time="Today"/>
-            </div>
-            <div class="panel-wrapper">
-              <Panel number="10" username="chris" title="OS Quiz 2" />
-            </div>
-            <div class="panel-wrapper">
-              <Panel number="22" username="Gagan" title="AI & Machine Learing" />
-            </div>
-            <div class="divide">
-              <divider time="Last week"/>
-            </div>
-            <div class="panel-wrapper">
-              <Panel number="33" username="Jomal" title="Moblie  Development" />
-            </div>
-            <div class="panel-wrapper">
-              <Panel number="23" username="Matt" title="Spring Cards" />
-            </div>
-            <div class="divide">
-              <divider time="1 month ago"/>
-            </div>
-            <div class="panel-wrapper">
-              <Panel number="12" username="Jen" title="React Native" />
-            </div>
+            <!-- Error state -->
+            <div v-if="error">Error loading flashcard sets: {{ error.message }}</div>
 
+            <!-- Data display -->
+            <template v-if="myFlashcardSets.length">
+              <!-- Today's sets -->
+              <div v-if="groupedSets.today.length" class="divide">
+                <divider time="Today"/>
+              </div>
+              <div v-for="set in groupedSets.today" :key="set.id" class="panel-wrapper">
+                <Panel
+                    :number="set.flashcards.length"
+                    :username="set.author.username"
+                    :title="set.title"
+                    :id="set.id"
+                />
+              </div>
+
+              <!-- Last week's sets -->
+              <div v-if="groupedSets.lastWeek.length" class="divide">
+                <divider time="Last week"/>
+              </div>
+              <div v-for="set in groupedSets.lastWeek" :key="set.id" class="panel-wrapper">
+                <Panel
+                    :number="set.flashcards.length"
+                    :username="set.author.username"
+                    :title="set.title"
+                    :id="set.id"
+                />
+              </div>
+
+              <!-- Older sets -->
+              <div v-if="groupedSets.older.length" class="divide">
+                <divider time="Older"/>
+              </div>
+              <div v-for="set in groupedSets.older" :key="set.id" class="panel-wrapper">
+                <Panel
+                    :number="set.flashcards.length"
+                    :username="set.author.username"
+                    :title="set.title"
+                    :id="set.id"
+                />
+              </div>
+            </template>
+
+            <!-- No data state -->
+            <div v-else-if="!loading && !error">
+              No flashcard sets found. Create your first set!
+            </div>
           </tab>
-          <tab title="Practice Test">Contents2</tab>
-          <tab title="Study Guides">Contents3</tab>
-          <tab title="Expert solutions">Contents4</tab>
+          <tab title="Practice Test (Not Working ATM)">Contents2</tab>
+          <tab title="Study Guides (Not Working ATM)">Contents3</tab>
+          <tab title="Expert solutions (Not Working ATM)">Contents4</tab>
         </tabs>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import {computed, ref} from 'vue';
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import setBar from "@/components/SetBar.vue";
@@ -58,30 +85,46 @@ import Tab from "@/components/Tab.vue";
 import Tabs from "@/components/Tabs.vue";
 import Panel from "@/components/panelSets.vue";
 import divider from "@/components/timeDivider.vue";
+import { useQuery } from '@vue/apollo-composable';
+import { GET_ALL_MY_SETS } from '@/graphql/auth';
 
-export default {
-  name: "FlashsetViewer",
-  components: {
-    SidebarNavigation,
-    NavigationBar,
-    setBar,
-    Tabs,
-    Panel,
-    Tab,
-    divider,
-  },
-  data() {
-    return {
-      isSidebarCollapsed: false,
-      mode: 'default'
-    };
-  },
-  methods: {
-    toggleSidebar() {
-      this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    },
-  },
-};
+// State
+const isSidebarCollapsed = ref(false);
+
+const mode = ref('default');
+
+// Exec GraphQL Query
+const {result, loading, error} = useQuery(GET_ALL_MY_SETS);
+
+const myFlashcardSets = computed(() => {
+  return result.value?.me?.flashcardSets || [];
+});
+
+// Group sets by date for your dividers
+const groupedSets = computed(() => {
+  const sets = myFlashcardSets.value;
+  // Group logic here - you can separate by today, last week, etc.
+  // Example basic grouping:
+  return {
+    today: sets.filter(set => isToday(new Date(set.creationDate))),
+    lastWeek: sets.filter(set => isLastWeek(new Date(set.creationDate))),
+    older: sets.filter(set => !isToday(new Date(set.creationDate)) && !isLastWeek(new Date(set.creationDate)))
+  };
+});
+
+// Methods
+function toggleSidebar() {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+}
+
+// Helper date functions (implement as needed)
+function isToday(date) {
+  // Implement date comparison logic
+}
+
+function isLastWeek(date) {
+  // Implement date comparison logic
+}
 </script>
 
 <style scoped>
@@ -149,18 +192,18 @@ export default {
 .panel-container {
   display: flex;
   flex-direction: column;
-  gap: 20px; 
+  gap: 20px;
   padding-top: 2%;
 }
 
 .panel-wrapper {
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
 }
 
 .panel-wrapper:last-child {
   margin-bottom: 0;
 }
 .divide {
-  
+
 }
 </style>

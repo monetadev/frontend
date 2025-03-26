@@ -10,13 +10,13 @@
 
       <form @submit.prevent="handleLogin">
         <InputWithIcon iconName="user" label="Username" type="text" v-model="username" />
-        <InputWithIcon iconName="lock" label="Password" type="password" v-model="password" />
+        <InputWithIcon iconName="lock" label="Password" :type="showPassword ? 'text' : 'password'" v-model="password" />
 
         <div class="remember-container">
           <label class="checkbox-label">
-            <input type="checkbox" id="rememberMe" v-model="rememberMe" />
+            <input type="checkbox" id="rememberMe" v-model="showPassword" />
             <span class="checkmark"></span>
-            Remember Me
+            Show Password
           </label>
           <router-link to="/reset-password" class="forgot-password">
             Forgot Password?
@@ -41,10 +41,11 @@ import { useRouter } from 'vue-router';
 import InputWithIcon from "@/components/InputWithIcon.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { LOGIN_USER } from '@/graphql/auth';
+import eventBus from "@/eventBus.js";
 
 const username = ref('');
 const password = ref('');
-const rememberMe = ref(false);
+const showPassword = ref(false);
 const router = useRouter();
 
 const { mutate: loginMutate } = useMutation(LOGIN_USER);
@@ -55,13 +56,25 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value
     };
-    const result = await loginMutate(variables);
-    console.log("Login successful:", result.data.login);
+    await loginMutate(variables);
+
+    toastFunction("Login successful!", "success");
+
+    //after successful log in, go to dashboard
     await router.push('/dashboard');
   } catch (error) {
-    console.error("Login error:", error);
+
+    toastFunction("Invalid username/Password. Please try again.", "error");
   }
 };
+
+function toastFunction(message, type) {
+  eventBus.emit('toast', {
+    msg: message,
+    type: type,
+    duration: 3000
+  })
+}
 </script>
 
 <style scoped>

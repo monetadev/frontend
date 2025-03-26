@@ -1,0 +1,319 @@
+"""
+Custom scalars for specialized data types
+"""
+scalar DateTime
+scalar UUID
+
+"""
+Pagination types and metadata
+"""
+type PageInfo {
+    totalPages: Int!
+    totalElements: Int!
+    currentPage: Int!
+}
+
+type PaginatedUser {
+    items: [User!]!
+    pageInfo: PageInfo!
+}
+
+type PaginatedFlashcard {
+    items: [Flashcard!]!
+    pageInfo: PageInfo!
+}
+
+type PaginatedFlashcardSet {
+    items: [FlashcardSet!]!
+    pageInfo: PageInfo!
+}
+
+type PaginatedRole {
+    items: [Role!]!
+    pageInfo: PageInfo!
+}
+
+type PaginatedPrivilege {
+    items: [Privilege!]!
+    pageInfo: PageInfo!
+}
+
+"""
+Input types for various operations
+"""
+input UserRegInput {
+    username: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+    password: String!
+}
+
+input FlashcardInput {
+    term: String!
+    definition: String!
+    position: Int!
+}
+
+input FlashcardSetInput {
+    title: String
+    description: String
+    isPublic: Boolean!
+    flashcards: [FlashcardInput]!
+    #tags: [String!]
+}
+
+"""
+Filtering input types
+"""
+input FlashcardFilterInput {
+    """
+    Search term
+    """
+    searchTerm: String
+
+    """
+    Filter by creation date
+    """
+    createdAfter: DateTime
+    createdBefore: DateTime
+}
+
+input FlashcardSetFilterInput {
+    """
+    Search term
+    """
+    searchTerm: String
+
+    """
+    Filter by visibility
+    """
+    isPublic: Boolean
+
+    """
+    Filter by creation date
+    """
+    createdAfter: DateTime
+    createdBefore: DateTime
+}
+
+"""
+AI generation input types
+"""
+input DocumentInput {
+    documentText: String
+    documentBase64: String
+    documentUrl: String
+}
+
+input AIGenerationOptions {
+    aiProvider: String!  # "OPENAI", "ANTHROPIC", "OLLAMA"
+    modelName: String!
+    cardCount: Int!
+    difficulty: String!  # "BEGINNER", "INTERMEDIATE", "ADVANCED"
+    language: String!
+    topic: String
+}
+
+"""
+Core domain types
+"""
+type Flashcard {
+    """
+    Unique identifier
+    """
+    id: UUID!
+
+    """
+    Unique identifier that links THIS flashcard to a FlashcardSet
+    """
+    setID: UUID!
+
+    term: String!
+
+    definition: String!
+
+    """
+    THIS Flashcard's position within the set
+    """
+    position: Int!
+
+    creationDate: DateTime!
+
+    updatedAt: DateTime
+}
+
+type FlashcardSet {
+    """
+    Unique identifier
+    """
+    id: UUID!
+
+    """
+    Unique identifier that links THIS FlashcardSet to the original User
+    """
+    author: User!
+
+    title: String
+
+    description: String
+
+    """
+    Determine whether THIS FlashcardSet is visible to the public or just to the original User
+    """
+    isPublic: Boolean!
+
+    creationDate: DateTime!
+
+    lastUpdated: DateTime
+
+    """
+    List of Flashcards within the set
+    """
+    flashcards: [Flashcard]
+}
+
+type User {
+    """
+    Unique identifier
+    """
+    id: UUID!
+
+    username: String!
+
+    email: String!
+
+    firstName: String!
+
+    lastName: String!
+
+    creationDate: DateTime!
+
+    lastUpdated: DateTime
+
+    flashcardSets: [FlashcardSet]
+
+    """
+    THIS User's assigned roles
+    """
+    roles: [Role]
+}
+
+"""
+AI generation response types
+"""
+type GeneratedFlashcard {
+    term: String!
+    definition: String!
+    position: Int!
+}
+
+type FlashcardGenerationResult {
+    temporaryId: UUID!
+    generatedFlashcards: [GeneratedFlashcard!]!
+}
+
+"""
+Authorization types
+"""
+type Role {
+    """
+    Uniquely identify every role
+    """
+    id: UUID!
+
+    name: String!
+
+    privileges: [Privilege]
+}
+
+type Privilege {
+    """
+    Uniquely identify every privilege
+    """
+    id: UUID!
+
+    name: String!
+}
+
+"""
+Mutations for performing CRUD operations and other actions
+"""
+type Mutation {
+    """
+    Authentication Mutations
+    """
+    register(input: UserRegInput!): User!
+    registerAdmin(input: UserRegInput!, secret: String!): User!
+    login(username: String!, password: String!): User!
+
+    # TODO
+    """
+    AI Generation Mutations
+    """
+    generateFlashcards(document: DocumentInput!, options: AIGenerationOptions!): FlashcardGenerationResult!
+    saveGeneratedFlashcards(
+        temporaryId: UUID!,
+        title: String!,
+        description: String,
+        isPublic: Boolean!,
+        flashcards: [FlashcardInput!]!
+    ): FlashcardSet!
+
+    """
+    Flashcard and FlashcardSet Mutations
+    """
+    createFlashcardSet(flashcardSetInput: FlashcardSetInput!): FlashcardSet!
+    updateFlashcardSet(id: UUID!, flashcardSetInput: FlashcardSetInput): FlashcardSet!
+    deleteFlashcardSet(userId: UUID!, setId: UUID!): String!
+
+    """
+    User Mutations
+    """
+    updateUser(id: UUID!, username: String, email: String, firstName: String, lastName: String): User!
+    deleteUser(id: UUID!): UUID!
+
+    """
+    Role and Privilege Mutations
+    """
+    createRole(name: String!): Role!
+    updateRole(id: UUID, name: String): Role!
+    deleteRole(id: UUID!): UUID!
+
+    """
+    Role and User Assignment Mutations
+    """
+    assignRoleToUser(userId: UUID!, roleId: UUID!): User!
+    removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
+    assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
+    removePrivilegeFromRole(roleId: UUID!, privilegeId: UUID!): Role!
+}
+
+"""
+Queries for retrieving data
+"""
+type Query {
+    """
+    User Queries
+    """
+    me: User
+    findUserById(id: UUID): User
+    findUserByUsername(username: String!): User
+    findUserByEmail(email: String!): User
+    findAllUsers(page: Int!, size: Int!): PaginatedUser
+
+    """
+    FlashcardSet Queries
+    """
+    findFlashcardSetById(id: UUID!): FlashcardSet
+    findFlashcardSetByAuthorId(id: UUID!, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
+    findPublicFlashcardSets(filter: FlashcardSetFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
+
+    """
+    Role and Privilege Queries
+    """
+    findRoleById(id: UUID!): Role
+    findRoleByName(name: String!): Role
+    roles(page: Int = 0, size: Int = 10): PaginatedRole
+    privileges: [Privilege!]!
+}

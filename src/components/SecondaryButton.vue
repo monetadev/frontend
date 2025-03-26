@@ -1,29 +1,32 @@
 <template>
-  <button class="secondary-button" @click="$emit('click')">
+  <button
+      class="secondary-button"
+      :type="type"
+      :disabled="disabled"
+      @click.stop="$emit('click')"
+  >
     {{ text }}
   </button>
 </template>
 
-  
-  <script>
-
-  export default {
-    props: {
-      text: {
-        type: String,
-        required: true
-      },
-      type: {
-        type: String,
-        default: 'button'
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      }
+<script>
+export default {
+  props: {
+    text: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      default: 'button'
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   }
-  </script>
+}
+</script>
 //TODO implement disabling buttons for user when import fields are empty
   <style scoped>
 .secondary-button {

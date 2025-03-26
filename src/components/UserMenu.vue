@@ -45,17 +45,11 @@ import createButton from '@/components/createButton.vue';
 import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { ME_QUERY } from "@/graphql/auth.js";
-import { useRouter } from "vue-router";
 import router from '@/router';
-import apolloClient from "@/plugins/apollo.js";
-
 
 const { result, loading, error } = useQuery(ME_QUERY);
 
 const user = computed(() => result.value?.me);
-
-const router = useRouter();
-
 
 const avatarInitials = computed(() => {
   if (loading.value) return "";
@@ -89,7 +83,6 @@ const usernameText = computed(() => {
 const showMenu = ref(false);
 const showCreatePopup = ref(false);
 
-
 function toggleMenu() {
   showMenu.value = !showMenu.value;
 }
@@ -111,26 +104,16 @@ function createFlashcard() {
   showCreatePopup.value = false;
   // TODO: Implement create flashcard logic
   console.log("Create flashcard");
-  router.push('/create');
+  router.push('/create')
 }
-
-// Route to settings (if needed, implement logic here)
-
 function goToSettings() {
   showMenu.value = false;
-  router.push('/settings');
+  // TODO: Implement settings logic
 }
-
 function logout() {
   showMenu.value = false;
-  // TODO: Implement logout logic (JWT cookie management)
-
-  apolloClient.clearStore().then(() => {
-    //navigate to log-in screen after clearing apollo cache
-    router.push('/login');
-  })
+  // TODO: Implement logout logic
 }
-
 </script>
 
 <style scoped>

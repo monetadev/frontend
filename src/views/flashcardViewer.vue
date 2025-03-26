@@ -4,24 +4,24 @@
     <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
       <div class="content">
-
+  
         <FlashcardTitle :title="currentDeck.title" />
 
         <div class="flashcard-container">
-          <FlashCard
-              :term="currentFlashcard.term"
-              :definition="currentFlashcard.definition"
-              ref="flashcard"
+          <FlashCard 
+            :term="currentFlashcard.term" 
+            :definition="currentFlashcard.definition" 
+            ref="flashcard"
           />
         </div>
-
+      
         <div class="icon-container">
           <div class="prev-next">
-            <PrevIcon
-                active
-                :disabled="currIndex === 0"
-                @click="prevCardDebounced"
-            />
+            <PrevIcon 
+              active 
+              :disabled="currIndex === 0" 
+              @click="prevCardDebounced"
+            />     
             <counterDisplay :current="currIndex+1" :total="flashcards.length" />
             <NextIcon active @click="nextCardDebounced"/>
           </div>
@@ -31,16 +31,13 @@
             <PlayButtonIcon active />
             <FullScreenIcon active />
           </div>
-        </div>
+        </div> 
       </div>
-    </div>
+    </div> 
   </div>
 </template>
 
 <script>
-import { useRoute } from 'vue-router';
-import { useQuery } from '@vue/apollo-composable';
-import { GET_FLASHCARD_SET_BY_ID } from "@/graphql/auth.js";
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import FlashCard from "@/components/FlashCard.vue";
@@ -58,7 +55,7 @@ export default {
     SidebarNavigation,
     FlashCard,
     NavigationBar,
-    FlashcardTitle,
+    FlashcardTitle, 
     NextIcon,
     PrevIcon,
     FullScreenIcon,
@@ -66,36 +63,12 @@ export default {
     counterDisplay,
     shuffle,
   },
-  setup() {
-    const route = useRoute();
-    const flashcardSetId = route.params.id;
-
-    console.log('Viewing flashcard set with ID:', flashcardSetId);
-
-    // If we have an ID, fetch the data
-    let flashcardSet = null;
-
-    if (flashcardSetId) {
-      const { result, loading, error } = useQuery(
-          GET_FLASHCARD_SET_BY_ID,
-          { id: flashcardSetId }
-      );
-
-      // Make this data available to the template
-      flashcardSet = { result, loading, error };
-    }
-
-    return {
-      flashcardSetId,
-      flashcardSet
-    };
-  },
   data() {
     return {
       isSidebarCollapsed: false,
       currIndex: 0,
-      isNavigating: false,
-      fallbackFlashcards: [
+      isNavigating: false, 
+      flashcards: [
         {id: 1, term: "What is an Atom?", definition: "The smallest unit of matter."},
         {id: 2, term: "What is a Molecule?", definition: "A group of atoms bonded together."},
         {id: 3, term: "What is a Cell?", definition: "The basic unit of life."},
@@ -106,60 +79,46 @@ export default {
         {id: 8, term: "What is a Population?", definition: "A group of organisms of the same species that live in the same area."},
         {id: 9, term: "What is a Community?", definition: "All the populations of different species that live in the same area."},
       ],
-      fallbackDeck: {
+      currentDeck: {
         id: 1,
         title: "Biology",
       }
     };
   },
   computed: {
-    // Use GraphQL data if available, otherwise fallback
-    flashcards() {
-      if (this.flashcardSetId && this.flashcardSet?.result?.value?.findFlashcardSetById?.flashcards) {
-        return this.flashcardSet.result.value.findFlashcardSetById.flashcards;
-      }
-      return this.fallbackFlashcards;
-    },
-    currentDeck() {
-      if (this.flashcardSetId && this.flashcardSet?.result?.value?.findFlashcardSetById) {
-        return this.flashcardSet.result.value.findFlashcardSetById;
-      }
-      return this.fallbackDeck;
-    },
     currentFlashcard() {
       return this.flashcards[this.currIndex] || { term: "", definition: "" };
     },
   },
-
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
 
     //These Debounce Methods Prevent Spamming the Next and Previous Buttons
-
+    
     nextCardDebounced() {
       if (this.isNavigating) return;
       this.isNavigating = true;
-
+      
       this.nextCard();
-
+      
       setTimeout(() => {
         this.isNavigating = false;
       }, 300);
     },
-
+    
     prevCardDebounced() {
       if (this.isNavigating) return;
       this.isNavigating = true;
-
+      
       this.prevCard();
-
+      
       setTimeout(() => {
         this.isNavigating = false;
       }, 300);
     },
-
+    
     //Methods for Navigation
     nextCard() {
       if (this.currIndex < this.flashcards.length - 1) {
@@ -175,7 +134,7 @@ export default {
         this.currIndex = this.flashcards.length - 1;
       }
     },
-
+    
     shuffleCards() {
       const shuffled = [...this.flashcards];
       for (let i = shuffled.length - 1; i > 0; i--) {

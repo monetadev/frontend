@@ -12,22 +12,26 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 
-// Component name (optional in Vue 3.3+)
-defineOptions({
-  name: 'Dashboard'
-});
-
-// Reactive state
-const isSidebarCollapsed = ref(false);
-
-// Methods
-const toggleSidebar = () => {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+export default {
+  name: "Dashboard",
+  components: {
+    SidebarNavigation,
+    NavigationBar,
+  },
+  data() {
+    return {
+      isSidebarCollapsed: false,
+    };
+  },
+  methods: {
+    toggleSidebar() {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    },
+  },
 };
 </script>
 

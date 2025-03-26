@@ -21,6 +21,13 @@
                 <i class="fas fa-moon"></i>
                 <span>Theme</span>
               </li>
+              
+              <!--Deleted Notifications to save for later
+              <li :class="{ active: activeTab === 'notifications' }" @click="activeTab = 'notifications'">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+              </li>
+              -->
 
               <li :class="{ active: activeTab === 'admin' }" @click="activeTab = 'admin'">
               <i class="fas fa-tools"></i>
@@ -34,7 +41,7 @@
             <h2 class="section-title">{{ getTitle }}</h2>
   
             <div v-if="activeTab === 'account'" class="settings-section">
-              <h2>Edit Account Settings?</h2>
+              <h2>Account Settings</h2>
 
               
               <!-- Profile Picture Section -->
@@ -76,20 +83,25 @@
                 <input type="email" v-model="user.email" class="input-field" />
               </div>
 
-              <!-- Creation Date -->
+              <!-- Bio -->
               <div class="input-group">
-                <label>Creation Date:</label>
-                <input type="text" :value= "formattedCreationDate" class="read-only-field" readonly/>
+                <label>Bio:</label>
+                <textarea v-model="user.bio" class="input-field"></textarea>
               </div>
 
-              <!-- LastUpdated -->
+
+              <!-- Timezone -->
               <div class="input-group">
-                <label>Last Updated:</label>
-                <input type="text" :value= "formattedLastUpdated" class="read-only-field" readonly/>
+                <label>Timezone:</label>
+                <select v-model="user.timezone" class="input-field">
+                  <option value="GMT-5">Eastern Time (GMT-5)</option>
+                  <option value="GMT-8">Pacific Time (GMT-8)</option>
+                  <option value="GMT+1">Central European Time (GMT+1)</option>
+                </select>
               </div>
 
               <!-- Save Button -->
-              <button class="save-button" @click="handleUserUpdated" :disabled="!isUserDataLoaded">Save Changes</button>
+              <button class="save-button" @click="saveAccountSettings">Save Changes</button>
             </div>
 
   
@@ -115,18 +127,18 @@
  
             </div>
 
-
-
+            
             <div v-if="activeTab === 'theme'" class="settings-section">
               <h2>Theme Settings</h2>
               <p>Change Your Theme!</p>
-
+              
+              <!-- Theme Toggle Switch -->
               <label class="theme-switch">
-                <input type="checkbox" v-model="themeStore.isDarkMode" @change="toggleTheme">
+                <input type="checkbox" v-model="isDarkMode" @change="toggleTheme">
                 <span class="slider"></span>
               </label>
-
-              <p>Current Mode: <strong>{{ themeStore.isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
+              
+              <p>Current Mode: <strong>{{ isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
             </div>
             
             <!-- Deleted Notifications to save for later
@@ -140,65 +152,31 @@
 
             <div v-if="activeTab === 'admin'" class="settings-section">
             <h2>Admin Settings</h2>
-              <div class="table-container">
-                <!-- Loading indicator -->
-                <div v-if="usersLoading && !paginatedUsers.length" class="loading-indicator">
-                  Loading users...
-                </div>
-
-                <!-- Error display -->
-                <div v-if="usersError" class="error-message">
-                  Error loading users: {{ usersError.message }}
-                </div>
-
-                <!-- Users Table -->
-                <table v-if="paginatedUsers.length" class="admin-table">
-                  <thead>
+            <div class="table-container">
+              <!-- Users Table -->
+              <table class="admin-table">
+                <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>Uuid</th>
                     <th>Username</th>
                     <th>Email</th>
                     <th>Date Created</th>
                     <th>Last Updated</th>
                     <th>Roles</th>
                   </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="user in paginatedUsers" :key="user.id">
-                    <td>{{ user.id }}</td>
+                </thead>
+                <tbody>
+                  <tr v-for="user in users" :key="user.uuid">
+                    <td>{{ user.uuid }}</td>
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.creationDate.split('T')[0] }}</td>
-                    <td>{{ user.lastUpdated?.split('T')[0] || '—' }}</td>
-                    <td>{{ user.roles.map(role => role.name).join(', ') }}</td>
+                    <td>{{ user.dateCreated }}</td>
+                    <td>{{ user.lastUpdated }}</td>
+                    <td>{{ user.roles.join(', ') }}</td>
                   </tr>
-                  </tbody>
-                </table>
-
-                <!-- Pagination controls -->
-                <div v-if="paginatedUsers.length" class="pagination-controls">
-                  <button
-                      @click="prevPage"
-                      :disabled="pageInfo.currentPage <= 0"
-                      class="pagination-button"
-                  >
-                    Previous
-                  </button>
-
-                  <span class="page-info">
-      Page {{ pageInfo.currentPage + 1 }} of {{ pageInfo.totalPages }}
-      ({{ pageInfo.totalElements }} total users)
-    </span>
-
-                  <button
-                      @click="nextPage"
-                      :disabled="pageInfo.currentPage >= pageInfo.totalPages - 1"
-                      class="pagination-button"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Roles Management -->
             <h2>Role Management</h2>
@@ -235,246 +213,89 @@
       </div>
     </div>
   </template>
-
   
   <script>
   import SideNavigation from "@/components/SideNavigation.vue";
   import TopNavigation from "@/components/TopNavigation.vue";
   import eventBus from '../eventBus';
 
+  
+  
+  
+  export default {
+  components: {
+    SideNavigation,
+    TopNavigation,
+  },
+  data() {
+    return {
+      
+      activeTab: 'account',
+      user: {
+      profilePicture: "https://cdn2.momjunction.com/wp-content/uploads/2019/07/Whatsapp-DP-Images-For-Boys-1.jpg.avif", // Placeholder image URL
+      firstname: "John",
+      lastname: "Doe",
+      username: "johndoe123",
+      email: "john.doe@example.com",
+      bio: "Passionate developer, coffee lover, and tech enthusiast.",
+      language: "en",
+      timezone: "GMT-5",
+    },
 
-<script setup>
-import { useThemeStore } from "@/stores/themeStore";
-import SideNavigation from "@/components/SideNavigation.vue";
-import TopNavigation from "@/components/TopNavigation.vue";
-import { ref, reactive, computed, watch } from 'vue';
-import {useMutation, useQuery} from '@vue/apollo-composable';
-import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS} from "@/graphql/auth.js"
-import apolloClient from '../plugins/apollo.js';
-import eventBus from "@/eventBus.js";
+    //  notifications: { email: true },
+      users: [
+        { uuid: "123", username: "johndoe", email: "john@example.com", dateCreated: "2024-01-01", lastUpdated: "2024-03-01", roles: ["Admin"] },
+        { uuid: "456", username: "janedoe", email: "jane@example.com", dateCreated: "2023-11-15", lastUpdated: "2024-02-20", roles: ["User"] }
+      ],
+      roleOptions: ["Admin", "Editor", "User"],
+      selectedRoles: {},
 
-const currentPage = ref(0);
-const pageSize = ref(10);
+      
+       isDarkMode: true, // Default mode is light mode
 
-const {
-  result: usersResult,
-  loading: usersLoading,
-  error: usersError
-} = useQuery(
-    FIND_ALL_USERS,
-    () => ({
-      page: currentPage.value,
-      size: pageSize.value
-    }),
-    {
-      fetchPolicy: 'cache-and-network'
-    }
-);
+       isSidebarCollapsed: false,
 
-// Parse the results
-const paginatedUsers = computed(() => {
-  return usersResult.value?.findAllUsers?.items || [];
-});
+    };
 
-const pageInfo = computed(() => {
-  return usersResult.value?.findAllUsers?.pageInfo || {
-    currentPage: 0,
-    totalPages: 0,
-    totalElements: 0
-  };
-});
+    
 
-// Pagination control methods
-function nextPage() {
-  if (currentPage.value < pageInfo.value.totalPages - 1) {
-    currentPage.value++;
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 0) {
-    currentPage.value--;
-  }
-}
-
-// execute graphql 'me' query to retrieve current user data
-const { result, loading, error } = useQuery(ME_QUERY);
-
-// //fetched the current user
-// const queriedUser = computed(() => result.value?.me);
-
-//update user details
-const { mutate: updateUser } = useMutation(UPDATE_USER);
-
-// Use the theme store
-const themeStore = useThemeStore();
-
-// Reactive state
-const activeTab = ref('account');
-const isSidebarCollapsed = ref(false);
-
-
-const formattedLastUpdated = computed(() => {
-  if (!user.lastUpdated) return '';
-  return user.lastUpdated.split('T')[0]; // Shows "2025-03-20"
-});
-
-
-const formattedCreationDate = computed(() => {
-  if (!user.creationDate) return '';
-  return user.creationDate.split('T')[0]; // Shows "2025-03-20"
-});
-
-const user = reactive({
-  profilePicture: "https://cdn2.momjunction.com/wp-content/uploads/2019/07/Whatsapp-DP-Images-For-Boys-1.jpg.avif",
-  firstname: "",
-  lastname: "",
-  username: "",
-  email: "",
-  bio: "Passionate developer, coffee lover, and tech enthusiast.",
-  language: "en",
-  creationDate: "",
-  lastUpdated: "",
-});
-
-// Add this computed property
-const isUserDataLoaded = computed(() => {
-  return !loading.value && result.value?.me?.id;
-});
-
-// Watch for query results and update user data
-watch(() => result.value?.me, (userData) => {
-  if (userData) {
-    user.firstname = userData.firstName;
-    user.lastname = userData.lastName;
-    user.username = userData.username;
-    user.email = userData.email;
-    user.creationDate = userData.creationDate;
-    user.lastUpdated = userData.lastUpdated;
-  }
-}, { immediate: true });
-
-const users = ref([
-  { uuid: "123", username: "johndoe", email: "john@example.com", dateCreated: "2024-01-01", lastUpdated: "2024-03-01", roles: ["Admin"] },
-  { uuid: "456", username: "janedoe", email: "jane@example.com", dateCreated: "2023-11-15", lastUpdated: "2024-02-20", roles: ["User"] }
-]);
-
-const roleOptions = ref(["Admin", "Moderator", "User"]);
-const selectedRoles = ref({});
-
-// Computed properties
-const getTitle = computed(() => {
-  return activeTab.value.charAt(0).toUpperCase() + activeTab.value.slice(1) + ' Settings';
-});
-
-// Methods
-function toggleSidebar() {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value;
-}
-
-function toggleTheme() {
-  themeStore.toggleTheme();
-}
-
-function updateUserRole(uuid) {
-  const newRole = selectedRoles.value[uuid];
-  const user = users.value.find(user => user.uuid === uuid);
-
-  if (user) {
-    user.roles = [newRole];
-  }
-}
-
-toggleSidebar() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-},
-
-saveAccountSettings() {
-    eventBus.emit('toast', {
-        msg: 'Settings saved!',
-        type: 'success',
-        duration: 3000
-    });
-}
-
-
-
-function uploadProfilePicture(event) {
-  const file = event.target.files[0];
-  if (file) {
-    user.profilePicture = URL.createObjectURL(file);
-  }
-}
-
-function toastFunction(message, type) {
-  eventBus.emit('toast', {
-    msg: message,
-    type: type,
-    duration: 3000
-  })
-}
-
-const handleUserUpdated = async () => {
-  try {
-
-    //used to retrieve the UUID for the currently logged-in user
-    const userId = result.value?.me;
-
-    //calling updateUser query
-    await apolloClient.mutate({
-      mutation: UPDATE_USER,
-      variables: {
-        id: userId.id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstname,
-        lastName: user.lastname
-      },
-
-      //update apollo client cache
-      update: (cache, { data }) => {
-        const updatedUser = data.updateUser;
-
-        cache.writeQuery({
-          query: ME_QUERY,
-          data:{
-            me:{
-              ...result.value.me,
-              firstName: updatedUser.firstName,
-              lastName: updatedUser.lastName,
-              username: updatedUser.username,
-              email: updatedUser.email,
-              lastUpdated: updatedUser.lastUpdated
-            }
-          }
-        })
+  },
+  methods: {
+    
+    updateUserRole(uuid) {
+      const newRole = this.selectedRoles[uuid];
+      const user = this.users.find(user => user.uuid === uuid);
+      
+      if (user) {
+        user.roles = [newRole]; // Replace existing role
       }
-    });
+    },
 
-    toastFunction("Settings saved!", 'success');
+    uploadProfilePicture(event) {
+    const file = event.target.files[0];
+    if (file) {
+      this.user.profilePicture = URL.createObjectURL(file); // Show preview of selected image
+    }
+  },
+
+  toggleSidebar() {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    },
+
+  saveAccountSettings() {
+    eventBus.emit('toast', {
+      msg: 'Settings saved!',
+      type: 'success',
+      duration: 3000
+    })
   }
-  catch (error) {
 
-    //graphql mutation failed
-    toastFunction("Error while saving user", "error");
+    
 
   }
-}
+};
 
-// TODO: Implement password changing mutation
-// const changePassword() = async () => {
-//   try{
-//
-//
-//
-//     // TODO: Display successful message
-//     toastFunction("Password updated successfully!", "success");
-//   }
-//   catch (error) {
-//    toastFunction("Error while updating password.", "error");
-//   }
-// }
-</script>
+  </script>
 
   
 
@@ -491,8 +312,8 @@ const handleUserUpdated = async () => {
   .settings-wrapper {
     display: flex;
     height: 100vh;
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: #121729; /* Back ground color */
+    color: white;
   }
   
   /* Main Content Area */
@@ -523,7 +344,7 @@ const handleUserUpdated = async () => {
   .settings-sidebar {
     width: 240px; /* Reduced sidebar width */
     min-width: 220px;
-    background: var(--bg-secondary);
+    background: #22293A; /* Sidebar background color */
     padding: 20px;
     border-radius: 12px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
@@ -563,7 +384,7 @@ const handleUserUpdated = async () => {
   }
   
   .settings-sidebar li.active {
-    background: var(--sidebar-active);
+    background: #5f98ef;  /* When button is clicked */
   }
   
   /* Settings Content */
@@ -571,7 +392,7 @@ const handleUserUpdated = async () => {
   .settings-content {
     flex: 1;
     padding: 30px;
-    background: var(--bg-secondary);
+    background: #22293A; /* Main Content background color */
     border-radius: 12px;
     margin-left: 50px; /* Increase space between sidebar and content */
     max-width: 800px; /* Limit content width */
@@ -589,7 +410,7 @@ const handleUserUpdated = async () => {
   
   /* Individual Setting Sections */
   .settings-section {
-    background: var(--bg-primary);
+    background:  #121729;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
@@ -611,9 +432,9 @@ const handleUserUpdated = async () => {
     width: 95%;
     padding: 12px;
     border-radius: 8px;
-    border: 2px solid var(--border-color);
-    background: var(--input-bg);
-    color: var(--text-primary);
+    border: 2px solid #31406d; /* Adds a border */ /* Another Color: #4a5f9e */
+    background: #121729;
+    color: white;
     font-size: 16px;
     outline: none; /* Removes default outline */
     transition: border 0.3s;
@@ -623,20 +444,11 @@ const handleUserUpdated = async () => {
     border-color: #5f98ef; /* Changes border color when input is focused   */ 
 }
 
-.display-field {
-  width: 95%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  font-size: 16px;
-}
 
 
 
-
-/* Save Button */
+  
+  /* Save Button */
   .save-button {
     background: #2a335a;
     color: white;
@@ -807,66 +619,8 @@ input:checked + .slider:before {
   border-color: #5f98ef;
 }
 
-.read-only-field {
-  /* Just copy all properties from input-field */
-  width: 95%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
-  background: var(--input-bg); /* Change this if you want a different background */
-  color: var(--text-primary);
-  font-size: 16px;
-  outline: none;
-  /* Optional: add a subtle visual cue that it's read-only */
-  cursor: not-allowed;
-}
 
-.pagination-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
-  padding: 10px;
-  background: #22293A;
-  border-radius: 8px;
-}
 
-.pagination-button {
-  background: #2a335a;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.pagination-button:hover:not(:disabled) {
-  background: #5f98ef;
-}
-
-.pagination-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-info {
-  color: white;
-  font-weight: bold;
-}
-
-.loading-indicator, .error-message {
-  padding: 20px;
-  text-align: center;
-  background: #22293A;
-  color: white;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-
-.error-message {
-  color: #ff6b6b;
-}
 
 
 
@@ -878,6 +632,8 @@ input:checked + .slider:before {
 
   */
 
+
+  
   </style>
   
 

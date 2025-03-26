@@ -1,11 +1,10 @@
-<script>
-export default {
-  name: 'App',
-};
+<script setup>
+import Toast from "@/components/ToastFunction.vue";
 </script>
 
 <template>
-  <router-view></router-view>
+  <router-view />
+  <Toast />
 </template>
 
 <style scoped>

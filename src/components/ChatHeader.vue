@@ -23,7 +23,7 @@
           @click="$emit('close')"
           title="Close"
         >
-          &times;
+          &minus;
         </button>
       </div>
     </div>
@@ -103,10 +103,10 @@
   }
   
   .close-btn {
-    color: #ff4d4d;
+    color: #666;
   }
   
   .close-btn:hover {
-    color: #ff0000;
+    color:#666;
   }
   </style>

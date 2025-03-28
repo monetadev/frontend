@@ -34,6 +34,7 @@
         </div> 
       </div>
     </div> 
+    <chat :current-card-term="currentFlashcard.term" />
   </div>
 </template>
 
@@ -48,6 +49,7 @@ import FullScreenIcon from "@/components/icons/fullScreen.vue";
 import PlayButtonIcon from "@/components/icons/playButton.vue";
 import counterDisplay from "@/components/icons/counterDisplay.vue";
 import shuffle from "@/components/icons/shuffle.vue";
+import chat from '@/components/ChatbotLauncher.vue';
 
 export default {
   name: "Dashboard",
@@ -62,6 +64,7 @@ export default {
     PlayButtonIcon,
     counterDisplay,
     shuffle,
+    chat,
   },
   data() {
     return {

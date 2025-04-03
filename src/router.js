@@ -23,11 +23,14 @@ const routes = [
   { path: '/settings', component: Settings},
   {path: '/create', component: Create},
 
+  
+
+
   // { path: '/:pathMatch(.*)*', redirect: '/login' } // Catch-all route to handle undefined routes
   
 
 ];
-
+ 
 const router = createRouter({
   history: createWebHistory(),
   routes

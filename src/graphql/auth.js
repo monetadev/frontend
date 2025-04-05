@@ -35,6 +35,15 @@ export const ME_QUERY = gql`
             lastName
             creationDate
             lastUpdated
+            files{
+                id
+                filename
+                filePath
+                contentType
+            }
+            roles{
+                name
+            }
         }
     }
 `;
@@ -49,6 +58,24 @@ export const UPDATE_USER = gql`
             lastUpdated
         }
     }
+`;
+
+export const UPLOAD_PROFILE_PICTURE = gql`
+  mutation UploadProfilePicture($input: Upload!) {
+    uploadProfilePicture(input: $input) {
+        filename
+        originalFilename
+        size
+        contentType
+        path
+    }
+  }
+`;
+
+export const DELETE_PROFILE_PICTURE = gql`
+  mutation DeleteCurrentUserProfilePicture {
+    deleteCurrentUserProfilePicture
+  }
 `;
 
 export const FIND_ALL_USERS = gql`
@@ -192,6 +219,11 @@ export const CREATE_FLASHCARD_SET = gql`
         }
     }
 `;
+
+export const DELETE_FLASHCARD_SET = gql`
+    mutation DeleteFlashcardSet($userId: UUID!, $setId: UUID!) {
+        deleteFlashcardSet(userId: $userId, setId: $setId) 
+}`
 
 // export const CHANGE_PASSWORD = gql`
 //     mutation ChangePassword($oldPassword: String!, $newPassword: String!) {

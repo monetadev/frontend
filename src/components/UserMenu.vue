@@ -4,7 +4,7 @@
   <div class="user-menu" @click="toggleMenu">
 
     <div class ='create set' @click.stop="toggleCreatePopup" >
-      <createButton text="+" @click="" />
+      <createButton text="+" />
     </div>
 
     <div class="avatar">{{ avatarInitials }}</div>

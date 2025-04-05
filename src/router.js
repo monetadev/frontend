@@ -23,7 +23,7 @@ const routes = [
   { path: '/view', component: View, props: true},
   // {path: '/view', redirect: '/myLibrary'}, // Redirect old path to sets
   { path: '/settings', component: Settings},
-  { path: '/', component: Dashboard },
+  { path: '/', component: Login },
   {path: '/create', component: Create}
 
 ];

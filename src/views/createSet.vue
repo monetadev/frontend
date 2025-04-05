@@ -136,8 +136,6 @@ function handleSubmit() {
     }))
   };
 
-  console.log(input);
-
   isSubmitting.value = true;
   errorMessage.value = '';
 
@@ -187,10 +185,6 @@ function handleAddCard() {
 
 // Update your clear function
 function handleClear() {
-  formData.value = {
-    title: '',
-    description: ''
-  };
   flashcardsData.value = [];
   flashcardsCount.value = 1; // Reset to one empty card
   errorMessage.value = '';

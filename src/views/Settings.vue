@@ -42,13 +42,39 @@
                 <h3>Profile Picture:</h3>
 
                 <!-- Profile Image Container -->
+
                 <div class="profile-image-container">
-                  <img v-if="user.profilePicture" :src="user.profilePicture" alt="Profile Picture" class="profile-img">
-                  <span v-else class="placeholder-text">Profile Picture</span>
+                  <img
+                      v-if="user.profilePicture"
+                      :src="user.profilePicture"
+                      alt="Profile Picture"
+                      class="profile-img"
+                  >
+                  <div v-else class="placeholder-avatar">
+                    {{ avatarInitials }}
+                  </div>
                 </div>
 
-                <!-- File Upload Input -->
-                <input type="file" id="profile-upload" @change="uploadProfilePicture" accept="image/*">
+                <div class="profile-pic-controls">
+                  <!-- File Input with Apollo Upload -->
+                  <label for="profile-upload" class="upload-button">Choose File</label>
+                  <input
+                      type="file"
+                      id="profile-upload"
+                      @change="uploadProfilePicture"
+                      accept="image/*"
+                      class="file-input"
+                      ref="fileInput"
+                  />
+
+                  <button
+                      v-if="user.profilePicture"
+                      @click="deleteProfilePicture"
+                      class="delete-button"
+                  >
+                    Remove Picture
+                  </button>
+                </div>
               </div>
 
 
@@ -78,13 +104,13 @@
 
               <!-- Creation Date -->
               <div class="input-group">
-                <label>Creation Date:</label>
+                <label>Creation Date (YYYY-MM-DD):</label>
                 <input type="text" :value= "formattedCreationDate" class="read-only-field" readonly/>
               </div>
 
               <!-- LastUpdated -->
               <div class="input-group">
-                <label>Last Updated:</label>
+                <label>Last Updated (YYYY-MM-DD):</label>
                 <input type="text" :value= "formattedLastUpdated" class="read-only-field" readonly/>
               </div>
 
@@ -242,12 +268,27 @@ import SideNavigation from "@/components/SideNavigation.vue";
 import TopNavigation from "@/components/TopNavigation.vue";
 import { ref, reactive, computed, watch } from 'vue';
 import {useMutation, useQuery} from '@vue/apollo-composable';
-import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS} from "@/graphql/auth.js"
+import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE} from "@/graphql/auth.js"
 import apolloClient from '../plugins/apollo.js';
 import eventBus from "@/eventBus.js";
+import router from "@/router.js";
 
+// Reactive state
+const activeTab = ref('account');
+const isSidebarCollapsed = ref(false);
 const currentPage = ref(0);
 const pageSize = ref(10);
+const fileInput = ref(null);
+const themeStore = useThemeStore();
+const user = reactive({
+  profilePicture: null,
+  firstname: "",
+  lastname: "",
+  username: "",
+  email: "",
+  creationDate: "",
+  lastUpdated: "",
+});
 
 const {
   result: usersResult,
@@ -263,6 +304,29 @@ const {
       fetchPolicy: 'cache-and-network'
     }
 );
+
+// const avatarInitials = computed(() => {
+//   if (!user.firstname && !user.lastname) return '';
+//   const firstInitial = user.firstname ? user.firstname.charAt(0) : '';
+//   const lastInitial = user.lastname ? user.lastname.charAt(0) : '';
+//   return ```${firstInitial}${lastInitial}```.toUpperCase();
+// });
+
+const formattedLastUpdated = computed(() => {
+  if (!user.lastUpdated) return '';
+  return user.lastUpdated.split('T')[0]; // Shows "2025-03-20"
+});
+
+
+const formattedCreationDate = computed(() => {
+  if (!user.creationDate) return '';
+  return user.creationDate.split('T')[0]; // Shows "2025-03-20"
+});
+
+// Add this computed property
+const isUserDataLoaded = computed(() => {
+  return !loading.value && result.value?.me?.id;
+});
 
 // Parse the results
 const paginatedUsers = computed(() => {
@@ -299,41 +363,7 @@ const { result, loading, error } = useQuery(ME_QUERY);
 //update user details
 const { mutate: updateUser } = useMutation(UPDATE_USER);
 
-// Use the theme store
-const themeStore = useThemeStore();
-
-// Reactive state
-const activeTab = ref('account');
-const isSidebarCollapsed = ref(false);
-
-
-const formattedLastUpdated = computed(() => {
-  if (!user.lastUpdated) return '';
-  return user.lastUpdated.split('T')[0]; // Shows "2025-03-20"
-});
-
-
-const formattedCreationDate = computed(() => {
-  if (!user.creationDate) return '';
-  return user.creationDate.split('T')[0]; // Shows "2025-03-20"
-});
-
-const user = reactive({
-  profilePicture: "https://cdn2.momjunction.com/wp-content/uploads/2019/07/Whatsapp-DP-Images-For-Boys-1.jpg.avif",
-  firstname: "",
-  lastname: "",
-  username: "",
-  email: "",
-  bio: "Passionate developer, coffee lover, and tech enthusiast.",
-  language: "en",
-  creationDate: "",
-  lastUpdated: "",
-});
-
-// Add this computed property
-const isUserDataLoaded = computed(() => {
-  return !loading.value && result.value?.me?.id;
-});
+const { mutate: deleteProfilePic } = useMutation(DELETE_PROFILE_PICTURE);
 
 // Watch for query results and update user data
 watch(() => result.value?.me, (userData) => {
@@ -344,6 +374,21 @@ watch(() => result.value?.me, (userData) => {
     user.email = userData.email;
     user.creationDate = userData.creationDate;
     user.lastUpdated = userData.lastUpdated;
+
+    if (userData.files && userData.files.length > 0) {
+      const profilePic = userData.files.find(file =>
+          file.contentType?.startsWith('image/'));
+
+      if (profilePic) {
+        user.profilePicture = `http://localhost:8080/profile/${profilePic.filename}`;
+      }
+      else{
+        user.profilePicture = null
+      }
+    }
+    else{
+      user.profilePicture = null
+    }
   }
 }, { immediate: true });
 
@@ -378,12 +423,54 @@ function updateUserRole(uuid) {
   }
 }
 
-
-
-function uploadProfilePicture(event) {
+async function uploadProfilePicture(event) {
   const file = event.target.files[0];
-  if (file) {
-    user.profilePicture = URL.createObjectURL(file);
+  if (!file) return;
+
+  try {
+    toastFunction("Uploading profile picture...", "info");
+
+    const { data } = await apolloClient.mutate({
+      mutation: UPLOAD_PROFILE_PICTURE,
+      variables: {
+        input: file
+      }
+    });
+
+    const uploadResult = data.uploadProfilePicture;
+    console.log(uploadResult);
+    user.profilePicture = `http://localhost:8080/profile/${uploadResult.filename}`;
+
+    toastFunction("Profile picture updated successfully!", "success");
+
+    // Refresh user data
+    apolloClient.refetchQueries({
+      include: [ME_QUERY]
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    toastFunction("Failed to upload profile picture", "error");
+  }
+}
+
+async function deleteProfilePicture() {
+  try {
+    const { data } = await deleteProfilePic();
+
+    if (data.deleteCurrentUserProfilePicture) {
+      user.profilePicture = null;
+      toastFunction("Profile picture removed", "success");
+
+      // Refresh user data
+      apolloClient.refetchQueries({
+        include: [ME_QUERY]
+      });
+    } else {
+      throw new Error("Failed to delete profile picture");
+    }
+  } catch (error) {
+    console.error("Error deleting profile picture:", error);
+    toastFunction("Failed to remove profile picture", "error");
   }
 }
 
@@ -397,6 +484,9 @@ function toastFunction(message, type) {
 
 const handleUserUpdated = async () => {
   try {
+
+   //used for when the user changes their username
+    const originalUsername = result.value?.me?.username;
 
     //used to retrieve the UUID for the currently logged-in user
     const userId = result.value?.me;
@@ -431,8 +521,24 @@ const handleUserUpdated = async () => {
         })
       }
     });
+    // Check if username was changed
+    if (originalUsername !== user.username) {
+      // Username changed, show message and trigger logout
+      toastFunction("Username changed. Please login again with your new username.", "info");
 
-    toastFunction("Settings saved!", 'success');
+      // Wait 2 seconds before logging out so user can see the message
+      setTimeout(() => {
+        // Clear Apollo store
+        apolloClient.clearStore().then(() => {
+          // Navigate to login screen
+          router.push('/login');
+        });
+      }, 2000);
+    }
+    else
+    {
+      toastFunction("Settings saved!", 'success');
+    }
   }
   catch (error) {
 
@@ -847,6 +953,57 @@ input:checked + .slider:before {
 
 .error-message {
   color: #ff6b6b;
+}
+
+.placeholder-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 36px;
+  font-weight: bold;
+  color: white;
+}
+
+.profile-pic-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.upload-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #2a335a;
+  color: white;
+  border: none;
+  transition: background 0.3s;
+}
+
+.delete-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #8b1f1f;
+  color: white;
+  border: none;
+  transition: background 0.3s;
+}
+
+.upload-button:hover {
+  background: #5f98ef;
+}
+
+.delete-button:hover {
+  background: #c53030;
+}
+
+.file-input {
+  display: none;
 }
 
 

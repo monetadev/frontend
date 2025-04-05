@@ -27,12 +27,18 @@
                 <divider time="Today"/>
               </div>
               <div v-for="set in groupedSets.today" :key="set.id" class="panel-wrapper">
-                <Panel
-                    :number="set.flashcards.length"
-                    :username="set.author.username"
-                    :title="set.title"
-                    :id="set.id"
-                />
+                <div class="panel-container-with-delete">
+                  <Panel
+                      :number="set.flashcards.length"
+                      :username="set.author.username"
+                      :title="set.title"
+                      :description="set.description"
+                      :id="set.id"
+                  />
+                  <button @click.stop="confirmDelete(set)" class="delete-button">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
 
               <!-- Last week's sets -->
@@ -40,12 +46,18 @@
                 <divider time="Last week"/>
               </div>
               <div v-for="set in groupedSets.lastWeek" :key="set.id" class="panel-wrapper">
-                <Panel
-                    :number="set.flashcards.length"
-                    :username="set.author.username"
-                    :title="set.title"
-                    :id="set.id"
-                />
+                <div class="panel-container-with-delete">
+                  <Panel
+                      :number="set.flashcards.length"
+                      :username="set.author.username"
+                      :title="set.title"
+                      :description="set.description"
+                      :id="set.id"
+                  />
+                  <button @click.stop="confirmDelete(set)" class="delete-button">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
 
               <!-- Older sets -->
@@ -53,12 +65,18 @@
                 <divider time="Older"/>
               </div>
               <div v-for="set in groupedSets.older" :key="set.id" class="panel-wrapper">
-                <Panel
-                    :number="set.flashcards.length"
-                    :username="set.author.username"
-                    :title="set.title"
-                    :id="set.id"
-                />
+                <div class="panel-container-with-delete">
+                  <Panel
+                      :number="set.flashcards.length"
+                      :username="set.author.username"
+                      :title="set.title"
+                      :description="set.description"
+                      :id="set.id"
+                  />
+                  <button @click.stop="confirmDelete(set)" class="delete-button">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
             </template>
 
@@ -73,6 +91,18 @@
         </tabs>
       </div>
     </div>
+    <div v-if="showDeleteConfirm" class="delete-modal">
+      <div class="delete-modal-content">
+        <h2>Delete Flashcard Set</h2>
+        <p>Are you sure you want to delete "<strong>{{ setToDelete?.title }}</strong>"?</p>
+        <p class="warning">This action cannot be undone.</p>
+        <div class="button-group">
+          <button @click="cancelDelete" class="cancel-button">Cancel</button>
+          <button @click="deleteSet" class="confirm-delete-button">Delete</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -85,16 +115,23 @@ import Tab from "@/components/Tab.vue";
 import Tabs from "@/components/Tabs.vue";
 import Panel from "@/components/panelSets.vue";
 import divider from "@/components/timeDivider.vue";
-import { useQuery } from '@vue/apollo-composable';
-import { GET_ALL_MY_SETS } from '@/graphql/auth';
+import { useQuery, useMutation} from '@vue/apollo-composable';
+import {DELETE_FLASHCARD_SET, GET_ALL_MY_SETS} from '@/graphql/auth';
+import eventBus from "@/eventBus.js";
 
 // State
 const isSidebarCollapsed = ref(false);
-
 const mode = ref('default');
+const showDeleteConfirm = ref(false);
+const setToDelete = ref(null);
 
 // Exec GraphQL Query
-const {result, loading, error} = useQuery(GET_ALL_MY_SETS);
+const {result, loading, error, refetch} = useQuery(GET_ALL_MY_SETS);
+
+//setup delete mutation
+const {mutate: deleteFlashcardSet, loading: deleteLoading } = useMutation(DELETE_FLASHCARD_SET);
+
+const userId = computed(() => result.value?.me?.id);
 
 const myFlashcardSets = computed(() => {
   return result.value?.me?.flashcardSets || [];
@@ -117,13 +154,66 @@ function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
 }
 
-// Helper date functions (implement as needed)
+//Helper date functions
 function isToday(date) {
   // Implement date comparison logic
+  const today = new Date();
+  return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
 }
 
 function isLastWeek(date) {
   // Implement date comparison logic
+  const today = new Date();
+  const lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+  return date >= lastWeek && date < today && !isToday(date);
+}
+
+function confirmDelete(set) {
+  setToDelete.value = set;
+  showDeleteConfirm.value = true;
+}
+
+function cancelDelete() {
+  showDeleteConfirm.value = false;
+  setToDelete.value = null;
+}
+
+async function deleteSet() {
+  if (!setToDelete.value || !userId.value) return;
+
+  try {
+    const { data } = await deleteFlashcardSet({
+      variables: {
+        userId: userId.value,
+        setId: setToDelete.value.id
+      }
+    });
+
+    if (data.deleteFlashcardSet) {
+      // Show success toast
+      toastFunction("Flashcard set deleted successfully", "success");
+
+      // Refresh data
+      await refetch();
+    }
+  } catch (error) {
+    console.error("Error deleting flashcard set:", error);
+    toastFunction("Failed to delete flashcard set", "error");
+  } finally {
+    // Close confirmation dialog
+    showDeleteConfirm.value = false;
+    setToDelete.value = null;
+  }
+}
+
+function toastFunction(message, type) {
+  eventBus.emit('toast', {
+    msg: message,
+    type: type,
+    duration: 3000
+  });
 }
 </script>
 
@@ -203,6 +293,110 @@ function isLastWeek(date) {
 .panel-wrapper:last-child {
   margin-bottom: 0;
 }
+.panel-container-with-delete {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.delete-button {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+}
+
+.panel-container-with-delete:hover .delete-button {
+  opacity: 1;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.delete-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-modal-content {
+  background-color: #1b2233;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.delete-modal-content h2 {
+  margin-top: 0;
+  color: white;
+}
+
+.delete-modal-content .warning {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.cancel-button {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cancel-button:hover {
+  background-color: #2c3e50;
+}
+
+.confirm-delete-button:hover {
+  background-color: #c0392b;
+}
+
 .divide {
 
 }

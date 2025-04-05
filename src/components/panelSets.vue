@@ -8,6 +8,7 @@
       </div>
       <div class="content">
         <h2 class="title">{{ title }}</h2>
+        <p v-if="description" class="description">{{ description }}</p>
       </div>
     </div>
   </template>
@@ -20,6 +21,7 @@ const props = defineProps({
   number: Number,
   username: String,
   title: String,
+  description: String,
   id: {
     type: [Number, String],
     default: null
@@ -61,7 +63,7 @@ const handleClick = () => {
   .flashcard {
     position: relative;
     width: 95%;
-    height: 75px;
+    min-height: 75px;
     background-color: #1b2233;
     border-radius: 20px;
     padding: 20px;
@@ -117,5 +119,18 @@ const handleClick = () => {
     font-weight: 700;
     text-align: left;
     color: white;
+    margin-bottom: 4px;
+  }
+
+  .description {
+    font-size: 14px;
+    color: #b8c4e0;
+    text-align: left;
+    margin-top: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   </style>

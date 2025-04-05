@@ -61,7 +61,7 @@ const handleLogin = async () => {
     toastFunction("Login successful!", "success");
 
     //after successful log in, go to dashboard
-    await router.push('/dashboard');
+    await router.push('/myLibrary');
   } catch (error) {
 
     toastFunction("Invalid username/Password. Please try again.", "error");

@@ -1,36 +1,41 @@
 <template>
-  <div class="reset-container">
-    <div class="illustration-container">
-      <img src="@/assets/reset.png" alt="Illustration" class="illustration" />
+  <div class="reset-wrapper">
+    <div class="reset-container">
+      <div class="illustration-container">
+        <img src="@/assets/reset.png" alt="Illustration" class="illustration" />
+      </div>
+
+      <div class="form-container">
+        <h1>Reset Password</h1>
+        <p class="subtitle">Enter your email address to receive a password reset link.</p>
+
+        <form @submit.prevent="handleResetPassword">
+          <InputWithIcon iconName="email" label="Email" type="email" v-model="email" />
+
+          <PrimaryButton text="Send Link" />
+          <div class="signup">
+            <router-link to="/login">
+              Back to Login
+            </router-link>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <div class="form-container">
-      <h1>Reset Password</h1>
-      <p class="subtitle">Enter your email address to receive a password reset link.</p>
-
-      <form @submit.prevent="handleResetPassword">
-        <InputWithIcon iconName="email" label="Email" type="email" v-model="email" />
-
-        <PrimaryButton text="Send Link" />
-        <div class="signup">
-          <router-link to="/login">
-            Back to Login
-          </router-link>
-        </div>
-      </form>
-    </div>
+    <Footer class="footer" />
   </div>
 </template>
 
 <script>
 import InputWithIcon from "@/components/InputWithIcon.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
+import Footer from '@/components/Footer.vue';
 
 export default {
   name: "ResetPassword",
   components: {
     InputWithIcon,
-    PrimaryButton
+    PrimaryButton,
+    Footer
   },
   data() {
     return {
@@ -60,6 +65,14 @@ export default {
   height: 100vh;
   background-color: #22293A;
 }
+
+
+.reset-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 
 .illustration-container {
   flex: 1.2;

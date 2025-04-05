@@ -1,109 +1,115 @@
 <template>
-  <section class="create-account">
-    <div class="before-form">
-      <h1>Create Account</h1>
-      <p>The ultimate study experience. Sign up for free!</p>
-      <p>
-        Already have an account?
-        <router-link to="/login" class="hyperlink">Sign in</router-link>
-      </p>
-    </div>
+  <div class="page-wrapper">
+    <div class="signup-layout">
+      <section class="Image-class">
+        <div class="image">
+          <img src="../assets/3d-casual-life-smiling-young-man-with-laptop-sitting-on-floor 1.svg" alt="Guy sitting" />
+        </div>
+      </section>
 
-    <div class="circle-container">
-      <ProgressCircle :number="1" :is-active="currentStep >= 1" />
-      <ProgressLine :is-active="currentStep === 2" />
-      <ProgressCircle :number="2" :is-active="currentStep === 2" />
-    </div>
-
-    <div class="container">
-      <div v-if="currentStep === 1" class="form-step">
-        <h2>Personal Information</h2>
-        <div class="form-row">
-          <InputForm
-              label="Username"
-              v-model="usernameInput"
-              type="text"
-              placeholder="Username"
-              name="username"
-              :required="true"
-              id="username"
-          />
-        </div>
-        <div class="form-row">
-          <InputForm
-              label="Email"
-              v-model="emailInput"
-              type="text"
-              placeholder="Email"
-              name="email"
-              :required="true"
-              id="email"
-          />
-        </div>
-        <div class="form-row">
-          <InputForm
-              label="First Name"
-              v-model="firstnameInput"
-              type="text"
-              placeholder="First Name"
-              name="firstName"
-              :required="true"
-              id="firstName"
-          />
-        </div>
-        <div class="form-row">
-          <InputForm
-              label="Last Name"
-              v-model="lastnameInput"
-              type="text"
-              placeholder="Last Name"
-              name="lastName"
-              :required="true"
-              id="lastName"
-          />
+      <section class="create-account">
+        <div class="before-form">
+          <h1>Create Account</h1>
+          <p>The ultimate study experience. Sign up for free!</p>
+          <p>
+            Already have an account?
+            <router-link to="/login" class="hyperlink">Sign in</router-link>
+          </p>
         </div>
 
-        <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Next" @click="e => { e.preventDefault(); moveToStep(2); }" />
+        <div class="circle-container">
+          <ProgressCircle :number="1" :is-active="currentStep >= 1" />
+          <ProgressLine :is-active="currentStep === 2" />
+          <ProgressCircle :number="2" :is-active="currentStep === 2" />
         </div>
-      </div>
-      <div v-if="currentStep === 2" class="form-step">
-        <h2>Password Information</h2>
-        <div class="form-row">
-          <InputForm
-              label="Password"
-              v-model="passwordInput"
-              type="password"
-              placeholder="Password"
-              name="password"
-              :required="true"
-              id="password"
-          />
-        </div>
-        <div class="form-row">
-          <InputForm
-              label="Confirm Password"
-              v-model="confirmPasswordInput"
-              type="confirmPassword"
-              placeholder="Confirm Password"
-              name="confirmPassword"
-              :required="true"
-              id="confirmPassword"
-          />
-        </div>
-        <div style="text-align: center; margin-top: 20px">
-          <SecondaryButton text="Back" @click="moveToStep(1)" />
-          <SecondaryButton text="Submit" @click="submitForm" />
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="Image-class">
-    <div class="image">
-      <img src="../assets/3d-casual-life-smiling-young-man-with-laptop-sitting-on-floor 1.svg" alt="Guy sitting" />
+        <div class="container">
+          <div v-if="currentStep === 1" class="form-step">
+            <h2>Personal Information</h2>
+            <div class="form-row">
+              <InputForm
+                  label="Username"
+                  v-model="usernameInput"
+                  type="text"
+                  placeholder="Username"
+                  name="username"
+                  :required="true"
+                  id="username"
+              />
+            </div>
+            <div class="form-row">
+              <InputForm
+                  label="Email"
+                  v-model="emailInput"
+                  type="text"
+                  placeholder="Email"
+                  name="email"
+                  :required="true"
+                  id="email"
+              />
+            </div>
+            <div class="form-row">
+              <InputForm
+                  label="First Name"
+                  v-model="firstnameInput"
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  :required="true"
+                  id="firstName"
+              />
+            </div>
+            <div class="form-row">
+              <InputForm
+                  label="Last Name"
+                  v-model="lastnameInput"
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  :required="true"
+                  id="lastName"
+              />
+            </div>
+
+            <div style="text-align: center; margin-top: 20px">
+              <SecondaryButton text="Next" @click="e => { e.preventDefault(); moveToStep(2); }" />
+            </div>
+          </div>
+          <div v-if="currentStep === 2" class="form-step">
+            <h2>Password Information</h2>
+            <div class="form-row">
+              <InputForm
+                  label="Password"
+                  v-model="passwordInput"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  :required="true"
+                  id="password"
+              />
+            </div>
+            <div class="form-row">
+              <InputForm
+                  label="Confirm Password"
+                  v-model="confirmPasswordInput"
+                  type="confirmPassword"
+                  placeholder="Confirm Password"
+                  name="confirmPassword"
+                  :required="true"
+                  id="confirmPassword"
+              />
+            </div>
+            <div style="text-align: center; margin-top: 20px">
+              <SecondaryButton text="Back" @click="moveToStep(1)" />
+              <SecondaryButton text="Submit" @click="submitForm" />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  </section>
+
+    <Footer class="footer" />
+  </div>
 </template>
 
 <script setup>
@@ -116,6 +122,7 @@ import ProgressCircle from '@/components/ProgressCircle.vue';
 import ProgressLine from '@/components/ProgressLine.vue';
 import { REGISTER_USER } from '@/graphql/auth';
 import eventBus from "@/eventBus.js";
+import Footer from '@/components/Footer.vue';
 
 const router = useRouter();
 const currentStep = ref(1);
@@ -239,32 +246,42 @@ html, body {
   font-family: 'Outfit', sans-serif;
 }
 
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.signup-layout {
+  display: flex;
+  width: 100%;
+}
+
 .Image-class {
   background-color: #121729;
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 27%;
-  height: 100%;
+  height: auto;
+  min-height: 100vh;
   padding: 30px;
   box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
 .create-account {
-  position: fixed;
-  top: 0;
-  right: 0;
   width: 65%;
-  height: 100%;
+  height: auto;
+  min-height: 100vh;
   background-color: #22293A;
   color: white;
   padding: 30px;
   box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.2);
-  overflow-y: auto;
+  overflow-y: visible;
+  position: relative;
+  padding-bottom: 100px; /* Make room for footer */
 }
 
 .create-account .before-form {
@@ -320,5 +337,11 @@ html, body {
   padding-left: 10%;
 }
 
-
+.footer {
+  background: #1a1f2e;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
 </style>

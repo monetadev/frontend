@@ -59,6 +59,7 @@
       </div>
     </div>
   </div>
+  <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
 </template>
 
 <script setup>
@@ -75,6 +76,7 @@ import FCTitle from '@/components/FlashcardTitle.vue';
 import createPanel from '@/components/createPanel.vue';
 import addCard from '@/components/addCardCreate.vue';
 import {CREATE_FLASHCARD_SET} from "@/graphql/auth.js";
+import Footer from "@/components/Footer.vue";
 
 // State
 const isSidebarCollapsed = ref(true);
@@ -292,5 +294,17 @@ function handleDeletePanel(position) {
   padding: 10px;
   margin: 10px 6% 0 12%;
   text-align: center;
+}
+
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
 }
 </style>

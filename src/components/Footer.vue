@@ -1,7 +1,8 @@
 <template>
-  <footer class="global-footer">
-    <div class="footer-content">
-<!--      <div class="footer-section">-->
+  <footer class="global-footer" :class="{ collapsed: isSidebarCollapsed }">
+    <div class="footer-inner">
+      <div class="footer-content">
+        <!--      <div class="footer-section">-->
 <!--        <h3>Learn</h3>-->
 <!--        <ul>-->
 <!--          <li><a href="#">Flashcards</a></li>-->
@@ -9,38 +10,39 @@
 <!--          <li><a href="#">Practice Tests</a></li>-->
 <!--        </ul>-->
 <!--      </div>-->
-      
-      <div class="footer-section">
-        <h3>Company</h3>
-        <ul>
-          <li><a href="https://github.com/monetadev" target ="_blank">About Us</a></li>
-        </ul>
+
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="https://github.com/monetadev" target ="_blank">About Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Help Center</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
       </div>
-      
-      <div class="footer-section">
-        <h3>Support</h3>
-        <ul>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Help Center</a></li>
-        </ul>
-      </div>
-      
-      <div class="footer-section">
-        <h3>Legal</h3>
-        <ul>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Cookie Policy</a></li>
-        </ul>
-      </div>
-    </div>
-    
-    <div class="footer-bottom">
-      <p>© {{ currentYear }} Moneta. License TBD.</p>
-      <div class="social-icons">
-        <a href="https://x.com/JohnDoe1494410" target= "_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-        <a href="https://github.com/monetadev" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+
+      <div class="footer-bottom">
+        <p>© {{ currentYear }} Moneta. License TBD.</p>
+        <div class="social-icons">
+          <a href="https://x.com/JohnDoe1494410" target= "_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="https://github.com/monetadev" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
       </div>
     </div>
   </footer>
@@ -48,6 +50,10 @@
 
 <script setup>
 import { computed } from 'vue';
+
+defineProps({
+  isSidebarCollapsed: Boolean
+});
 
 const currentYear = computed(() => new Date().getFullYear());
 </script>
@@ -59,11 +65,14 @@ const currentYear = computed(() => new Date().getFullYear());
   background-color: #1b2233;
   color: #b8c4e0;
   font-family: 'Outfit', sans-serif;
-  padding: 3rem 2rem 1.5rem;
-  width: 100%;
-  z-index: 100;
-  margin-top: auto;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+}  
+
+.footer-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .footer-content {
@@ -148,11 +157,11 @@ const currentYear = computed(() => new Date().getFullYear());
     flex-direction: column;
     gap: 2rem;
   }
-  
+
   .footer-section {
     width: 100%;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
@@ -182,4 +191,4 @@ const currentYear = computed(() => new Date().getFullYear());
     margin-top: 1.5rem;
   }
 }
-</style> 
+</style>

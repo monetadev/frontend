@@ -10,12 +10,14 @@
       </div>
     </div>
   </div>
+  <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
+import Footer from "@/components/Footer.vue";
 
 // Component name (optional in Vue 3.3+)
 defineOptions({
@@ -50,5 +52,17 @@ const toggleSidebar = () => {
 .content {
   padding: 20px;
   color: white;
+}
+
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
 }
 </style>

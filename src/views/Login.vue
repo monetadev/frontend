@@ -32,6 +32,7 @@
       </form>
     </div>
   </div>
+  <Footer class="footer" />
 </template>
 
 <script setup>
@@ -42,6 +43,7 @@ import InputWithIcon from "@/components/InputWithIcon.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { LOGIN_USER } from '@/graphql/auth';
 import eventBus from "@/eventBus.js";
+import Footer from '@/components/Footer.vue';
 
 const username = ref('');
 const password = ref('');

@@ -1,22 +1,22 @@
 <template>
   <div class="flashset-set-viewer">
-    <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
+    <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" /> 
     <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
-      <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
+      <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />   
       <div class="Top">
         <div class="my-Stuffs">
           <h1>My Sets</h1>
         </div>
-      </div>
+      </div>   
       <div class="Search_Bar">
         <setBar />
-      </div>
+      </div>  
       <div class='wrapper'>
         <tabs :mode="mode">
           <tab title="Flashcard Sets" class="panel-container">
             <!-- Loading state -->
             <div v-if="loading">Loading your flashcard sets...</div>
-
+            
             <!-- Error state -->
             <div v-if="error">Error loading flashcard sets: {{ error.message }}</div>
 
@@ -27,6 +27,7 @@
                 <divider time="Today"/>
               </div>
               <div v-for="set in groupedSets.today" :key="set.id" class="panel-wrapper">
+
                 <div class="panel-container-with-delete">
                   <Panel
                       :number="set.flashcards.length"
@@ -39,8 +40,9 @@
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
-              </div>
 
+              </div>
+              
               <!-- Last week's sets -->
               <div v-if="groupedSets.lastWeek.length" class="divide">
                 <divider time="Last week"/>
@@ -104,6 +106,7 @@
     </div>
 
   </div>
+  <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
 </template>
 
 <script setup>
@@ -118,7 +121,7 @@ import divider from "@/components/timeDivider.vue";
 import { useQuery, useMutation} from '@vue/apollo-composable';
 import {DELETE_FLASHCARD_SET, GET_ALL_MY_SETS} from '@/graphql/auth';
 import eventBus from "@/eventBus.js";
-
+import Footer from "@/components/Footer.vue";
 // State
 const isSidebarCollapsed = ref(false);
 const mode = ref('default');
@@ -397,7 +400,18 @@ function toastFunction(message, type) {
   background-color: #c0392b;
 }
 
-.divide {
 
+
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
 }
 </style>
+

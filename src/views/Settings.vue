@@ -260,6 +260,7 @@
         </div>
       </div>
     </div>
+  <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
   </template>
 
 <script setup>
@@ -272,6 +273,8 @@ import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS, UPLOAD_PROFILE_PICTURE, DELETE_PR
 import apolloClient from '../plugins/apollo.js';
 import eventBus from "@/eventBus.js";
 import router from "@/router.js";
+import Footer from "@/components/Footer.vue";
+
 
 // Reactive state
 const activeTab = ref('account');
@@ -576,11 +579,13 @@ const handleUserUpdated = async () => {
 }
   /* Full Page Layout */
   .settings-wrapper {
-    display: flex;
-    height: 100vh;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-  }
+  display: flex;
+  flex-direction: column; /* Allow vertical stacking */
+  min-height: 100vh;       /*  Allow page to grow */
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
   
   /* Main Content Area */
   .settings-main {
@@ -1007,6 +1012,17 @@ input:checked + .slider:before {
 }
 
 
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
+}
 
 
   /* Background Colors: 

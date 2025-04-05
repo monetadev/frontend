@@ -35,6 +35,7 @@
       </div>
     </div>
   </div>
+  <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
 </template>
 
 <script>
@@ -51,6 +52,7 @@ import FullScreenIcon from "@/components/icons/fullScreen.vue";
 import PlayButtonIcon from "@/components/icons/playButton.vue";
 import counterDisplay from "@/components/icons/counterDisplay.vue";
 import shuffle from "@/components/icons/shuffle.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
   name: "Dashboard",
@@ -65,6 +67,7 @@ export default {
     PlayButtonIcon,
     counterDisplay,
     shuffle,
+    Footer
   },
   setup() {
     const route = useRoute();
@@ -204,8 +207,9 @@ export default {
 <style scoped>
 .dashboard {
   display: flex;
-  height: 100vh;
   background-color: #22293A;
+  min-height: 100vh; /*  instead, allow it to grow but fill at least the screen */
+  flex-direction: column;
 }
 
 .main-content {
@@ -223,7 +227,7 @@ export default {
   color: white;
   padding-left: 1%;
   position: relative;
-  height: 100%;
+  height: 100%; 
 }
 
 .flashcard-container {
@@ -266,5 +270,17 @@ export default {
 .full-screen-container svg:hover {
   cursor: pointer;
   fill: #F9F9F9;
+}
+
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
 }
 </style>

@@ -1,34 +1,35 @@
 <template>
   <div class="page">
-    <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
-    <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
-      <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
-      <div class="content-wrapper">
-        <div class="content-container">
-          <div class="content-header">
-            <div class="content-text">
-              <h1>Upload Document</h1>
-              <p>Drop in your study document and instantly turn it into smart flashcards!</p>
+    <div class="layout">
+      <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
+      <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
+        <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
+        <div class="content-wrapper">
+          <div class="content-container">
+            <div class="content-header">
+              <div class="content-text">
+                <h1>Upload Document</h1>
+                <p>Drop in your study document and instantly turn it into smart flashcards!</p>
+              </div>
+              <img src="@/assets/book.svg" class="page-icon" alt="Book Icon" />
             </div>
-            <img src="@/assets/book.svg" class="page-icon" alt="Book Icon" />
-          </div>
 
-          <div class="progress-container">
-            <ProgressCircle :number="1" :isActive="progressStep >= 1" subText="Upload" />
-            <ProgressLine :isActive="progressStep >= 2" />
-            <ProgressCircle :number="2" :isActive="progressStep >= 2" subText="Review" />
-            <ProgressLine :isActive="progressStep >= 3" />
-            <ProgressCircle :number="3" :isActive="progressStep >= 3" subText="Organize" />
-          </div>
+            <div class="progress-container">
+              <ProgressCircle :number="1" :isActive="progressStep >= 1" subText="Upload" />
+              <ProgressLine :isActive="progressStep >= 2" />
+              <ProgressCircle :number="2" :isActive="progressStep >= 2" subText="Review" />
+              <ProgressLine :isActive="progressStep >= 3" />
+              <ProgressCircle :number="3" :isActive="progressStep >= 3" subText="Organize" />
+            </div>
 
-          <UploadBox v-if="progressStep === 1" />
+            <UploadBox v-if="progressStep === 1" />
 
-          <div  v-if="progressStep === 1" class="button-container">
-            <PrimaryButton text="Generate" @click="goToReview" />
-          </div>
+            <div  v-if="progressStep === 1" class="button-container">
+              <PrimaryButton text="Generate" @click="goToReview" />
+            </div>
 
-          <div v-if="progressStep === 2" class="flashcard-container">
-            <Flashcard
+            <div v-if="progressStep === 2" class="flashcard-container">
+              <Flashcard
                 v-for="(card, index) in flashcards"
                 :key="index"
                 :number="index + 1"
@@ -36,21 +37,23 @@
                 :answer="card.answer"
                 @accept="handleAccept"
                 @reject="handleReject"
-            />
-          </div>
+              />
+            </div>
 
-          <div  v-if="progressStep === 2" class="button-container">
-            <PrimaryButton text="Organize" @click="goToOrganize" />
-          </div>
+            <div  v-if="progressStep === 2" class="button-container">
+              <PrimaryButton text="Organize" @click="goToOrganize" />
+            </div>
 
-          <div v-if="progressStep === 3" class="organize-section">
-
-
+            <div v-if="progressStep === 3" class="organize-section">
+            
+              
+            </div>
 
           </div>
         </div>
       </div>
     </div>
+    <Footer :class="[isSidebarCollapsed ? 'footer-collapsed' : 'footer-expanded']" />
   </div>
 </template>
 
@@ -62,6 +65,7 @@ import ProgressLine from "@/components/ProgressLine.vue";
 import UploadBox from "@/components/UploadBox.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import Flashcard from "@/components/GeneratedFlashcard.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
   name: "AddFlashcard",
@@ -73,6 +77,7 @@ export default {
     NavigationBar,
     UploadBox,
     Flashcard,
+    Footer
   },
   data() {
     return {
@@ -156,12 +161,12 @@ export default {
     },
     filterInstitutions() {
       this.filteredInstitutions = this.institutions.filter(inst =>
-          inst.toLowerCase().includes(this.searchInstitution.toLowerCase())
+        inst.toLowerCase().includes(this.searchInstitution.toLowerCase())
       );
     },
     filterCourses() {
       this.filteredCourses = this.courses.filter(course =>
-          course.toLowerCase().includes(this.searchCourse.toLowerCase())
+        course.toLowerCase().includes(this.searchCourse.toLowerCase())
       );
     }
   },
@@ -177,6 +182,13 @@ export default {
 
 .page {
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
 }
 
 .main-content {
@@ -184,6 +196,7 @@ export default {
   transition: margin-left 0.3s ease-in-out;
   margin-left: 250px;
   display: flex;
+  flex-direction: column;
   width: calc(100% - 250px);
   padding-top: 80px;
 }
@@ -194,6 +207,7 @@ export default {
 }
 
 .content-wrapper {
+  flex: 1;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -265,7 +279,7 @@ export default {
   flex-wrap: wrap;
   width: 90%;
   gap: 20px;
-
+  
 }
 
 .button-container {
@@ -281,4 +295,15 @@ export default {
   max-width: 200px;
 }
 
+/* Footer dynamic layout */
+.footer-expanded {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.footer-collapsed {
+  margin-left: 80px;
+  transition: margin-left 0.3s ease-in-out;
+  
+}
 </style>

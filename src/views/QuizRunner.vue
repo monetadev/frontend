@@ -2,9 +2,6 @@
   <div class="quiz-runner">
     <h2>Quiz Mode: {{ quizOptions.mode }}</h2>
     <p>Flashcard Set: {{ quizOptions.set }}</p>
-    <p v-if="quizOptions.timeEnabled">Time Limit: {{ quizOptions.timeLimit }} min</p>
-    <p>Locked Navigation: {{ quizOptions.lockedNav ? 'Yes' : 'No' }}</p>
-    <p>Review Mode: {{ quizOptions.reviewMode ? 'Enabled' : 'Disabled' }}</p>
 
     <div v-if="quizOptions.timeEnabled" class="timer-bar">
       <div class="progress" :style="{ width: timeProgress + '%' }"></div>
@@ -410,7 +407,7 @@ export default {
   height: 24px;
   background: #121729;
   border-radius: 10px;
-  margin: 20px 20;
+  margin: 20px 0;
   overflow: hidden;
   border: 1px solid #4caf50;
 }

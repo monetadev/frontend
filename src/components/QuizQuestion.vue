@@ -19,7 +19,7 @@
             type="radio"
             :value="opt"
             v-model="userAnswer"
-            :disabled="answered"
+            :disabled="reviewMode && answered"
             @change="checkAnswer(opt)"
         />
         <span class="custom-radio"></span>
@@ -29,7 +29,7 @@
 
 
     <div v-else-if="mode === 'One-word'">
-      <input type="text" v-model="userAnswer" :disabled="answered" />
+      <input type="text" v-model="userAnswer" :disabled="reviewMode && answered"/>
       <button :disabled="answered" @click="checkAnswer(userAnswer)">Submit</button>
     </div>
 
@@ -57,9 +57,15 @@ export default {
   methods: {
     checkAnswer(answer) {
       this.userAnswer = answer;
-      this.answered = true;
-      this.isCorrect = answer.toLowerCase() === this.question.correctAnswer.toLowerCase();
-      this.$emit("answered");
+
+      if (this.reviewMode) {
+        this.answered = true;
+        this.isCorrect = answer.toLowerCase() === this.question.correctAnswer.toLowerCase();
+        this.$emit("answered");
+      } else {
+        this.$emit("answered");
+      }
+
     }
   }
 };

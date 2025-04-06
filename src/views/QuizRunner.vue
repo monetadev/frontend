@@ -6,6 +6,11 @@
     <p>Locked Navigation: {{ quizOptions.lockedNav ? 'Yes' : 'No' }}</p>
     <p>Review Mode: {{ quizOptions.reviewMode ? 'Enabled' : 'Disabled' }}</p>
 
+    <div v-if="quizOptions.timeEnabled" class="timer-bar">
+      <div class="progress" :style="{ width: timeProgress + '%' }"></div>
+      <span class="time-label">{{ formattedTime }}</span>
+    </div>
+
     <div v-if="questions.length">
       <div v-if="quizOptions.lockedNav">
         <div v-if="currentIndex < questions.length">
@@ -46,6 +51,8 @@ export default {
       quizOptions: {},
       questions: [],
       currentIndex: 0,
+      timeLeft: 0,
+      timerInterval: null
     };
   },
   created() {
@@ -61,6 +68,11 @@ export default {
     };
 
     this.loadQuestions();
+
+    if (this.quizOptions.timeEnabled) {
+      this.timeLeft = this.quizOptions.timeLimit * 60;
+      this.startTimer();
+    }
   },
   methods: {
     loadQuestions() {
@@ -143,11 +155,42 @@ export default {
         this.questions = oneWordQuestions.slice(0, this.quizOptions.questionCount);
       }
     },
+    startTimer() {
+      this.timerInterval = setInterval(() => {
+        if (this.timeLeft > 0) {
+          this.timeLeft--;
+
+          const half = (this.quizOptions.timeLimit * 60) / 2;
+          if (this.timeLeft === half) {
+            alert("Halfway through!");
+          }
+
+          if (this.timeLeft === 60) {
+            alert("Only 1 minute left!");
+          }
+        } else {
+          clearInterval(this.timerInterval);
+          alert("Time's up!");
+          this.submitQuiz();
+        }
+      }, 1000);
+    },
     handleAnswer() {
       this.currentIndex++;
     },
     submitQuiz() {
       alert("Quiz submitted!");
+    }
+  },
+  computed: {
+    timeProgress() {
+      if (!this.quizOptions.timeEnabled) return 100;
+      return (this.timeLeft / (this.quizOptions.timeLimit * 60)) * 100;
+    },
+    formattedTime() {
+      const min = Math.floor(this.timeLeft / 60);
+      const sec = this.timeLeft % 60;
+      return `${min}:${sec < 10 ? "0" + sec : sec}`;
     }
   }
 };
@@ -159,4 +202,33 @@ export default {
   font-family: 'Outfit', sans-serif;
   color: white;
 }
+.timer-bar {
+  position: relative;
+  height: 24px;
+  background: #121729;
+  border-radius: 10px;
+  margin: 20px 0;
+  overflow: hidden;
+  border: 1px solid #4caf50;
+}
+
+.timer-bar .progress {
+  height: 100%;
+  background: #4caf50;
+  border-right: 2px solid #4caf50;
+  transition: width 1s linear;
+  border-radius: 10px 0 0 10px;
+}
+
+
+.timer-bar .time-label {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: white;
+  top: 0;
+  line-height: 24px;
+  font-weight: bold;
+}
+
 </style>

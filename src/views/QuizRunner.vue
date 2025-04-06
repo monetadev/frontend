@@ -27,16 +27,37 @@
         </div>
       </div>
 
-      <div v-else>
-        <QuizQuestion
-            v-for="(q, i) in questions"
-            :key="i"
-            :question="q"
-            :mode="quizOptions.mode"
-            :reviewMode="quizOptions.reviewMode"
-            :questionNumber="q.questionNo"
-        />
-        <button @click="submitQuiz">Submit</button>
+      <div v-else class="quiz-container">
+        <div class="question-nav" :style="navHeightStyle">
+
+        <div
+              v-for="(q, i) in questions"
+              :key="i"
+              class="nav-number"
+              :class="{ answered: answeredQuestions.includes(i) }"
+              @click="scrollToQuestion(i)"
+          >
+            {{ q.questionNo }}
+          </div>
+        </div>
+
+        <div class="questions-area">
+          <div
+              v-for="(q, i) in questions"
+              :key="i"
+              :ref="'question-' + i"
+              class="question-wrapper"
+          >
+            <QuizQuestion
+                :question="q"
+                :mode="quizOptions.mode"
+                :reviewMode="quizOptions.reviewMode"
+                :questionNumber="q.questionNo"
+                @answered="markAnswered(i)"
+            />
+          </div>
+          <button class="submit-button" @click="submitQuiz">Submit</button>
+        </div>
       </div>
     </div>
   </div>
@@ -61,6 +82,7 @@ export default {
       timerInterval: null,
       toastMessage: "",
       showToast: false,
+      answeredQuestions: [],
     };
   },
   created() {
@@ -108,7 +130,8 @@ export default {
           text: "Which continent is the Sahara Desert located in?",
           correctAnswer: "Africa",
           options: ["Asia", "Africa", "Australia", "North America"]
-        }
+        },
+
       ];
 
       const trueFalseQuestions = [
@@ -210,9 +233,27 @@ export default {
     },
     submitQuiz() {
       this.toastMessage("Quiz submitted!");
-    }
+    },
+    markAnswered(index) {
+      if (!this.answeredQuestions.includes(index)) {
+        this.answeredQuestions.push(index);
+      }
+    },
+    scrollToQuestion(index) {
+      const el = this.$refs['question-' + index]?.[0];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    },
   },
   computed: {
+    navHeightStyle() {
+      if (this.questions.length <= 10) {
+        const height = this.questions.length * 40 + (this.questions.length - 1) * 10;
+        return { maxHeight: `${height}px` };
+      }
+      return { maxHeight: '460px' };
+    },
     timeProgress() {
       if (!this.quizOptions.timeEnabled) return 100;
       return (this.timeLeft / (this.quizOptions.timeLimit * 60)) * 100;
@@ -305,6 +346,68 @@ export default {
     opacity: 0;
     transform: translateY(20px);
   }
+}
+.quiz-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.question-nav {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-rows: 40px;
+  grid-template-rows: repeat(10, 40px);
+  gap: 10px;
+  background: #1e2238;
+  padding: 16px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+
+.nav-number {
+  background: #2c2f4a;
+  color: white;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.nav-number.answered {
+  background: #5f98ef;
+  color: white;
+}
+
+.questions-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.question-wrapper {
+  scroll-margin-top: 100px;
+}
+
+.submit-button {
+  margin-top: 30px;
+  padding: 12px 20px;
+  background: #5f98ef;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  align-self: flex-end;
+  cursor: pointer;
 }
 
 </style>

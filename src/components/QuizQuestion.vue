@@ -56,6 +56,7 @@ export default {
   },
   methods: {
     checkAnswer(answer) {
+      this.userAnswer = answer;
       this.answered = true;
       this.isCorrect = answer.toLowerCase() === this.question.correctAnswer.toLowerCase();
       this.$emit("answered");

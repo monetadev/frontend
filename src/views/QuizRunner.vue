@@ -18,6 +18,7 @@
               :question="questions[currentIndex]"
               :mode="quizOptions.mode"
               :reviewMode="quizOptions.reviewMode"
+              :questionNumber="questions[currentIndex].questionNo"
               @answered="handleAnswer"
           />
         </div>
@@ -33,6 +34,7 @@
             :question="q"
             :mode="quizOptions.mode"
             :reviewMode="quizOptions.reviewMode"
+            :questionNumber="q.questionNo"
         />
         <button @click="submitQuiz">Submit</button>
       </div>
@@ -84,21 +86,25 @@ export default {
     loadQuestions() {
       const mcqQuestions = [
         {
+          questionNo: 1,
           text: "What is the capital of Japan?",
           correctAnswer: "Tokyo",
           options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"]
         },
         {
+          questionNo: 2,
           text: "Which gas do plants absorb from the atmosphere?",
           correctAnswer: "Carbon Dioxide",
           options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"]
         },
         {
+          questionNo: 3,
           text: "What is the largest mammal on Earth?",
           correctAnswer: "Blue Whale",
           options: ["Elephant", "Blue Whale", "Giraffe", "Shark"]
         },
         {
+          questionNo: 4,
           text: "Which continent is the Sahara Desert located in?",
           correctAnswer: "Africa",
           options: ["Asia", "Africa", "Australia", "North America"]
@@ -107,21 +113,25 @@ export default {
 
       const trueFalseQuestions = [
         {
+          questionNo: 1,
           text: "The Great Wall of China is visible from space.",
           correctAnswer: "False",
           options: ["True", "False"]
         },
         {
+          questionNo: 2,
           text: "Sound travels faster in water than in air.",
           correctAnswer: "True",
           options: ["True", "False"]
         },
         {
+          questionNo: 3,
           text: "The human body has four lungs.",
           correctAnswer: "False",
           options: ["True", "False"]
         },
         {
+          questionNo: 4,
           text: "Lightning never strikes the same place twice.",
           correctAnswer: "False",
           options: ["True", "False"]
@@ -130,21 +140,25 @@ export default {
 
       const oneWordQuestions = [
         {
+          questionNo: 1,
           text: "One-word: What planet is known as the Red Planet?",
           correctAnswer: "Mars",
           options: []
         },
         {
+          questionNo: 2,
           text: "One-word: Chemical symbol for Gold?",
           correctAnswer: "Au",
           options: []
         },
         {
+          questionNo: 3,
           text: "One-word: First element on the periodic table?",
           correctAnswer: "Hydrogen",
           options: []
         },
         {
+          questionNo: 4,
           text: "One-word: Author of 'Romeo and Juliet'?",
           correctAnswer: "Shakespeare",
           options: []

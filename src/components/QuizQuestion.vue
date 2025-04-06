@@ -1,6 +1,13 @@
 <template>
   <div class="question-box">
-    <p>{{ question.text }}</p>
+
+    <div class="number-container">
+      <span class="question-number-text">
+        {{ questionNumber }}
+      </span>
+    </div>
+
+    <p style="margin-left: 80px;">{{ question.text }}</p>
 
     <div v-if="mode === 'Multiple Choice' || mode === 'True/False'">
       <label
@@ -37,7 +44,8 @@ export default {
   props: {
     question: Object,
     mode: String,
-    reviewMode: Boolean
+    reviewMode: Boolean,
+    questionNumber: Number,
   },
   data() {
     return {
@@ -58,10 +66,11 @@ export default {
 
 <style scoped>
 .question-box {
+  position: relative;
   margin-bottom: 30px;
-  padding: 20px;
+  padding: 40px 20px 20px 20px;
   background: #2c2f4a;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 .question-box button {
   margin-right: 10px;
@@ -115,5 +124,24 @@ input[type="radio"]:checked + .custom-radio::after {
   background: #1e2238;
 }
 
+.number-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #5f98ef;
+  width: 76px;
+  height: 53px;
+  border-radius: 20px 0 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.3s ease-in-out;
+}
 
+.question-number-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
 </style>

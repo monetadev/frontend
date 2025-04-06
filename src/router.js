@@ -9,7 +9,7 @@ import Set from './views/flashsetViewer.vue';
 import View from './views/flashcardViewer.vue';
 import Create from './views/createSet.vue';
 import Quizzes from './views/Quizzes.vue';
-
+import QuizRunner from "@/views/QuizRunner.vue";
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -22,6 +22,7 @@ const routes = [
   {path: '/view', component: View},
   { path: '/settings', component: Settings},
   {path: '/create', component: Create},
+  {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
 
   
 

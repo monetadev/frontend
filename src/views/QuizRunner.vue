@@ -38,6 +38,10 @@
       </div>
     </div>
   </div>
+
+  <div v-if="showToast" class="toast">
+    {{ toastMessage }}
+  </div>
 </template>
 
 <script>
@@ -52,7 +56,9 @@ export default {
       questions: [],
       currentIndex: 0,
       timeLeft: 0,
-      timerInterval: null
+      timerInterval: null,
+      toastMessage: "",
+      showToast: false,
     };
   },
   created() {
@@ -162,24 +168,34 @@ export default {
 
           const half = (this.quizOptions.timeLimit * 60) / 2;
           if (this.timeLeft === half) {
-            alert("Halfway through!");
+            this.triggerToast("Halfway through!");
           }
 
           if (this.timeLeft === 60) {
-            alert("Only 1 minute left!");
+            this.triggerToast("Only 1 minute left!");
           }
+
         } else {
           clearInterval(this.timerInterval);
-          alert("Time's up!");
+          this.triggerToast("Time's up!");
           this.submitQuiz();
         }
       }, 1000);
+    },
+    triggerToast(message) {
+      this.toastMessage = message;
+      this.showToast = true;
+
+      setTimeout(() => {
+        this.showToast = false;
+        this.toastMessage = "";
+      }, 4000);
     },
     handleAnswer() {
       this.currentIndex++;
     },
     submitQuiz() {
-      alert("Quiz submitted!");
+      this.toastMessage("Quiz submitted!");
     }
   },
   computed: {
@@ -229,6 +245,52 @@ export default {
   top: 0;
   line-height: 24px;
   font-weight: bold;
+}
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  min-width: 260px;
+  max-width: 320px;
+  background: linear-gradient(135deg, #1f2434, #2b3146);
+  color: #ffffff;
+  padding: 16px 20px;
+  border-left: 6px solid #5f98ef;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  font-family: "Outfit", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  animation: slideIn 0.5s ease, fadeOut 0.5s ease 3.5s;
+  transition: all 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 
 </style>

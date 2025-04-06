@@ -108,29 +108,159 @@ export default {
     loadQuestions() {
       const mcqQuestions = [
         {
-          questionNo: 1,
-          text: "What is the capital of Japan?",
-          correctAnswer: "Tokyo",
-          options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"]
+          "questionNo": 1,
+          "text": "Who developed the theory of relativity?",
+          "correctAnswer": "Albert Einstein",
+          "options": [
+            "Albert Einstein",
+            "Isaac Newton",
+            "Galileo Galilei",
+            "Nikola Tesla"
+          ]
         },
         {
-          questionNo: 2,
-          text: "Which gas do plants absorb from the atmosphere?",
-          correctAnswer: "Carbon Dioxide",
-          options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"]
+          "questionNo": 2,
+          "text": "What is the hardest natural substance on Earth?",
+          "correctAnswer": "Diamond",
+          "options": [
+            "Gold",
+            "Iron",
+            "Diamond",
+            "Quartz"
+          ]
         },
         {
-          questionNo: 3,
-          text: "What is the largest mammal on Earth?",
-          correctAnswer: "Blue Whale",
-          options: ["Elephant", "Blue Whale", "Giraffe", "Shark"]
+          "questionNo": 3,
+          "text": "Which planet is known as the Red Planet?",
+          "correctAnswer": "Mars",
+          "options": [
+            "Earth",
+            "Mars",
+            "Venus",
+            "Jupiter"
+          ]
         },
         {
-          questionNo: 4,
-          text: "Which continent is the Sahara Desert located in?",
-          correctAnswer: "Africa",
-          options: ["Asia", "Africa", "Australia", "North America"]
+          "questionNo": 4,
+          "text": "How many continents are there?",
+          "correctAnswer": "7",
+          "options": [
+            "5",
+            "7",
+            "8",
+            "6"
+          ]
         },
+        {
+          "questionNo": 5,
+          "text": "What is the main language spoken in Brazil?",
+          "correctAnswer": "Portuguese",
+          "options": [
+            "Portuguese",
+            "French",
+            "Spanish",
+            "English"
+          ]
+        },
+        {
+          "questionNo": 6,
+          "text": "What is the chemical symbol for water?",
+          "correctAnswer": "H2O",
+          "options": [
+            "O2",
+            "NaCl",
+            "H2O",
+            "CO2"
+          ]
+        },
+        {
+          "questionNo": 7,
+          "text": "Who painted the Mona Lisa?",
+          "correctAnswer": "Leonardo da Vinci",
+          "options": [
+            "Pablo Picasso",
+            "Leonardo da Vinci",
+            "Michelangelo",
+            "Vincent Van Gogh"
+          ]
+        },
+        {
+          "questionNo": 8,
+          "text": "Which animal is known as the 'King of the Jungle'?",
+          "correctAnswer": "Lion",
+          "options": [
+            "Panther",
+            "Elephant",
+            "Lion",
+            "Tiger"
+          ]
+        },
+        {
+          "questionNo": 9,
+          "text": "What is the currency of Japan?",
+          "correctAnswer": "Yen",
+          "options": [
+            "Won",
+            "Yuan",
+            "Dollar",
+            "Yen"
+          ]
+        },
+        {
+          "questionNo": 10,
+          "text": "What is the freezing point of water?",
+          "correctAnswer": "0\u00b0C",
+          "options": [
+            "10\u00b0C",
+            "-10\u00b0C",
+            "100\u00b0C",
+            "0\u00b0C"
+          ]
+        },
+        {
+          "questionNo": 11,
+          "text": "What is the square root of 64?",
+          "correctAnswer": "8",
+          "options": [
+            "7",
+            "6",
+            "8",
+            "9"
+          ]
+        },
+        {
+          "questionNo": 12,
+          "text": "In which country is the Great Pyramid of Giza located?",
+          "correctAnswer": "Egypt",
+          "options": [
+            "China",
+            "India",
+            "Mexico",
+            "Egypt"
+          ]
+        },
+        {
+          "questionNo": 13,
+          "text": "What is the tallest mountain in the world?",
+          "correctAnswer": "Mount Everest",
+          "options": [
+            "Lhotse",
+            "K2",
+            "Mount Everest",
+            "Kangchenjunga"
+          ]
+        },
+        {
+          "questionNo": 14,
+          "text": "How many legs does a spider have?",
+          "correctAnswer": "8",
+          "options": [
+            "12",
+            "10",
+            "8",
+            "6"
+          ]
+        }
 
       ];
 
@@ -252,7 +382,7 @@ export default {
         const height = this.questions.length * 40 + (this.questions.length - 1) * 10;
         return { maxHeight: `${height}px` };
       }
-      return { maxHeight: '460px' };
+      return { maxHeight: '490px' };
     },
     timeProgress() {
       if (!this.quizOptions.timeEnabled) return 100;
@@ -274,11 +404,13 @@ export default {
   color: white;
 }
 .timer-bar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 999;
   height: 24px;
   background: #121729;
   border-radius: 10px;
-  margin: 20px 0;
+  margin: 20px 20;
   overflow: hidden;
   border: 1px solid #4caf50;
 }

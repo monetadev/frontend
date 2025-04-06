@@ -7,7 +7,7 @@
       </span>
     </div>
 
-    <p style="margin-left: 80px;">{{ question.text }}</p>
+    <p class="question-text" >{{ question.text }}</p>
 
     <div v-if="mode === 'Multiple Choice' || mode === 'True/False'">
       <label
@@ -144,4 +144,12 @@ input[type="radio"]:checked + .custom-radio::after {
   font-weight: bold;
   color: white;
 }
+.question-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.6;
+  padding-top: 20px;
+}
+
 </style>

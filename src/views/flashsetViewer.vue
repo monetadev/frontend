@@ -82,10 +82,15 @@
               </div>
             </template>
 
-            <!-- No data state -->
-            <div v-else-if="!loading && !error">
-              No flashcard sets found. Create your first set!
-            </div>
+      <!-- No data state -->
+      <div v-else-if="!loading && !error" class="empty-state">
+        <h2>You haven't created your first flashcard set yet.</h2>
+        <p>Start by uploading a document or create a set from scratch.</p>
+        <div class="empty-state-buttons">
+          <button @click="goToUpload" class="upload-button">📄 Upload Document</button>
+          <button @click="goToCreate" class="create-button">➕ Create Flashcard Set</button>
+        </div>
+      </div>
           </tab>
           <tab title="Practice Test">Contents2</tab>
           <tab title="Study Guides">Contents3</tab>
@@ -122,11 +127,13 @@ import { useQuery, useMutation} from '@vue/apollo-composable';
 import {DELETE_FLASHCARD_SET, GET_ALL_MY_SETS} from '@/graphql/auth';
 import eventBus from "@/eventBus.js";
 import Footer from "@/components/Footer.vue";
+import { useRouter } from 'vue-router';
 // State
 const isSidebarCollapsed = ref(false);
 const mode = ref('default');
 const showDeleteConfirm = ref(false);
 const setToDelete = ref(null);
+const router = useRouter();
 
 // Exec GraphQL Query
 const {result, loading, error, refetch} = useQuery(GET_ALL_MY_SETS);
@@ -218,6 +225,15 @@ function toastFunction(message, type) {
     duration: 3000
   });
 }
+
+function goToUpload() {
+  router.push('/add-flashcard');
+}
+
+function goToCreate() {
+  router.push('/create');
+}
+
 </script>
 
 <style scoped>
@@ -413,5 +429,58 @@ function toastFunction(message, type) {
   transition: margin-left 0.3s ease-in-out;
   
 }
+
+.empty-state {
+  text-align: center;
+  color: white;
+  padding: 50px 20px;
+}
+
+.empty-state h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
+
+.empty-state-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.upload-button,
+.create-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.upload-button:hover {
+  background-color: #2980b9;
+}
+
+.create-button {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.create-button:hover {
+  background-color: #27ae60;
+}
+
 </style>
 

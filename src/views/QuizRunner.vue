@@ -64,13 +64,84 @@ export default {
   },
   methods: {
     loadQuestions() {
-      const dummy = Array.from({ length: this.quizOptions.questionCount }).map((_, i) => ({
-        text: `Question ${i + 1}`,
-        correctAnswer: "Answer",
-        options: ["Answer", "Wrong 1", "Wrong 2", "Wrong 3"]
-      }));
+      const mcqQuestions = [
+        {
+          text: "What is the capital of Japan?",
+          correctAnswer: "Tokyo",
+          options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"]
+        },
+        {
+          text: "Which gas do plants absorb from the atmosphere?",
+          correctAnswer: "Carbon Dioxide",
+          options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"]
+        },
+        {
+          text: "What is the largest mammal on Earth?",
+          correctAnswer: "Blue Whale",
+          options: ["Elephant", "Blue Whale", "Giraffe", "Shark"]
+        },
+        {
+          text: "Which continent is the Sahara Desert located in?",
+          correctAnswer: "Africa",
+          options: ["Asia", "Africa", "Australia", "North America"]
+        }
+      ];
 
-      this.questions = dummy;
+      const trueFalseQuestions = [
+        {
+          text: "The Great Wall of China is visible from space.",
+          correctAnswer: "False",
+          options: ["True", "False"]
+        },
+        {
+          text: "Sound travels faster in water than in air.",
+          correctAnswer: "True",
+          options: ["True", "False"]
+        },
+        {
+          text: "The human body has four lungs.",
+          correctAnswer: "False",
+          options: ["True", "False"]
+        },
+        {
+          text: "Lightning never strikes the same place twice.",
+          correctAnswer: "False",
+          options: ["True", "False"]
+        }
+      ];
+
+      const oneWordQuestions = [
+        {
+          text: "One-word: What planet is known as the Red Planet?",
+          correctAnswer: "Mars",
+          options: []
+        },
+        {
+          text: "One-word: Chemical symbol for Gold?",
+          correctAnswer: "Au",
+          options: []
+        },
+        {
+          text: "One-word: First element on the periodic table?",
+          correctAnswer: "Hydrogen",
+          options: []
+        },
+        {
+          text: "One-word: Author of 'Romeo and Juliet'?",
+          correctAnswer: "Shakespeare",
+          options: []
+        }
+      ];
+
+      const mode = this.quizOptions.mode;
+
+      if (mode === "Multiple Choice") {
+        this.questions = mcqQuestions.slice(0, this.quizOptions.questionCount);
+      } else if (mode === "True/False") {
+        this.questions = trueFalseQuestions.slice(0, this.quizOptions.questionCount);
+      } else if (mode === "One-word") {
+        this.questions = oneWordQuestions.slice(0, this.quizOptions.questionCount);
+      }
     },
     handleAnswer() {
       this.currentIndex++;

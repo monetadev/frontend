@@ -331,7 +331,6 @@
     padding: 20px;
     gap: 15px; /* Reduce the gap for better spacing */
     margin-left: 450px; /* Move it further right */
-    max-width: 1000px; /* Limit the settings page width */
   }
 
   .settings-content-wrapper.collapsed {
@@ -395,7 +394,6 @@
     background: #22293A; /* Main Content background color */
     border-radius: 12px;
     margin-left: 50px; /* Increase space between sidebar and content */
-    max-width: 800px; /* Limit content width */
     box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
     min-height: calc(100vh - 100px);
     overflow-y: auto;

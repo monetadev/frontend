@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-runner">
-    <h2>Quiz Mode: {{ quizOptions.mode }}</h2>
-    <p>Flashcard Set: {{ quizOptions.set }}</p>
+    <h2>{{ quizOptions.mode }}</h2>
+    <p>{{ quizOptions.set }}</p>
 
     <div v-if="quizOptions.timeEnabled" class="timer-bar">
       <div class="progress" :style="{ width: timeProgress + '%' }"></div>
@@ -19,9 +19,14 @@
               @answered="handleAnswer"
           />
         </div>
-        <div v-else>
-          <h3>Quiz Completed!</h3>
+        <div v-if="quizOptions.lockedNav && currentIndex < questions.length - 1" class="next-btn-wrapper">
+          <button class="next-button" @click="goToNextQuestion">Next Question</button>
         </div>
+        <div v-else>
+          <button class="submit-button" @click="submitQuiz">Submit Quiz</button>
+        </div>
+
+
       </div>
 
       <div v-else class="quiz-container">
@@ -356,7 +361,9 @@ export default {
       }, 4000);
     },
     handleAnswer() {
-      this.currentIndex++;
+      if (!this.answeredQuestions.includes(this.currentIndex)) {
+        this.answeredQuestions.push(this.currentIndex);
+      }
     },
     submitQuiz() {
       this.toastMessage("Quiz submitted!");
@@ -372,6 +379,12 @@ export default {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     },
+    goToNextQuestion() {
+      if (this.currentIndex < this.questions.length - 1) {
+        this.currentIndex++;
+      }
+    }
+
   },
   computed: {
     navHeightStyle() {
@@ -537,6 +550,26 @@ export default {
   font-weight: 600;
   align-self: flex-end;
   cursor: pointer;
+}
+.next-btn-wrapper {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.next-button {
+  background-color: #5f98ef;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.next-button:hover {
+  background-color: #4a82c8;
 }
 
 </style>

@@ -16,7 +16,7 @@ export default {
 
 <style scoped>
 .progress-line{
-  width: 200px;
+  width: 30%;
   height: 2px;
   background-color: #121729;
   margin-left: 20px;

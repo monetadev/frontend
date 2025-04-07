@@ -108,6 +108,25 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
+    goToQuiz() {
+      if (!this.selectedMode || !this.selectedSet) {
+        alert("Please select a mode and a flashcard set.");
+        return;
+      }
+
+      this.$router.push({
+        name: "QuizRunner",
+        query: {
+          mode: this.selectedMode,
+          set: this.selectedSet,
+          timeEnabled: this.timeEnabled,
+          timeLimit: this.timeLimit,
+          lockedNav: this.lockedNav,
+          questionCount: this.questionCount,
+          reviewMode: this.reviewMode
+        }
+      });
+    }
   },
 };
 </script>

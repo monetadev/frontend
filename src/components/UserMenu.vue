@@ -2,12 +2,16 @@
 
 
   <div class="user-menu" @click="toggleMenu">
-
-    <div class ='create set' @click.stop="toggleCreatePopup" >
+    <div class="create-set" @click.stop="toggleCreatePopup">
       <createButton text="+" />
     </div>
 
-    <div class="avatar">{{ avatarInitials }}</div>
+    <!-- Updated avatar markup -->
+    <div class="avatar">
+      <img v-if="profilePictureUrl" :src="profilePictureUrl" alt="Profile Picture">
+      <span v-else>{{ avatarInitials }}</span>
+    </div>
+
     <div class="user-info">
       <p class="name">{{ fullName }}</p>
       <p class="username">{{ usernameText }}</p>
@@ -49,11 +53,28 @@ import {useRouter} from "vue-router";
 import apolloClient from "@/plugins/apollo.js";
 
 const { result, loading, error } = useQuery(ME_QUERY);
-
 const user = computed(() => result.value?.me);
-
 const router = useRouter();
+const showMenu = ref(false);
+const showCreatePopup = ref(false);
 
+const profilePictureUrl = computed(() => {
+  if (loading.value || error.value || !user.value) return null;
+
+  // Check if user has files array with at least one file
+  if (user.value.files && user.value.files.length > 0) {
+    // Find the first file with an image content type
+    const profilePic = user.value.files.find(file =>
+        file.contentType?.startsWith('image/'));
+
+    if (profilePic) {
+      // Construct the URL to the profile picture
+      return `http://localhost:8080/profile/${profilePic.filename}`;
+    }
+  }
+
+  return null; // No profile picture found
+});
 
 const avatarInitials = computed(() => {
   if (loading.value) return "";
@@ -83,9 +104,6 @@ const usernameText = computed(() => {
   }
   return "";
 });
-
-const showMenu = ref(false);
-const showCreatePopup = ref(false);
 
 function toggleMenu() {
   showMenu.value = !showMenu.value;
@@ -153,6 +171,18 @@ function logout() {
   font-weight: bold;
   color: white;
   margin-right: 10px;
+  overflow: hidden; /* Ensures the image stays within the circular bounds */
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Makes sure the image covers the area properly */
+}
+
+.avatar span {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .user-info {

@@ -357,9 +357,6 @@ function prevPage() {
 // execute graphql 'me' query to retrieve current user data
 const { result, loading, error } = useQuery(ME_QUERY);
 
-// //fetched the current user
-// const queriedUser = computed(() => result.value?.me);
-
 //update user details
 const { mutate: updateUser } = useMutation(UPDATE_USER);
 
@@ -597,7 +594,7 @@ const handleUserUpdated = async () => {
     padding: 20px;
     gap: 15px; /* Reduce the gap for better spacing */
     margin-left: 450px; /* Move it further right */
-    max-width: 1000px; /* Limit the settings page width */
+    //max-width: 1000px; /* Limit the settings page width */
   }
 
   .settings-content-wrapper.collapsed {
@@ -661,7 +658,7 @@ const handleUserUpdated = async () => {
     background: var(--bg-secondary);
     border-radius: 12px;
     margin-left: 50px; /* Increase space between sidebar and content */
-    max-width: 800px; /* Limit content width */
+    //max-width: 800px; /* Limit content width */
     box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.3);
     min-height: calc(100vh - 100px);
     overflow-y: auto;

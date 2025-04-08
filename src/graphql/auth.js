@@ -106,6 +106,7 @@ export const FIND_ALL_USERS = gql`
 export const GET_ALL_MY_SETS = gql`
     query Me {
         me{
+            id
             flashcardSets{
                 id
                 author{
@@ -132,8 +133,11 @@ export const GET_FLASHCARD_SET_BY_ID = gql`
             id
             title
             description
+            isPublic
             creationDate
+            lastUpdated
             author{
+                id
                 username
             }
             flashcards{
@@ -141,6 +145,7 @@ export const GET_FLASHCARD_SET_BY_ID = gql`
                 term
                 definition
                 position
+                updatedAt
             }
         }
     }
@@ -224,6 +229,33 @@ export const DELETE_FLASHCARD_SET = gql`
     mutation DeleteFlashcardSet($userId: UUID!, $setId: UUID!) {
         deleteFlashcardSet(userId: $userId, setId: $setId) 
 }`
+
+
+export const UPDATE_FLASHCARD_SET = gql`
+    mutation UpdateFlashcardSet($id: UUID!, $flashcardSetInput: FlashcardSetInput!) {
+        updateFlashcardSet(id: $id, flashcardSetInput: $flashcardSetInput) {
+            id
+            title
+            description
+            isPublic
+            lastUpdated
+            flashcards {
+                id
+                term
+                definition
+                position
+                updatedAt
+            }
+        }
+    }
+`;
+
+
+export const FLASHCARD_SET_CHAT = gql`
+    subscription FlashcardSetChat($conversationId: UUID!, $setId: UUID!, $message: String!) {
+        flashcardSetChat(conversationId: $conversationId, setId: $setId, message: $message)
+    }
+`;
 
 // export const CHANGE_PASSWORD = gql`
 //     mutation ChangePassword($oldPassword: String!, $newPassword: String!) {

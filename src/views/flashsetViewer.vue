@@ -35,9 +35,14 @@
                       :description="set.description"
                       :id="set.id"
                   />
-                  <button @click.stop="confirmDelete(set)" class="delete-button">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <div class="action-buttons">
+                    <button @click.stop="editSet(set)" class="edit-button">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click.stop="confirmDelete(set)" class="delete-button">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -46,6 +51,7 @@
                 <divider time="Last week"/>
               </div>
               <div v-for="set in groupedSets.lastWeek" :key="set.id" class="panel-wrapper">
+
                 <div class="panel-container-with-delete">
                   <Panel
                       :number="set.flashcards.length"
@@ -54,9 +60,14 @@
                       :description="set.description"
                       :id="set.id"
                   />
-                  <button @click.stop="confirmDelete(set)" class="delete-button">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <div class="action-buttons">
+                    <button @click.stop="editSet(set)" class="edit-button">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click.stop="confirmDelete(set)" class="delete-button">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -65,6 +76,7 @@
                 <divider time="Older"/>
               </div>
               <div v-for="set in groupedSets.older" :key="set.id" class="panel-wrapper">
+
                 <div class="panel-container-with-delete">
                   <Panel
                       :number="set.flashcards.length"
@@ -73,9 +85,14 @@
                       :description="set.description"
                       :id="set.id"
                   />
-                  <button @click.stop="confirmDelete(set)" class="delete-button">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <div class="action-buttons">
+                    <button @click.stop="editSet(set)" class="edit-button">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click.stop="confirmDelete(set)" class="delete-button">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </template>
@@ -85,9 +102,6 @@
               No flashcard sets found. Create your first set!
             </div>
           </tab>
-          <tab title="Practice Test">Contents2</tab>
-          <tab title="Study Guides">Contents3</tab>
-          <tab title="Expert solutions">Contents4</tab>
         </tabs>
       </div>
     </div>
@@ -118,6 +132,12 @@ import divider from "@/components/timeDivider.vue";
 import { useQuery, useMutation} from '@vue/apollo-composable';
 import {DELETE_FLASHCARD_SET, GET_ALL_MY_SETS} from '@/graphql/auth';
 import eventBus from "@/eventBus.js";
+import { ApolloClient } from '@apollo/client/core';
+import { useRouter } from 'vue-router';
+import { useApolloClient } from '@vue/apollo-composable';
+
+const apolloClient = useApolloClient();
+const router = useRouter();
 
 // State
 const isSidebarCollapsed = ref(false);
@@ -180,29 +200,55 @@ function cancelDelete() {
   setToDelete.value = null;
 }
 
+
+
+
+
 async function deleteSet() {
-  if (!setToDelete.value || !userId.value) return;
+  if (!setToDelete.value) {
+    toastFunction("Error: No set selected", "error");
+    return;
+  }
+
+  const userIdToUse = userId.value;
+  const setIdToUse = setToDelete.value.id;
+
+  if (!userIdToUse || !setIdToUse) {
+    console.error("Missing UUID values:", { userId: userIdToUse, setId: setIdToUse });
+    toastFunction("Error: Missing UUID values", "error");
+    return;
+  }
 
   try {
-    const { data } = await deleteFlashcardSet({
+    // Get the actual Apollo client instance
+    const client = apolloClient.client;  // Access the actual client
+
+    console.log("Sending deletion request with:", {
+      userId: userIdToUse,
+      setId: setIdToUse
+    });
+
+    // Use the actual client instance
+    const result = await client.mutate({
+      mutation: DELETE_FLASHCARD_SET,
       variables: {
-        userId: userId.value,
-        setId: setToDelete.value.id
+        userId: userIdToUse,
+        setId: setIdToUse
       }
     });
 
-    if (data.deleteFlashcardSet) {
-      // Show success toast
-      toastFunction("Flashcard set deleted successfully", "success");
+    console.log("Result from server:", result);
 
-      // Refresh data
+    if (result.data?.deleteFlashcardSet) {
+      toastFunction("Flashcard set deleted successfully", "success");
       await refetch();
+    } else {
+      toastFunction("Failed to delete flashcard set", "error");
     }
   } catch (error) {
     console.error("Error deleting flashcard set:", error);
-    toastFunction("Failed to delete flashcard set", "error");
+    toastFunction("Failed to delete flashcard set: " + error.message, "error");
   } finally {
-    // Close confirmation dialog
     showDeleteConfirm.value = false;
     setToDelete.value = null;
   }
@@ -215,6 +261,11 @@ function toastFunction(message, type) {
     duration: 3000
   });
 }
+
+function editSet(set) {
+  router.push(`/edit-flashcard-set/${set.id}`);
+}
+
 </script>
 
 <style scoped>
@@ -301,10 +352,6 @@ function toastFunction(message, type) {
 }
 
 .delete-button {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -315,9 +362,6 @@ function toastFunction(message, type) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 5;
 }
 
 .panel-container-with-delete:hover .delete-button {
@@ -395,6 +439,41 @@ function toastFunction(message, type) {
 
 .confirm-delete-button:hover {
   background-color: #c0392b;
+}
+
+
+.action-buttons {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+}
+
+.panel-container-with-delete:hover .action-buttons {
+  opacity: 1;
+}
+
+.edit-button {
+  background-color: #5F98EF;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.edit-button:hover {
+  background-color: #4a86e8;
 }
 
 .divide {

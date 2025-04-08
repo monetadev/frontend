@@ -73,7 +73,7 @@
           <InputForm
               label="Password"
               v-model="passwordInput"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               placeholder="Password"
               name="password"
               :required="true"
@@ -84,12 +84,21 @@
           <InputForm
               label="Confirm Password"
               v-model="confirmPasswordInput"
-              type="confirmPassword"
+              :type="showPassword ? 'text' : 'password'"
               placeholder="Confirm Password"
               name="confirmPassword"
               :required="true"
               id="confirmPassword"
           />
+        </div>
+
+        <div class="password-toggle">
+          <input
+              type="checkbox"
+              id="togglePassword"
+              v-model="showPassword"
+          >
+          <label for="togglePassword">Show passwords</label>
         </div>
         <div style="text-align: center; margin-top: 20px">
           <SecondaryButton text="Back" @click="moveToStep(1)" />
@@ -125,6 +134,8 @@ const firstnameInput = ref('');
 const lastnameInput = ref('');
 const passwordInput = ref('');
 const confirmPasswordInput = ref('');
+
+const showPassword = ref(false);
 
 // const formData = reactive({
 //   // TODO: Adjust to properly take username and email. For now, email response is stored as a username.
@@ -216,9 +227,6 @@ const submitForm = async () => {
     // Optionally update a global auth state here (e.g., via Pinia)
     await router.push('/myLibrary'); // Redirect to a protected route
   } catch (error) {
-
-    // TODO: Insert toast here....
-    console.error("Registration error:", error);
     toastFunction("Invalid Password. Please try again.", "error");
   }
   finally{
@@ -320,5 +328,22 @@ html, body {
   padding-left: 10%;
 }
 
+.password-toggle {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
 
+.password-toggle input[type="checkbox"] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.password-toggle label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: #cccccc;
+}
 </style>

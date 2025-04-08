@@ -47,6 +47,14 @@ type ImageUploadResult {
     path: String!
 }
 
+type DocumentUploadResult {
+    filename: String!
+    originalFilename: String!
+    size: Int!
+    contentType: String!
+    path: String!
+}
+
 """
 Input types for various operations
 """
@@ -272,7 +280,8 @@ type Privilege {
 
 extend type Mutation {
     uploadProfilePicture(input: Upload!): ImageUploadResult!
-    uploadDocument(input: Upload!): Boolean
+    uploadDocument(input: Upload!): DocumentUploadResult!
+    deleteDocument(id: UUID!): UUID!
 
     deleteCurrentUserProfilePicture: Boolean!
     deleteUserProfilePicture(id: UUID!): Boolean!
@@ -358,4 +367,8 @@ type Query {
     findRoleByName(name: String!): Role
     roles(page: Int = 0, size: Int = 10): PaginatedRole
     privileges: [Privilege!]!
+}
+
+type Subscription {
+    flashcardSetChat(conversationId: UUID!, setId: UUID!, message: String!): String
 }

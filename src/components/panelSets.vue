@@ -32,7 +32,8 @@
           title: this.title,
           number: this.number
         });
-        this.$router.push(`/view`);
+        this.$router.push(`/define`);
+
         /*
         TODO: I will need to work with backend to have id of the specifc flashcard set route you to the specific flashcard View page
         */

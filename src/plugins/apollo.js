@@ -13,12 +13,11 @@ const httpLink = createUploadLink({
 const wsLink = new GraphQLWsLink(createClient({
     url: 'ws://localhost:8080/graphql',
     connectionParams: {
-        // Add authentication if needed
     },
 }));
 
 const splitLink = split(
-    // Check if it's a subscription
+
     ({ query }) => {
         const definition = getMainDefinition(query);
         return (
@@ -26,8 +25,8 @@ const splitLink = split(
             definition.operation === 'subscription'
         );
     },
-    wsLink, // Use WebSocket for subscriptions
-    httpLink // Use HTTP for queries and mutations
+    wsLink,
+    httpLink
 );
 
 const cache = new InMemoryCache({

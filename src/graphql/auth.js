@@ -257,6 +257,59 @@ export const FLASHCARD_SET_CHAT = gql`
     }
 `;
 
+export const FIND_PUBLIC_FLASHCARD_SETS = gql`
+    query FindPublicFlashcardSets($page: Int!, $size: Int!) {
+        findPublicFlashcardSets(page: $page, size: $size) {
+            items {
+                id
+                title
+                description
+                creationDate
+                author {
+                    id
+                    username
+                }
+                flashcards {
+                    id
+                    term
+                    definition
+                }
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const UPLOAD_DOCUMENT = gql`
+    mutation uploadDocument($input: Upload!) {
+        uploadDocument(input: $input) {
+            filename
+            originalFilename
+            size
+            contentType
+            path
+        }
+    }
+`;
+
+export const GENERATE_FLASHCARDS = gql`
+    mutation generateFlashcards($options: FlashcardGenOptions!) {
+        generateFlashcardSet(options: $options) {
+            title
+            description
+            generatedFlashcards {
+                term
+                definition
+                position
+            }
+        }
+    }
+`;
+
 // export const CHANGE_PASSWORD = gql`
 //     mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
 //         changePassword(oldPassword: $oldPassword, newPassword: $newPassword) {

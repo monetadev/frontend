@@ -64,7 +64,7 @@ export default {
       activeMenu: "Dashboard",
       menuItems: [
         { name: "My Sets", icon: MyStuffsIcon, path: "/myLibrary" },
-        { name: "Add Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
+        { name: "Create Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
         { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
         { name: "Explore", icon: ExploreIcon, path: "/explore" },
         { name: "Settings", icon: SettingsIcon, path: "/settings" },

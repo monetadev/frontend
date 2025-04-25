@@ -100,22 +100,6 @@ export default {
       shuffledCards: [], // To store shuffled cards
       isShuffled: false, // Track shuffle state
       isNavigating: false,
-      fallbackFlashcards: [
-        {id: 1, term: "What is an Atom?", definition: "The smallest unit of matter."},
-        {id: 2, term: "What is a Molecule?", definition: "A group of atoms bonded together."},
-        {id: 3, term: "What is a Cell?", definition: "The basic unit of life."},
-        {id: 4, term: "What is a Tissue?", definition: "A group of cells that work together to perform a specific function."},
-        {id: 5, term: "What is an Organ?", definition: "A group of tissues that work together to perform a specific function."},
-        {id: 6, term: "What is an Organ System?", definition: "A group of organs that work together to perform a specific function."},
-        {id: 7, term: "What is an Organism?", definition: "An individual living thing."},
-        {id: 8, term: "What is a Population?", definition: "A group of organisms of the same species that live in the same area."},
-        {id: 9, term: "What is a Community?", definition: "All the populations of different species that live in the same area."},
-      ],
-      fallbackDeck: {
-        id: 1,
-        title: "Biology",
-      }
-
     };
   },
   computed: {

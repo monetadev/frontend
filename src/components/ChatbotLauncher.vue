@@ -1,30 +1,45 @@
 <template>
   <div class="chat-container">
-    <div class="chat-launcher" @click="handleToggleChat">
-      <span v-if="!isChatOpen">💬</span>
-      <span v-else>×</span>
-    </div>
+    <button class="chat-launcher" @click="handleToggleChat" aria-label="Toggle chat">
+      <div class="launcher-background"></div>
+      <div class="launcher-icon-container">
+        <svg v-if="!isChatOpen" class="launcher-icon chat-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <svg v-else class="launcher-icon close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </div>
+    </button>
 
-    <div v-if="isChatOpen" class="chat-window" :class="{ 'minimized': isMinimized }">
-      <ChatHeader
-          :title="chatTitle"
-          @minimize="handleMinimize"
-          @clear="handleClearChat"
-      />
+    <transition name="chat-fade">
+      <div v-if="isChatOpen" class="chat-window" :class="{ 'minimized': isMinimized }">
+        <ChatHeader
+            :title="chatTitle"
+            @minimize="handleMinimize"
+            @clear="handleClearChat"
+        />
 
-      <div class="message-list" ref="messageListElement">
-        <ChatBubble
-            v-for="(msg, index) in messages"
-            :key="index"
-            :message="msg.text"
-            :sender="msg.sender"
+        <div class="message-list" ref="messageListElement">
+          <ChatBubble
+              v-for="(msg, index) in messages"
+              :key="index"
+              :message="msg.text"
+              :sender="msg.sender"
+          />
+        </div>
+
+        <div class="typing-indicator-container">
+          <TypingIndicator :isVisible="isLoading" />
+        </div>
+
+        <ChatInput
+            @send-message="sendMessage"
+            :isDisabled="isLoading"
         />
       </div>
-
-      <ChatInput
-          @send-message="sendMessage"
-      />
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -35,6 +50,7 @@ import { gql } from '@apollo/client/core'
 import ChatHeader from '@/components/ChatHeader.vue'
 import ChatBubble from '@/components/ChatBubble.vue'
 import ChatInput from '@/components/ChatInput.vue'
+import TypingIndicator from '@/components/TypingIndicator.vue'
 import { v4 as uuidv4 } from 'uuid'
 import { FLASHCARD_SET_CHAT } from '@/graphql/auth'
 import apolloClient from '@/plugins/apollo'
@@ -52,14 +68,18 @@ const streamingMessageIndex = ref(-1)
 
 // Reactive state
 const isChatOpen = ref(false)
-const chatTitle = ref('🤖Study Bot')
+const chatTitle = ref('Chat with Moneta')
 const messages = ref([])
-const savedMessages = ref([]) // Make this a ref
+const savedMessages = ref([])
 const conversationId = ref(uuidv4())
 const isLoading = ref(false)
 const subscription = ref(null)
 const messageListElement = ref(null)
 const isMinimized = ref(false)
+
+// New: For accumulating tokens before displaying
+const tempMessageContent = ref('')
+const hasMonetaResponseAppeared = ref(false)
 
 // Cleanup
 onBeforeUnmount(() => {
@@ -86,7 +106,7 @@ const openChat = (currentTerm = null) => {
 }
 
 const minimizeChat = () => {
-  savedMessages.value = [...messages.value] // Fixed assignment
+  savedMessages.value = [...messages.value]
   isChatOpen.value = false
 }
 
@@ -121,6 +141,10 @@ const clearChat = () => {
   streamingMessageIndex.value = -1;
   isLoading.value = false;
 
+  // Reset the temp message content and flag
+  tempMessageContent.value = '';
+  hasMonetaResponseAppeared.value = false;
+
   // Force UI update
   nextTick(() => {
     if (messageListElement.value) {
@@ -130,7 +154,6 @@ const clearChat = () => {
 }
 
 const sendMessage = async (userMessage) => {
-
   console.log("Message variables:", {
     conversationId: conversationId.value,
     setId: setId,
@@ -142,10 +165,13 @@ const sendMessage = async (userMessage) => {
 
   messages.value.push({ text: userMessage, sender: 'user' })
 
+  // Show typing indicator
   isLoading.value = true
-  messages.value.push({ text: "...", sender: 'bot', isLoading: true })
-
   streamingMessageIndex.value = -1
+
+  // Reset the temporary message content and flag
+  tempMessageContent.value = '';
+  hasMonetaResponseAppeared.value = false;
 
   try {
     // Always clean up any existing subscription
@@ -165,7 +191,7 @@ const sendMessage = async (userMessage) => {
         .subscribe({
           query: FLASHCARD_SET_CHAT,
           variables: {
-            conversationId: conversationId.value, // Keep the same conversation ID
+            conversationId: conversationId.value,
             setId: setId,
             message: userMessage
           },
@@ -182,31 +208,49 @@ const sendMessage = async (userMessage) => {
               return;
             }
 
-            // Handle token display
-            if (streamingMessageIndex.value === -1) {
-              // Remove loading indicator
-              const loadingIndex = messages.value.findIndex(msg => msg.isLoading)
-              if (loadingIndex !== -1) {
-                messages.value.splice(loadingIndex, 1)
-              }
+            // Accumulate tokens in the temporary content
+            tempMessageContent.value += token;
 
-              // Create new message
+            // Check if "# Moneta's Response" has appeared
+            if (!hasMonetaResponseAppeared.value &&
+                tempMessageContent.value.includes("# Moneta's Response")) {
+              hasMonetaResponseAppeared.value = true;
+
+              // Now we can show the message
+              isLoading.value = false;
               messages.value.push({
-                text: token,
+                text: tempMessageContent.value,
                 sender: 'bot',
                 isMarkdown: true
-              })
-              streamingMessageIndex.value = messages.value.length - 1
-            } else {
-              // Append to existing message
-              messages.value[streamingMessageIndex.value].text += token
+              });
+              streamingMessageIndex.value = messages.value.length - 1;
             }
+            // If we've already started showing the message, continue appending tokens
+            else if (hasMonetaResponseAppeared.value) {
+              messages.value[streamingMessageIndex.value].text = tempMessageContent.value;
+            }
+            // Otherwise keep accumulating tokens without showing anything
 
             // Handle end token
             if (token === "[END]") {
-              messages.value[streamingMessageIndex.value].text =
-                  messages.value[streamingMessageIndex.value].text.replace("[END]", "")
-              streamingMessageIndex.value = -1
+              // If we never saw "# Moneta's Response", show the message now
+              if (!hasMonetaResponseAppeared.value) {
+                isLoading.value = false;
+                messages.value.push({
+                  text: tempMessageContent.value.replace("[END]", ""),
+                  sender: 'bot',
+                  isMarkdown: true
+                });
+              } else {
+                // Just remove the end token from existing message
+                messages.value[streamingMessageIndex.value].text =
+                    messages.value[streamingMessageIndex.value].text.replace("[END]", "");
+              }
+
+              // Reset for next message
+              streamingMessageIndex.value = -1;
+              tempMessageContent.value = '';
+              hasMonetaResponseAppeared.value = false;
             }
           },
           error: (error) => {
@@ -220,45 +264,43 @@ const sendMessage = async (userMessage) => {
               console.error("Network error:", error.networkError);
             }
 
-            // Remove loading indicator
-            const loadingIndex = messages.value.findIndex(msg => msg.isLoading)
-            if (loadingIndex !== -1) {
-              messages.value.splice(loadingIndex, 1)
-            }
+            // Hide typing indicator
+            isLoading.value = false;
 
             // Show error message
             messages.value.push({
               text: "Connection error. Please try again later.",
               sender: 'bot'
-            })
+            });
 
-            isLoading.value = false
-            streamingMessageIndex.value = -1
+            // Reset temporary state
+            streamingMessageIndex.value = -1;
+            tempMessageContent.value = '';
+            hasMonetaResponseAppeared.value = false;
           },
           complete: () => {
             console.log("Subscription completed - ready for next message");
             streamingMessageIndex.value = -1;
             isLoading.value = false;
-            // Subscription is now completed and ready for the next message
+            tempMessageContent.value = '';
+            hasMonetaResponseAppeared.value = false;
           }
         })
   } catch (error) {
     console.error("Failed to create subscription:", error);
 
-    // Remove loading indicator
-    const loadingIndex = messages.value.findIndex(msg => msg.isLoading)
-    if (loadingIndex !== -1) {
-      messages.value.splice(loadingIndex, 1)
-    }
+    // Hide typing indicator
+    isLoading.value = false;
 
     // Show error message
     messages.value.push({
       text: "Sorry, I couldn't process your request. Please try again.",
       sender: 'bot'
-    })
+    });
 
-    isLoading.value = false
-    streamingMessageIndex.value = -1
+    streamingMessageIndex.value = -1;
+    tempMessageContent.value = '';
+    hasMonetaResponseAppeared.value = false;
   }
 }
 
@@ -308,63 +350,148 @@ watch(isChatOpen, async (isOpen) => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
 
+/* Base styling */
 .chat-container {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 1000;
+  font-family: 'Outfit', sans-serif;
 }
 
+/* Enhanced Chat launcher button */
 .chat-launcher {
-  width: 50px;
-  height: 50px;
-  background-color: #007bff;
+  position: relative;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
+  background: linear-gradient(145deg, #0083ff, #0065e0);
   color: white;
-  font-size: 24px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: background-color 0.3s ease;
+  border: none;
+  outline: none;
+  padding: 0;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 105, 217, 0.4);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.chat-launcher::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .chat-launcher:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 105, 217, 0.5);
 }
 
+.chat-launcher:hover::before {
+  opacity: 1;
+}
+
+.chat-launcher:active {
+  transform: translateY(1px) scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 105, 217, 0.4);
+}
+
+.launcher-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #0083ff, #0065e0);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.launcher-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.launcher-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.chat-icon {
+  animation: subtle-pulse 2s infinite ease-in-out;
+}
+
+.close-icon {
+  stroke-width: 2.5;
+}
+
+/* Pulse animation for the chat icon */
+@keyframes subtle-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Chat window */
 .chat-window {
-  width: 320px;
-  height: 450px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   overflow: hidden;
   position: absolute;
-  bottom: 60px;
+  bottom: 70px;
   right: 0;
-  transition: all 0.3s ease;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  width: 420px;
+  height: 600px;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+  border: 1px solid #eaeaea;
 }
 
 .chat-window.minimized {
-  transform: translateY(100%);
+  transform: translateY(20px);
   opacity: 0;
   pointer-events: none;
 }
 
+/* Message list */
 .message-list {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 15px 10px;
+  padding: 16px;
   background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f1f1f1;
 }
 
 .message-list::-webkit-scrollbar {
@@ -372,7 +499,7 @@ watch(isChatOpen, async (isOpen) => {
 }
 
 .message-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f5f5f5;
   border-radius: 3px;
 }
 
@@ -382,24 +509,169 @@ watch(isChatOpen, async (isOpen) => {
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: #888;
+  background: #999;
 }
 
-@media (max-width: 400px) {
+/* Typing indicator */
+.typing-indicator-container {
+  padding: 4px 0;
+  background-color: white;
+  border-top: 1px solid #eaeaea;
+}
+
+/* Transitions */
+.chat-fade-enter-active,
+.chat-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.chat-fade-enter-from,
+.chat-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Large desktop screens */
+@media (min-width: 1440px) {
+  .chat-window {
+    width: 480px;
+    height: 700px;
+  }
+
+  .chat-launcher {
+    width: 60px;
+    height: 60px;
+  }
+
+  .launcher-icon {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* Standard desktop screens */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .chat-window {
+    width: 420px;
+    height: 600px;
+  }
+}
+
+/* Tablets and small desktops */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .chat-window {
+    width: 360px;
+    height: 550px;
+  }
+
+  .chat-container {
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+/* Large phones and small tablets */
+@media (min-width: 481px) and (max-width: 767px) {
+  .chat-window {
+    width: 340px;
+    height: 500px;
+    bottom: 65px;
+  }
+
+  .chat-container {
+    bottom: 14px;
+    right: 14px;
+  }
+
+  .chat-launcher {
+    width: 48px;
+    height: 48px;
+  }
+
+  .launcher-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .message-list {
+    padding: 12px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
   .chat-container {
     bottom: 10px;
     right: 10px;
   }
 
+  .chat-launcher {
+    width: 45px;
+    height: 45px;
+  }
+
+  .launcher-icon {
+    width: 20px;
+    height: 20px;
+  }
+
   .chat-window {
     width: calc(100vw - 20px);
-    max-width: 350px;
     height: calc(100vh - 80px);
     max-height: 500px;
     position: fixed;
-    bottom: 70px;
+    bottom: 65px;
     right: 10px;
-    border-radius: 10px;
+    left: 10px;
+    border-radius: 12px;
+  }
+
+  .message-list {
+    padding: 10px;
+  }
+}
+
+/* Special case for very small screens */
+@media (max-width: 320px) {
+  .chat-window {
+    bottom: 60px;
+    height: calc(100vh - 70px);
+  }
+
+  .chat-launcher {
+    width: 40px;
+    height: 40px;
+  }
+
+  .launcher-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Height-based media queries for shorter screens */
+@media (max-height: 600px) {
+  .chat-window {
+    height: calc(100vh - 80px);
+    max-height: 450px;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .chat-window {
+    height: 85vh;
+    width: 60vw;
+    max-width: 450px;
+    right: 10px;
+    left: auto;
+  }
+
+  .chat-container {
+    right: 10px;
+    bottom: 10px;
   }
 }
 </style>

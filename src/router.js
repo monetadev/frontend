@@ -10,6 +10,7 @@ import View from './views/flashcardViewer.vue';
 import Create from './views/createSet.vue';
 import Quizzes from './views/Quizzes.vue';
 import QuizRunner from "@/views/QuizRunner.vue";
+import DefineView from "@/views/defineView.vue";
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -23,8 +24,7 @@ const routes = [
   { path: '/settings', component: Settings},
   {path: '/create', component: Create},
   {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
-
-  
+  {path: "/define", component: DefineView},
 
 
   // { path: '/:pathMatch(.*)*', redirect: '/login' } // Catch-all route to handle undefined routes

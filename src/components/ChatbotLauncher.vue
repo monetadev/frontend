@@ -14,7 +14,11 @@
     </button>
 
     <transition name="chat-fade">
-      <div v-if="isChatOpen" class="chat-window" :class="{ 'minimized': isMinimized }">
+      <div v-if="isChatOpen"
+           class="chat-window"
+           :class="{ 'minimized': isMinimized }"
+           :style="chatWindowStyle"
+           ref="chatWindowElement">
         <ChatHeader
             :title="chatTitle"
             @minimize="handleMinimize"
@@ -27,6 +31,7 @@
               :key="index"
               :message="msg.text"
               :sender="msg.sender"
+              @contextToggled="handleContextToggled"
           />
         </div>
 
@@ -38,13 +43,21 @@
             @send-message="sendMessage"
             :isDisabled="isLoading"
         />
+
+        <!-- Resize handles -->
+        <div class="resize-handle resize-handle-left"
+             @mousedown="startResizing('left', $event)"
+             @touchstart="startResizing('left', $event)"></div>
+        <div class="resize-handle resize-handle-right"
+             @mousedown="startResizing('right', $event)"
+             @touchstart="startResizing('right', $event)"></div>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, watch, nextTick, onBeforeUnmount, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { gql } from '@apollo/client/core'
 import ChatHeader from '@/components/ChatHeader.vue'
@@ -77,9 +90,31 @@ const subscription = ref(null)
 const messageListElement = ref(null)
 const isMinimized = ref(false)
 
-// New: For accumulating tokens before displaying
+// For accumulating tokens before displaying
 const tempMessageContent = ref('')
 const hasMonetaResponseAppeared = ref(false)
+
+// Resizing variables
+const chatWindowElement = ref(null)
+const chatWidth = ref(null)
+const isResizing = ref(false)
+const resizeDirection = ref(null)
+const startX = ref(0)
+const startWidth = ref(0)
+const startPosition = ref(0)
+
+// Flag to prevent auto-scrolling when expanding context
+const preventAutoScroll = ref(false)
+
+// Computed styles for the chat window
+const chatWindowStyle = computed(() => {
+  if (chatWidth.value) {
+    return {
+      width: `${chatWidth.value}px`
+    };
+  }
+  return {};
+})
 
 // Cleanup
 onBeforeUnmount(() => {
@@ -91,6 +126,25 @@ onBeforeUnmount(() => {
     }
     subscription.value = null
   }
+
+  // Clean up resizing event listeners
+  document.removeEventListener('mousemove', handleResize)
+  document.removeEventListener('touchmove', handleResize)
+  document.removeEventListener('mouseup', stopResizing)
+  document.removeEventListener('touchend', stopResizing)
+  window.removeEventListener('resize', handleWindowResize)
+})
+
+// Mounting
+onMounted(() => {
+  // Get saved width from localStorage if available
+  const savedWidth = localStorage.getItem('chatWindowWidth')
+  if (savedWidth) {
+    chatWidth.value = parseInt(savedWidth)
+  }
+
+  // Add window resize listener to ensure chat window stays within bounds
+  window.addEventListener('resize', handleWindowResize)
 })
 
 // Functions
@@ -111,46 +165,46 @@ const minimizeChat = () => {
 }
 
 const clearChat = () => {
-  console.log("Clearing chat...");
+  console.log("Clearing chat...")
 
   // Cancel any current subscription
   if (subscription.value) {
     try {
-      subscription.value.unsubscribe();
+      subscription.value.unsubscribe()
     } catch (e) {
-      console.warn("Error unsubscribing:", e);
+      console.warn("Error unsubscribing:", e)
     }
-    subscription.value = null;
+    subscription.value = null
   }
 
   // Reset messages with a new array (ensures reactivity)
-  messages.value = [];
-  savedMessages.value = [];
+  messages.value = []
+  savedMessages.value = []
 
   // Create a new conversation ID
-  conversationId.value = uuidv4();
-  console.log("New conversation ID:", conversationId.value);
+  conversationId.value = uuidv4()
+  console.log("New conversation ID:", conversationId.value)
 
   // Add an initial message
   messages.value.push({
     text: "Chat cleared. What would you like to discuss?",
     sender: "bot"
-  });
+  })
 
   // Reset the streaming state
-  streamingMessageIndex.value = -1;
-  isLoading.value = false;
+  streamingMessageIndex.value = -1
+  isLoading.value = false
 
   // Reset the temp message content and flag
-  tempMessageContent.value = '';
-  hasMonetaResponseAppeared.value = false;
+  tempMessageContent.value = ''
+  hasMonetaResponseAppeared.value = false
 
   // Force UI update
   nextTick(() => {
     if (messageListElement.value) {
-      messageListElement.value.scrollTop = messageListElement.value.scrollHeight;
+      messageListElement.value.scrollTop = messageListElement.value.scrollHeight
     }
-  });
+  })
 }
 
 const sendMessage = async (userMessage) => {
@@ -159,7 +213,7 @@ const sendMessage = async (userMessage) => {
     setId: setId,
     message: userMessage,
     messageCount: messages.value.filter(m => m.sender === 'user').length
-  });
+  })
 
   if (!userMessage.trim()) return
 
@@ -170,8 +224,8 @@ const sendMessage = async (userMessage) => {
   streamingMessageIndex.value = -1
 
   // Reset the temporary message content and flag
-  tempMessageContent.value = '';
-  hasMonetaResponseAppeared.value = false;
+  tempMessageContent.value = ''
+  hasMonetaResponseAppeared.value = false
 
   try {
     // Always clean up any existing subscription
@@ -184,7 +238,7 @@ const sendMessage = async (userMessage) => {
       subscription.value = null
     }
 
-    console.log("Creating new chat subscription for message:", userMessage);
+    console.log("Creating new chat subscription for message:", userMessage)
 
     // Create a new subscription for this message
     subscription.value = apolloClient
@@ -199,35 +253,35 @@ const sendMessage = async (userMessage) => {
         })
         .subscribe({
           next: (result) => {
-            console.log("Token received:", result);
+            console.log("Token received:", result)
 
             // Extract token
-            const token = result.data?.flashcardSetChat;
+            const token = result.data?.flashcardSetChat
             if (token === undefined || token === null) {
-              console.warn('Missing token in response:', result);
-              return;
+              console.warn('Missing token in response:', result)
+              return
             }
 
             // Accumulate tokens in the temporary content
-            tempMessageContent.value += token;
+            tempMessageContent.value += token
 
             // Check if "# Moneta's Response" has appeared
             if (!hasMonetaResponseAppeared.value &&
                 tempMessageContent.value.includes("# Moneta's Response")) {
-              hasMonetaResponseAppeared.value = true;
+              hasMonetaResponseAppeared.value = true
 
               // Now we can show the message
-              isLoading.value = false;
+              isLoading.value = false
               messages.value.push({
                 text: tempMessageContent.value,
                 sender: 'bot',
                 isMarkdown: true
-              });
-              streamingMessageIndex.value = messages.value.length - 1;
+              })
+              streamingMessageIndex.value = messages.value.length - 1
             }
             // If we've already started showing the message, continue appending tokens
             else if (hasMonetaResponseAppeared.value) {
-              messages.value[streamingMessageIndex.value].text = tempMessageContent.value;
+              messages.value[streamingMessageIndex.value].text = tempMessageContent.value
             }
             // Otherwise keep accumulating tokens without showing anything
 
@@ -235,72 +289,152 @@ const sendMessage = async (userMessage) => {
             if (token === "[END]") {
               // If we never saw "# Moneta's Response", show the message now
               if (!hasMonetaResponseAppeared.value) {
-                isLoading.value = false;
+                isLoading.value = false
                 messages.value.push({
                   text: tempMessageContent.value.replace("[END]", ""),
                   sender: 'bot',
                   isMarkdown: true
-                });
+                })
               } else {
                 // Just remove the end token from existing message
                 messages.value[streamingMessageIndex.value].text =
-                    messages.value[streamingMessageIndex.value].text.replace("[END]", "");
+                    messages.value[streamingMessageIndex.value].text.replace("[END]", "")
               }
 
               // Reset for next message
-              streamingMessageIndex.value = -1;
-              tempMessageContent.value = '';
-              hasMonetaResponseAppeared.value = false;
+              streamingMessageIndex.value = -1
+              tempMessageContent.value = ''
+              hasMonetaResponseAppeared.value = false
             }
           },
           error: (error) => {
-            console.error("Subscription error:", error);
+            console.error("Subscription error:", error)
 
             // More detailed logging
             if (error.graphQLErrors) {
-              console.error("GraphQL errors:", error.graphQLErrors);
+              console.error("GraphQL errors:", error.graphQLErrors)
             }
             if (error.networkError) {
-              console.error("Network error:", error.networkError);
+              console.error("Network error:", error.networkError)
             }
 
             // Hide typing indicator
-            isLoading.value = false;
+            isLoading.value = false
 
             // Show error message
             messages.value.push({
               text: "Connection error. Please try again later.",
               sender: 'bot'
-            });
+            })
 
             // Reset temporary state
-            streamingMessageIndex.value = -1;
-            tempMessageContent.value = '';
-            hasMonetaResponseAppeared.value = false;
+            streamingMessageIndex.value = -1
+            tempMessageContent.value = ''
+            hasMonetaResponseAppeared.value = false
           },
           complete: () => {
-            console.log("Subscription completed - ready for next message");
-            streamingMessageIndex.value = -1;
-            isLoading.value = false;
-            tempMessageContent.value = '';
-            hasMonetaResponseAppeared.value = false;
+            console.log("Subscription completed - ready for next message")
+            streamingMessageIndex.value = -1
+            isLoading.value = false
+            tempMessageContent.value = ''
+            hasMonetaResponseAppeared.value = false
           }
         })
   } catch (error) {
-    console.error("Failed to create subscription:", error);
+    console.error("Failed to create subscription:", error)
 
     // Hide typing indicator
-    isLoading.value = false;
+    isLoading.value = false
 
     // Show error message
     messages.value.push({
       text: "Sorry, I couldn't process your request. Please try again.",
       sender: 'bot'
-    });
+    })
 
-    streamingMessageIndex.value = -1;
-    tempMessageContent.value = '';
-    hasMonetaResponseAppeared.value = false;
+    streamingMessageIndex.value = -1
+    tempMessageContent.value = ''
+    hasMonetaResponseAppeared.value = false
+  }
+}
+
+// Resizing functions
+const startResizing = (direction, event) => {
+  if (event.type === 'touchstart') {
+    event.preventDefault()
+    startX.value = event.touches[0].clientX
+  } else {
+    startX.value = event.clientX
+  }
+
+  isResizing.value = true
+  resizeDirection.value = direction
+
+  const windowRect = chatWindowElement.value.getBoundingClientRect()
+  startWidth.value = windowRect.width
+  startPosition.value = windowRect.left
+
+  // Add event listeners
+  document.addEventListener('mousemove', handleResize)
+  document.addEventListener('touchmove', handleResize, { passive: false })
+  document.addEventListener('mouseup', stopResizing)
+  document.addEventListener('touchend', stopResizing)
+}
+
+const handleResize = (event) => {
+  if (!isResizing.value) return
+
+  let clientX
+  if (event.type === 'touchmove') {
+    event.preventDefault()
+    clientX = event.touches[0].clientX
+  } else {
+    clientX = event.clientX
+  }
+
+  const deltaX = clientX - startX.value
+
+  if (resizeDirection.value === 'right') {
+    // Resizing from right edge
+    let newWidth = startWidth.value + deltaX
+
+    // Apply constraints
+    newWidth = Math.max(newWidth, 320) // Min width
+    newWidth = Math.min(newWidth, window.innerWidth * 0.8) // Max width
+
+    chatWidth.value = newWidth
+  } else if (resizeDirection.value === 'left') {
+    // Resizing from left edge (more complex)
+    let newWidth = startWidth.value - deltaX
+
+    // Apply constraints
+    newWidth = Math.max(newWidth, 320) // Min width
+    newWidth = Math.min(newWidth, window.innerWidth * 0.8) // Max width
+
+    chatWidth.value = newWidth
+  }
+
+  // Remember user's preference
+  localStorage.setItem('chatWindowWidth', chatWidth.value)
+
+  // Update scrolling in case the chat bubbles reflow
+  updateScroll()
+}
+
+const stopResizing = () => {
+  isResizing.value = false
+
+  // Remove event listeners
+  document.removeEventListener('mousemove', handleResize)
+  document.removeEventListener('touchmove', handleResize)
+  document.removeEventListener('mouseup', stopResizing)
+  document.removeEventListener('touchend', stopResizing)
+}
+
+// Handle window resize (ensures chat window stays within viewport)
+const handleWindowResize = () => {
+  if (chatWidth.value && chatWidth.value > window.innerWidth * 0.8) {
+    chatWidth.value = window.innerWidth * 0.8
   }
 }
 
@@ -324,6 +458,24 @@ const handleClearChat = () => {
   clearChat()
 }
 
+// Handler for context toggle event from ChatBubble
+const handleContextToggled = (data) => {
+  // If the event explicitly says we should prevent auto-scrolling, do nothing
+  if (data && data.preventScroll) {
+    return;
+  }
+
+  // Otherwise update scroll normally
+  updateScroll();
+}
+
+// Update scroll function for context toggle and resizing
+const updateScroll = () => {
+  if (messageListElement.value) {
+    messageListElement.value.scrollTop = messageListElement.value.scrollHeight
+  }
+}
+
 // Watchers
 watch(() => props.currentCardTerm, (newTerm, oldTerm) => {
   if (isChatOpen.value && newTerm && newTerm !== oldTerm) {
@@ -333,17 +485,18 @@ watch(() => props.currentCardTerm, (newTerm, oldTerm) => {
 
 // Watch for new messages to scroll
 watch(messages, async () => {
-  await nextTick();
-  if (messageListElement.value) {
-    messageListElement.value.scrollTop = messageListElement.value.scrollHeight;
+  await nextTick()
+  // Only scroll to bottom if auto-scroll isn't temporarily prevented
+  if (messageListElement.value && !preventAutoScroll.value) {
+    messageListElement.value.scrollTop = messageListElement.value.scrollHeight
   }
-}, { deep: true });
+}, { deep: true })
 
 watch(isChatOpen, async (isOpen) => {
   if (isOpen) {
-    await nextTick();
+    await nextTick()
     if (messageListElement.value) {
-      messageListElement.value.scrollTop = messageListElement.value.scrollHeight;
+      messageListElement.value.scrollTop = messageListElement.value.scrollHeight
     }
   }
 })
@@ -471,7 +624,8 @@ watch(isChatOpen, async (isOpen) => {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   width: 420px;
   height: 600px;
-  transition: transform 0.3s ease, opacity 0.2s ease;
+  transition: transform 0.3s ease, opacity 0.2s ease, height 0.2s ease;
+  /* Remove width transition to allow smooth resizing */
   border: 1px solid #2a335a;
 }
 
@@ -479,6 +633,46 @@ watch(isChatOpen, async (isOpen) => {
   transform: translateY(20px);
   opacity: 0;
   pointer-events: none;
+}
+
+/* Resize handles */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 100%;
+  top: 0;
+  cursor: ew-resize;
+  z-index: 1002;
+  touch-action: none;
+}
+
+.resize-handle-left {
+  left: -4px;
+}
+
+.resize-handle-right {
+  right: -4px;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 30px;
+  background-color: rgba(95, 152, 239, 0);
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: background-color 0.2s ease;
+}
+
+.resize-handle:hover::after {
+  background-color: rgba(95, 152, 239, 0.5);
+}
+
+.resize-handle:active::after {
+  background-color: rgba(95, 152, 239, 0.7);
 }
 
 /* Message list */
@@ -535,7 +729,8 @@ watch(isChatOpen, async (isOpen) => {
 /* Large desktop screens */
 @media (min-width: 1440px) {
   .chat-window {
-    width: 480px;
+    /* Only apply default width if user hasn't resized */
+    width: var(--user-chat-width, 480px);
     height: 700px;
   }
 
@@ -553,7 +748,8 @@ watch(isChatOpen, async (isOpen) => {
 /* Standard desktop screens */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .chat-window {
-    width: 420px;
+    /* Only apply default width if user hasn't resized */
+    width: var(--user-chat-width, 420px);
     height: 600px;
   }
 }
@@ -561,7 +757,8 @@ watch(isChatOpen, async (isOpen) => {
 /* Tablets and small desktops */
 @media (min-width: 768px) and (max-width: 1023px) {
   .chat-window {
-    width: 360px;
+    /* Only apply default width if user hasn't resized */
+    width: var(--user-chat-width, 360px);
     height: 550px;
   }
 
@@ -601,6 +798,10 @@ watch(isChatOpen, async (isOpen) => {
 
 /* Mobile phones */
 @media (max-width: 480px) {
+  .resize-handle {
+    display: none; /* Hide resize handles on mobile */
+  }
+
   .chat-container {
     bottom: 10px;
     right: 10px;
@@ -617,7 +818,7 @@ watch(isChatOpen, async (isOpen) => {
   }
 
   .chat-window {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 20px) !important; /* Override any custom width */
     height: calc(100vh - 80px);
     max-height: 500px;
     position: fixed;

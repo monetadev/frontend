@@ -7,6 +7,7 @@
         'loading-bubble': isLoading,
         'structured-bubble': sender === 'bot' && hasContextAndResponse
       }"
+      ref="bubbleElement"
   >
     <span v-if="isLoading" class="loading-dots">
       <span class="dot"></span>
@@ -23,7 +24,7 @@
           </span>
           <span class="context-title">Moneta's Thoughts</span>
         </div>
-        <div v-show="isContextVisible" class="context-content" v-html="contextContent"></div>
+        <div class="context-content" :class="{'visible': isContextVisible}" ref="contextContentElement" v-html="contextContent"></div>
       </div>
       <div class="response-section">
         <div class="response-content" v-html="responseContent"></div>
@@ -81,16 +82,65 @@ const props = defineProps({
 // Define emits
 const emit = defineEmits(['contextToggled']);
 
+// Refs for DOM elements
+const bubbleElement = ref(null);
+const contextContentElement = ref(null);
+
 // State for collapsible context
 const isContextVisible = ref(false);
 
 const toggleContext = () => {
+  // Find the scrollable container before we make any changes
+  const scrollContainer = findScrollParent(bubbleElement.value);
+
+  // Store the initial bubble position and container scroll position
+  const initialBubbleRect = bubbleElement.value.getBoundingClientRect();
+  const initialScrollTop = scrollContainer.scrollTop;
+
+  // Toggle the visibility state
   isContextVisible.value = !isContextVisible.value;
 
-  // Emit an event to the parent to update scrolling
-  setTimeout(() => {
-    emit('contextToggled');
-  }, 100);
+  // After the DOM has updated
+  nextTick(() => {
+    if (isContextVisible.value) {
+      // When expanding:
+
+      // Setup copy buttons for any code blocks in the newly visible content
+      setupCopyButtons();
+
+      // Check if we need to make the expanded content visible
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const contextContentRect = contextContentElement.value.getBoundingClientRect();
+
+      // If the bottom of expanded content is not visible
+      if (contextContentRect.bottom > containerRect.bottom) {
+        // Calculate how much of the content is below the visible area
+        const extraHeight = contextContentRect.bottom - containerRect.bottom + 20; // 20px padding
+
+        // Scroll just enough to show the expanded content
+        scrollContainer.scrollTop += extraHeight;
+      }
+    }
+
+    // Tell parent component that context was toggled and to NOT auto-scroll
+    emit('contextToggled', { preventScroll: true });
+  });
+};
+
+// Helper function to find scrollable parent
+const findScrollParent = (element) => {
+  if (!element) return document.documentElement;
+
+  // Check if element has a scrollable parent
+  let parent = element.parentElement;
+  while (parent) {
+    if (parent.classList.contains('message-list')) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+
+  return document.querySelector('.message-list') || document.documentElement;
 };
 
 // Detect if message has the specific structure of context and response
@@ -202,7 +252,7 @@ watch(isContextVisible, () => {
   line-height: 1.5;
   font-family: "Outfit", sans-serif;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
+  width: fit-content;
 }
 
 .user-bubble {
@@ -223,6 +273,9 @@ watch(isContextVisible, () => {
 
 .structured-bubble {
   padding: 0;
+  overflow: visible;
+  max-height: none;
+  height: auto;
   width: 95%;
 }
 
@@ -231,11 +284,15 @@ watch(isContextVisible, () => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 .context-section {
   border-bottom: 1px solid rgba(42, 51, 90, 0.5);
   background-color: rgba(18, 23, 41, 0.5);
+  position: relative;
+  overflow: hidden;
 }
 
 .context-header {
@@ -248,6 +305,8 @@ watch(isContextVisible, () => {
   font-weight: 500;
   user-select: none;
   transition: background-color 0.2s ease;
+  z-index: 2;
+  position: relative;
 }
 
 .context-header:hover {
@@ -275,19 +334,37 @@ watch(isContextVisible, () => {
 }
 
 .context-content {
-  padding: 12px 14px;
   font-size: 13px;
   color: #9aa1b3;
+  position: relative;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0 14px;
+  transition: max-height 0.3s ease-in-out,
+  opacity 0.3s ease-in-out,
+  padding 0.3s ease-in-out;
+  will-change: max-height, opacity, padding;
+}
+
+.context-content.visible {
+  max-height: 500px; /* Increased for larger content */
+  opacity: 1;
+  padding: 12px 14px;
+  overflow-y: auto;
 }
 
 .response-section {
   background: transparent;
   border: none;
+  overflow: visible;
+  height: auto;
 }
 
 .response-content {
   padding: 14px;
   color: white;
+  overflow: visible;
 }
 
 :deep(p) {
@@ -496,4 +573,3 @@ watch(isContextVisible, () => {
   }
 }
 </style>
-

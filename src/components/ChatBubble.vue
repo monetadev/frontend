@@ -4,7 +4,8 @@
       :class="{
         'user-bubble': sender === 'user',
         'bot-bubble': sender === 'bot',
-        'loading-bubble': isLoading
+        'loading-bubble': isLoading,
+        'structured-bubble': sender === 'bot' && hasContextAndResponse
       }"
   >
     <span v-if="isLoading" class="loading-dots">
@@ -25,9 +26,6 @@
         <div v-show="isContextVisible" class="context-content" v-html="contextContent"></div>
       </div>
       <div class="response-section">
-        <div class="response-header">
-          <span class="response-title">Moneta's Response</span>
-        </div>
         <div class="response-content" v-html="responseContent"></div>
       </div>
     </div>
@@ -37,13 +35,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch, nextTick } from 'vue';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
-// Import a highlight.js theme (you can choose different themes)
-import 'highlight.js/styles/github.css';
+import 'highlight.js/styles/tokyo-night-dark.css';
 
-// Configure MarkdownIt with syntax highlighting
+// Configure MarkdownIt with syntax highlighting and custom renderer
 const md = new MarkdownIt({
   html: false,
   linkify: true,
@@ -52,14 +49,12 @@ const md = new MarkdownIt({
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return '<pre class="hljs"><code>' +
-            hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-            '</code></pre>';
+        return `<pre class="code-block" data-language="${lang || 'plaintext'}"><div class="code-header"><div class="code-language">${lang || 'plaintext'}</div><button class="code-copy-btn" title="Copy code"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></div><code class="language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`;
       } catch (__) {}
     }
 
     // Use external default escaping for languages not supported by highlight.js
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+    return `<pre class="code-block" data-language="plaintext"><div class="code-header"><div class="code-language">plaintext</div><button class="code-copy-btn" title="Copy code"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></div><code>${md.utils.escapeHtml(str)}</code></pre>`;
   }
 });
 
@@ -83,18 +78,24 @@ const props = defineProps({
   }
 });
 
+// Define emits
+const emit = defineEmits(['contextToggled']);
+
 // State for collapsible context
 const isContextVisible = ref(false);
 
 const toggleContext = () => {
   isContextVisible.value = !isContextVisible.value;
+
+  // Emit an event to the parent to update scrolling
+  setTimeout(() => {
+    emit('contextToggled');
+  }, 100);
 };
 
 // Detect if message has the specific structure of context and response
 const hasContextAndResponse = computed(() => {
   if (props.sender !== 'bot') return false;
-
-  // Check if message contains both the context and response headers
   return props.message.includes('# Context Provided') &&
       props.message.includes('# Moneta\'s Response');
 });
@@ -128,6 +129,62 @@ const renderedMarkdown = computed(() => {
   if (!props.message) return '';
   return md.render(props.message);
 });
+
+// Add copy functionality to code blocks after DOM updates
+const setupCopyButtons = () => {
+  nextTick(() => {
+    const copyButtons = document.querySelectorAll('.code-copy-btn');
+
+    copyButtons.forEach(btn => {
+      // Skip if already processed
+      if (btn.hasAttribute('data-processed')) return;
+      btn.setAttribute('data-processed', 'true');
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Find the code element (parent's sibling)
+        const pre = btn.closest('.code-block');
+        const code = pre.querySelector('code');
+        if (!code) return;
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(code.textContent).then(() => {
+          // Show success state
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          btn.classList.add('copied');
+
+          // Reset after 2 seconds
+          setTimeout(() => {
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            btn.classList.remove('copied');
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+      });
+    });
+  });
+};
+
+// Setup copy functionality when the component mounts
+onMounted(() => {
+  setupCopyButtons();
+});
+
+// Setup copy functionality when content changes
+watch([renderedMarkdown, responseContent, contextContent], () => {
+  // Use nextTick to wait for the DOM update
+  setupCopyButtons();
+});
+
+// Setup copy buttons when context visibility changes
+watch(isContextVisible, () => {
+  if (isContextVisible.value) {
+    setupCopyButtons();
+  }
+});
 </script>
 
 <style scoped>
@@ -144,12 +201,12 @@ const renderedMarkdown = computed(() => {
   font-size: 14px;
   line-height: 1.5;
   font-family: "Outfit", sans-serif;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
 .user-bubble {
-  background-color: #007bff;
+  background-color: #5F98EF;
   color: white;
   align-self: flex-end;
   margin-left: auto;
@@ -157,39 +214,36 @@ const renderedMarkdown = computed(() => {
 }
 
 .bot-bubble {
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #1a2233;
+  color: white;
   align-self: flex-start;
   margin-right: auto;
   border-bottom-left-radius: 4px;
+}
+
+.structured-bubble {
+  padding: 0;
+  width: 95%;
 }
 
 /* Structured response styling */
 .structured-response {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   width: 100%;
 }
 
 .context-section {
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #fafafa;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s ease;
-}
-
-.context-section:hover {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(42, 51, 90, 0.5);
+  background-color: rgba(18, 23, 41, 0.5);
 }
 
 .context-header {
   display: flex;
   align-items: center;
+  border-radius: 14px 14px 0 0;
   padding: 10px 14px;
-  background-color: #f2f2f2;
+  background-color: rgba(26, 34, 51, 0.5);
   cursor: pointer;
   font-weight: 500;
   user-select: none;
@@ -197,7 +251,7 @@ const renderedMarkdown = computed(() => {
 }
 
 .context-header:hover {
-  background-color: #eaeaea;
+  background-color: rgba(32, 41, 66, 0.7);
 }
 
 .context-icon {
@@ -205,6 +259,9 @@ const renderedMarkdown = computed(() => {
   align-items: center;
   justify-content: center;
   margin-right: 8px;
+}
+
+.context-icon svg {
   transition: transform 0.2s ease;
 }
 
@@ -213,42 +270,24 @@ const renderedMarkdown = computed(() => {
 }
 
 .context-title {
-  color: #555;
+  color: #9aa1b3;
   font-size: 13px;
 }
 
 .context-content {
   padding: 12px 14px;
-  max-height: 200px;
-  overflow-y: auto;
-  border-top: 1px solid #eaeaea;
   font-size: 13px;
-  color: #555;
-  background-color: #fdfdfd;
+  color: #9aa1b3;
 }
 
 .response-section {
-  border: 1px solid #e6eef7;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 123, 255, 0.05);
-}
-
-.response-header {
-  padding: 10px 14px;
-  background-color: #f0f7ff;
-  font-weight: 500;
-}
-
-.response-title {
-  color: #0066cc;
-  font-size: 13px;
+  background: transparent;
+  border: none;
 }
 
 .response-content {
   padding: 14px;
-  color: #333;
+  color: white;
 }
 
 :deep(p) {
@@ -261,30 +300,70 @@ const renderedMarkdown = computed(() => {
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 85%;
-  background-color: rgba(0, 0, 0, 0.04);
-  color: #333;
+  background-color: #2a335a;
+  color: #e0e0e0;
 }
 
-:deep(pre) {
+/* Code block styling with header */
+:deep(.code-block) {
   margin: 1em 0;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: #1a2233;
+}
+
+:deep(.code-header) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2a335a;
+  padding: 6px 12px;
+  border-bottom: 1px solid #3d4a7d;
+}
+
+:deep(.code-language) {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 12px;
+  color: #9aa1b3;
+  text-transform: lowercase;
+}
+
+:deep(.code-copy-btn) {
+  background: rgba(95, 152, 239, 0.1);
+  border: none;
+  border-radius: 4px;
+  color: #5F98EF;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.code-copy-btn:hover) {
+  background: rgba(95, 152, 239, 0.2);
+}
+
+:deep(.code-copy-btn.copied) {
+  background: rgba(70, 201, 137, 0.2);
+  color: #46c989;
 }
 
 :deep(pre code) {
   display: block;
-  padding: 1.2em;
+  padding: 1em;
   overflow-x: auto;
   line-height: 1.5;
-  background-color: #f6f8fa;
+  background-color: #1a2233;
   border-radius: 0;
   font-size: 13px;
 }
 
 /* Override hljs background for dark theme in user bubble */
 .user-bubble :deep(.hljs) {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 /* Handle code in user bubble with light text */
@@ -293,24 +372,41 @@ const renderedMarkdown = computed(() => {
   color: #fff;
 }
 
+.user-bubble :deep(.code-header) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.user-bubble :deep(.code-copy-btn) {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.user-bubble :deep(.code-copy-btn:hover) {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.user-bubble :deep(.code-language) {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 :deep(a) {
-  color: #0366d6;
+  color: #5F98EF;
   text-decoration: none;
-  border-bottom: 1px dotted #0366d6;
+  border-bottom: 1px dotted #5F98EF;
   transition: all 0.2s ease;
 }
 
 :deep(a:hover) {
   opacity: 0.85;
-  border-bottom: 1px solid #0366d6;
+  border-bottom: 1px solid #5F98EF;
 }
 
 :deep(blockquote) {
   margin: 0.8em 0;
   padding: 0.5em 1em;
-  border-left: 3px solid #e1e4e8;
-  color: #586069;
-  background-color: rgba(0, 0, 0, 0.02);
+  border-left: 3px solid #2a335a;
+  color: #9aa1b3;
+  background-color: rgba(26, 34, 51, 0.5);
   border-radius: 0 4px 4px 0;
 }
 
@@ -327,6 +423,7 @@ const renderedMarkdown = computed(() => {
   margin: 1em 0 0.5em;
   font-weight: 600;
   line-height: 1.3;
+  color: white;
 }
 
 :deep(h1) { font-size: 1.6em; }
@@ -349,17 +446,17 @@ const renderedMarkdown = computed(() => {
 }
 
 :deep(th), :deep(td) {
-  border: 1px solid #e1e4e8;
+  border: 1px solid #2a335a;
   padding: 6px 10px;
 }
 
 :deep(th) {
-  background-color: #f6f8fa;
+  background-color: #1a2233;
   font-weight: 600;
 }
 
 :deep(tr:nth-child(even)) {
-  background-color: #f8f8f8;
+  background-color: #202942;
 }
 
 /* Dot animation styling */
@@ -374,7 +471,7 @@ const renderedMarkdown = computed(() => {
 .dot {
   width: 6px;
   height: 6px;
-  background-color: #aaa;
+  background-color: #9aa1b3;
   border-radius: 50%;
   display: inline-block;
   animation: pulse 1.4s infinite ease-in-out both;
@@ -398,23 +495,5 @@ const renderedMarkdown = computed(() => {
     opacity: 1;
   }
 }
-
-/* Scrollbar styling for context content */
-.context-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.context-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.context-content::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
-
-.context-content::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
 </style>
+

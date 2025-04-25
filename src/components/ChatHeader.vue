@@ -88,12 +88,12 @@ const cancelClearTimer = () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background-color: white;
+  background-color: #121729;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid #2a335a;
   font-family: "Outfit", sans-serif;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .chat-header-left {
@@ -107,14 +107,14 @@ const cancelClearTimer = () => {
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .chat-title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .chat-header-actions {
@@ -131,7 +131,7 @@ const cancelClearTimer = () => {
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: #666;
+  color: #9aa1b3;
   background-color: transparent;
   transition: all 0.2s ease;
   position: relative;
@@ -139,8 +139,8 @@ const cancelClearTimer = () => {
 }
 
 .action-btn:hover {
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #1a2233;
+  color: white;
 }
 
 .clear-btn {
@@ -156,13 +156,13 @@ const cancelClearTimer = () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 8px; /* Start with a visible circle ~1/4 of the final size */
+  width: 8px;
   height: 8px;
-  background-color: #ff5757;
+  background-color: #ff5e5e;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
-  opacity: 0; /* Still start invisible until clearing state is active */
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -170,7 +170,7 @@ const cancelClearTimer = () => {
   0% {
     width: 8px;
     height: 8px;
-    opacity: 0.9; /* Start mostly visible */
+    opacity: 0.9;
   }
   100% {
     width: 32px;

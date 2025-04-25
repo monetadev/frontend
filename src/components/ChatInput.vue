@@ -59,8 +59,8 @@ const sendMessage = () => {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background-color: white;
-  border-top: 1px solid #e0e0e0;
+  background-color: #121729;
+  border-top: 1px solid #2a335a;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
@@ -68,16 +68,16 @@ const sendMessage = () => {
 .input-wrapper {
   display: flex;
   flex-grow: 1;
-  background-color: #f5f5f5;
+  background-color: #1a2233;
   border-radius: 18px;
   padding: 0 4px 0 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .input-wrapper:focus-within {
-  background-color: #f8f8f8;
-  box-shadow: 0 1px 3px rgba(0, 123, 255, 0.2);
+  background-color: #202942;
+  box-shadow: 0 1px 3px rgba(95, 152, 239, 0.3);
 }
 
 .message-input {
@@ -88,12 +88,12 @@ const sendMessage = () => {
   outline: none;
   font-size: 14px;
   font-family: "Outfit", sans-serif;
-  color: #333;
+  color: white;
   padding: 0;
 }
 
 .message-input::placeholder {
-  color: #aaa;
+  color: #9aa1b3;
 }
 
 .send-btn {
@@ -104,7 +104,7 @@ const sendMessage = () => {
   height: 32px;
   border: none;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: #5F98EF;
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -112,13 +112,13 @@ const sendMessage = () => {
 }
 
 .send-btn:hover:not(:disabled) {
-  background-color: #0069d9;
+  background-color: #4a7dd6;
   transform: scale(1.05);
 }
 
 .send-btn:disabled {
-  background-color: #e0e0e0;
-  color: #999;
+  background-color: #2a335a;
+  color: #9aa1b3;
   cursor: not-allowed;
 }
 

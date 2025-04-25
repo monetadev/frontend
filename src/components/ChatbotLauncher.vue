@@ -368,13 +368,13 @@ watch(isChatOpen, async (isOpen) => {
   height: 54px;
   border-radius: 50%;
   cursor: pointer;
-  background: linear-gradient(145deg, #0083ff, #0065e0);
+  background: linear-gradient(145deg, #5F98EF, #4a7dd6);
   color: white;
   border: none;
   outline: none;
   padding: 0;
   z-index: 1001;
-  box-shadow: 0 4px 12px rgba(0, 105, 217, 0.4);
+  box-shadow: 0 4px 12px rgba(95, 152, 239, 0.4);
   transition: all 0.2s ease;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
@@ -398,7 +398,7 @@ watch(isChatOpen, async (isOpen) => {
 
 .chat-launcher:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 105, 217, 0.5);
+  box-shadow: 0 6px 16px rgba(95, 152, 239, 0.5);
 }
 
 .chat-launcher:hover::before {
@@ -407,7 +407,7 @@ watch(isChatOpen, async (isOpen) => {
 
 .chat-launcher:active {
   transform: translateY(1px) scale(0.95);
-  box-shadow: 0 2px 8px rgba(0, 105, 217, 0.4);
+  box-shadow: 0 2px 8px rgba(95, 152, 239, 0.4);
 }
 
 .launcher-background {
@@ -416,7 +416,7 @@ watch(isChatOpen, async (isOpen) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, #0083ff, #0065e0);
+  background: linear-gradient(145deg, #5F98EF, #4a7dd6);
   border-radius: 50%;
   z-index: -1;
 }
@@ -466,13 +466,13 @@ watch(isChatOpen, async (isOpen) => {
   position: absolute;
   bottom: 70px;
   right: 0;
-  background-color: white;
+  background-color: #121729;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   width: 420px;
   height: 600px;
   transition: transform 0.3s ease, opacity 0.2s ease;
-  border: 1px solid #eaeaea;
+  border: 1px solid #2a335a;
 }
 
 .chat-window.minimized {
@@ -486,12 +486,12 @@ watch(isChatOpen, async (isOpen) => {
   flex-grow: 1;
   overflow-y: auto;
   padding: 16px;
-  background-color: #f9f9f9;
+  background-color: #121729;
   display: flex;
   flex-direction: column;
   gap: 12px;
   scrollbar-width: thin;
-  scrollbar-color: #bdbdbd #f1f1f1;
+  scrollbar-color: #2a335a #121729;
 }
 
 .message-list::-webkit-scrollbar {
@@ -499,24 +499,23 @@ watch(isChatOpen, async (isOpen) => {
 }
 
 .message-list::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: #121729;
   border-radius: 3px;
 }
 
 .message-list::-webkit-scrollbar-thumb {
-  background: #bdbdbd;
+  background: #2a335a;
   border-radius: 3px;
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: #3d4a7d;
 }
 
 /* Typing indicator */
 .typing-indicator-container {
   padding: 4px 0;
-  background-color: white;
-  border-top: 1px solid #eaeaea;
+  background-color: #121729;
 }
 
 /* Transitions */

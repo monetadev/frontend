@@ -28,6 +28,7 @@ const routes = [
   { path: '/create', component: Create },
   {path: "/quizzes", component: Quizzes},
   {path: "/explore", component: Explore},
+  {path: '/matching-game/:id', name: 'MatchingGame', component: () => import('@/views/MatchingGame.vue')},
   { path: '/edit-flashcard-set/:id', name: 'EditFlashcardSet', component: () => import('@/views/EditFlashcardSet.vue'), meta: { requiresAuth: true } }
 
 ];

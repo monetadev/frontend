@@ -22,10 +22,10 @@
                 <span>Theme</span>
               </li>
 
-              <li :class="{ active: activeTab === 'admin' }" @click="activeTab = 'admin'">
-              <i class="fas fa-tools"></i>
-              <span>Admin Settings</span>
-            </li>
+              <li :class="{ active: activeTab === 'admin' }" @click="activeTab = 'admin'" v-if="hasAdminRole">
+                <i class="fas fa-tools"></i>
+                <span>Admin Settings</span>
+              </li>
             </ul>
           </aside>
   
@@ -165,7 +165,7 @@
             -->
 
             <div v-if="activeTab === 'admin'" class="settings-section">
-            <h2>Admin Settings</h2>
+            <h2>Delete Users or Manage Roles</h2>
               <div class="table-container">
                 <!-- Loading indicator -->
                 <div v-if="usersLoading && !paginatedUsers.length" class="loading-indicator">
@@ -187,6 +187,7 @@
                     <th>Date Created</th>
                     <th>Last Updated</th>
                     <th>Roles</th>
+                    <th>Actions</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -197,6 +198,19 @@
                     <td>{{ user.creationDate.split('T')[0] }}</td>
                     <td>{{ user.lastUpdated?.split('T')[0] || '—' }}</td>
                     <td>{{ user.roles.map(role => role.name).join(', ') }}</td>
+                    <td class="action-buttons">
+                      <button
+                          @click="manageUserRoles(user)"
+                          class="manage-button">
+                        Manage Roles
+                      </button>
+                      <button
+                          @click="confirmDeleteUser(user)"
+                          class="delete-button"
+                          :disabled="user.id === result.value?.me?.id">
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                   </tbody>
                 </table>
@@ -252,7 +266,63 @@
                 </tbody>
               </table>
             </div>
+              <!-- Confirmation Modal -->
+              <div v-if="showDeleteConfirm" class="modal-overlay">
+                <div class="modal-content">
+                  <h3>Confirm User Deletion</h3>
+                  <p>Are you sure you want to delete the user <strong>{{ userToDelete?.username }}</strong>?</p>
+                  <p class="warning-text">This action cannot be undone.</p>
+                  <div class="modal-buttons">
+                    <button @click="cancelDeleteUser" class="cancel-button">Cancel</button>
+                    <button @click="executeDeleteUser" class="confirm-delete-button">Delete User</button>
+                  </div>
+                </div>
+              </div>
+              <!-- Role Management Modal -->
+              <div v-if="showRoleManagementModal" class="modal-overlay">
+                <div class="modal-content role-modal">
+                  <h3>Manage Roles for {{ userBeingManaged?.username }}</h3>
 
+                  <!-- Current Roles -->
+                  <div class="current-roles">
+                    <h4>Current Roles:</h4>
+                    <div v-if="userBeingManaged?.roles.length" class="role-chips">
+                      <div v-for="role in userBeingManaged.roles" :key="role.id" class="role-chip">
+                        {{ role.name }}
+                        <button @click="removeRole(role.id)" class="remove-role-btn">×</button>
+                      </div>
+                    </div>
+                    <p v-else>No roles assigned</p>
+                  </div>
+
+                  <!-- Assign New Role -->
+                  <div class="assign-role">
+                    <h4>Assign New Role:</h4>
+                    <div class="role-select-container">
+                      <select v-model="selectedRoleId" class="role-select">
+                        <option value="">Select a role to assign</option>
+                        <option
+                            v-for="role in availableRoles"
+                            :key="role.id"
+                            :value="role.id"
+                            :disabled="userBeingManaged?.roles.some(r => r.id === role.id)">
+                          {{ role.name }}
+                        </option>
+                      </select>
+                      <button
+                          @click="assignRole"
+                          class="assign-button"
+                          :disabled="!selectedRoleId">
+                        Assign
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="modal-buttons">
+                    <button @click="closeRoleManagement" class="close-button">Close</button>
+                  </div>
+                </div>
+              </div>
 
 </div>
 
@@ -268,10 +338,13 @@ import SideNavigation from "@/components/SideNavigation.vue";
 import TopNavigation from "@/components/TopNavigation.vue";
 import { ref, reactive, computed, watch } from 'vue';
 import {useMutation, useQuery} from '@vue/apollo-composable';
-import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE} from "@/graphql/auth.js"
+import {UPDATE_USER, ME_QUERY, FIND_ALL_USERS, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE, DELETE_USER, GET_ROLES,
+  REMOVE_ROLE_FROM_USER, ASSIGN_ROLE_TO_USER} from "@/graphql/auth.js"
 import apolloClient from '../plugins/apollo.js';
 import eventBus from "@/eventBus.js";
 import router from "@/router.js";
+
+
 
 // Reactive state
 const activeTab = ref('account');
@@ -305,12 +378,186 @@ const {
     }
 );
 
+const availableRoles = ref([]);
+const selectedRoleId = ref('');
+const userBeingManaged = ref(null);
+const showRoleManagementModal = ref(false);
+
+const { result: rolesResult, loading: rolesLoading } = useQuery(
+    GET_ROLES,
+    { page: 0, size: 10 }
+);
+
+// Watch for roles data
+watch(() => rolesResult.value?.roles?.items, (roles) => {
+  if (roles) {
+    availableRoles.value = roles;
+  }
+}, { immediate: true });
+
+// Open role management modal for a specific user
+function manageUserRoles(user) {
+  userBeingManaged.value = user;
+  showRoleManagementModal.value = true;
+  selectedRoleId.value = '';
+}
+// Assign role to user
+async function assignRole() {
+  if (!selectedRoleId.value || !userBeingManaged.value) return;
+
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: ASSIGN_ROLE_TO_USER,
+      variables: {
+        userId: userBeingManaged.value.id,
+        roleId: selectedRoleId.value
+      }
+    });
+
+    if (data.assignRoleToUser) {
+      // Find the role name for the toast message
+      const selectedRole = availableRoles.value.find(role => role.id === selectedRoleId.value);
+      toastFunction(`Role ${selectedRole.name} assigned to ${userBeingManaged.value.username}`, "success");
+
+      // Refetch to ensure data consistency
+      apolloClient.refetchQueries({
+        include: [{
+          query: FIND_ALL_USERS,
+          variables: { page: currentPage.value, size: pageSize.value }
+        }]
+      });
+
+      selectedRoleId.value = '';
+    }
+  } catch (error) {
+    console.error("Error assigning role:", error);
+    toastFunction(`Failed to assign role: ${error.message}`, "error");
+  }
+}
+
+function changePassword() {
+  // This is a placeholder until you implement the actual password change
+  toastFunction("Password change feature not yet implemented", "info");
+}
+
+// Remove role from user
+async function removeRole(roleId) {
+  if (!userBeingManaged.value) return;
+
+  try {
+    const { data } = await apolloClient.mutate({
+      mutation: REMOVE_ROLE_FROM_USER,
+      variables: {
+        userId: userBeingManaged.value.id,
+        roleId: roleId
+      }
+    });
+
+    if (data.removeRoleFromUser) {
+      const removedRole = userBeingManaged.value.roles.find(role => role.id === roleId);
+      toastFunction(`Role ${removedRole.name} removed from ${userBeingManaged.value.username}`, "success");
+
+      // Refetch to ensure data consistency
+      apolloClient.refetchQueries({
+        include: [{
+          query: FIND_ALL_USERS,
+          variables: { page: currentPage.value, size: pageSize.value }
+        }]
+      });
+    }
+  } catch (error) {
+    console.error("Error removing role:", error);
+    toastFunction(`Failed to remove role: ${error.message}`, "error");
+  }
+}
+
+// Close role management modal
+function closeRoleManagement() {
+  showRoleManagementModal.value = false;
+  userBeingManaged.value = null;
+  selectedRoleId.value = '';
+}
+
 // const avatarInitials = computed(() => {
 //   if (!user.firstname && !user.lastname) return '';
 //   const firstInitial = user.firstname ? user.firstname.charAt(0) : '';
 //   const lastInitial = user.lastname ? user.lastname.charAt(0) : '';
 //   return ```${firstInitial}${lastInitial}```.toUpperCase();
 // });
+
+const showDeleteConfirm = ref(false);
+const userToDelete = ref(null);
+
+
+function confirmDeleteUser(user) {
+  userToDelete.value = user;
+  showDeleteConfirm.value = true;
+}
+
+async function executeDeleteUser() {
+  if (!userToDelete.value) return;
+
+  try {
+    // Call apolloClient.mutate directly
+    const { data } = await apolloClient.mutate({
+      mutation: DELETE_USER,
+      variables: {
+        id: userToDelete.value.id
+      },
+      update: (cache) => {
+        // Update the cache to remove the deleted user
+        const existingData = cache.readQuery({
+          query: FIND_ALL_USERS,
+          variables: { page: currentPage.value, size: pageSize.value }
+        });
+
+        if (existingData) {
+          const newItems = existingData.findAllUsers.items.filter(
+              item => item.id !== userToDelete.value.id
+          );
+
+          cache.writeQuery({
+            query: FIND_ALL_USERS,
+            variables: { page: currentPage.value, size: pageSize.value },
+            data: {
+              findAllUsers: {
+                ...existingData.findAllUsers,
+                items: newItems,
+                pageInfo: {
+                  ...existingData.findAllUsers.pageInfo,
+                  totalElements: existingData.findAllUsers.pageInfo.totalElements - 1
+                }
+              }
+            }
+          });
+        }
+      }
+    });
+
+    // Check if deletion was successful
+    if (data.deleteUser) {
+      toastFunction(`User ${userToDelete.value.username} deleted successfully`, "success");
+
+      // Refetch to ensure data consistency
+      apolloClient.refetchQueries({
+        include: [{ query: FIND_ALL_USERS, variables: { page: currentPage.value, size: pageSize.value } }]
+      });
+    } else {
+      throw new Error("Failed to delete user");
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    toastFunction(`Failed to delete user: ${error.message}`, "error");
+  } finally {
+    showDeleteConfirm.value = false;
+    userToDelete.value = null;
+  }
+}
+
+function cancelDeleteUser() {
+  showDeleteConfirm.value = false;
+  userToDelete.value = null;
+}
 
 const formattedLastUpdated = computed(() => {
   if (!user.lastUpdated) return '';
@@ -339,6 +586,11 @@ const pageInfo = computed(() => {
     totalPages: 0,
     totalElements: 0
   };
+});
+
+const hasAdminRole = computed(() => {
+  const roles = result.value?.me?.roles || [];
+  return roles.some(role => role.name === "ROLE_ADMIN");
 });
 
 // Pagination control methods
@@ -389,10 +641,6 @@ watch(() => result.value?.me, (userData) => {
   }
 }, { immediate: true });
 
-const users = ref([
-  { uuid: "123", username: "johndoe", email: "john@example.com", dateCreated: "2024-01-01", lastUpdated: "2024-03-01", roles: ["Admin"] },
-  { uuid: "456", username: "janedoe", email: "jane@example.com", dateCreated: "2023-11-15", lastUpdated: "2024-02-20", roles: ["User"] }
-]);
 
 const roleOptions = ref(["Admin", "Moderator", "User"]);
 const selectedRoles = ref({});
@@ -560,10 +808,10 @@ const handleUserUpdated = async () => {
 // }
 </script>
 
-  
 
-  
-  
+
+
+
   <style scoped>
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
@@ -1003,7 +1251,78 @@ input:checked + .slider:before {
   display: none;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.modal-content {
+  background: #22293A;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  background: #3b3e56;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-delete-button {
+  background: #c53030;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.warning-text {
+  color: #ff6b6b;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Button Styles */
+.delete-button {
+  background: #8b1f1f;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #c53030;
+}
+
+.delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 
   /* Background Colors: 
@@ -1013,10 +1332,111 @@ input:checked + .slider:before {
 
   */
 
+/* Role Management Styles */
+.role-modal {
+  width: 500px;
+  max-width: 90%;
+}
+
+.current-roles, .assign-role {
+  margin-bottom: 20px;
+}
+
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.role-chip {
+  background: #2a335a;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.remove-role-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  margin-left: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.remove-role-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.role-select-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.role-select {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  background: #22293A;
+  color: white;
+  border: 1px solid #3b3e56;
+}
+
+.assign-button {
+  background: #2a335a;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.assign-button:hover:not(:disabled) {
+  background: #5f98ef;
+}
+
+.assign-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.close-button {
+  background: #3b3e56;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.manage-button {
+  background: #2a335a;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.manage-button:hover {
+  background: #5f98ef;
+}
+
   </style>
-  
-
-
-
-  
-

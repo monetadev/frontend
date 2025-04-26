@@ -3,8 +3,8 @@
       <label :for="id"><b>{{ label }}</b></label>
       <input
           :type="type"
-          :value="modelValue"
-          @input="$emit('update:modelValue', $event.target.value)"
+          :value="value"
+          @input="$emit('input', $event.target.value)"
           :placeholder="placeholder"
           :name="name"
           :required="required"
@@ -22,9 +22,8 @@
       name: String,
       required: Boolean,
       id: String,
-      modelValue: String,
-    },
-    emits: ['update:modelValue'],
+      value: String,
+    }
   };
   </script>
   

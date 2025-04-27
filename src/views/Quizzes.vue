@@ -47,7 +47,6 @@
             <input type="number" v-model.number="questionCount" min="1" />
           </div>
 
-          <ToggleSwitch label="Review Mode" v-model="reviewMode" />
           <div class="button-container">
             <PrimaryButton text="Start Quiz" @click="goToQuiz" />
           </div>

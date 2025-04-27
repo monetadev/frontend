@@ -9,31 +9,31 @@
       </div>
     </div>
     <hr class="divider">
-    
+
     <div class="content">
       <div class="flashcard-content">
         <div class="term-section">
           <div class="form__group field">
-            <input 
-              type="input" 
-              class="form__field" 
-              placeholder="Term" 
-              required="" 
-              v-model="flashcard.term"
-              @input="updateFlashcard"
+            <input
+                type="input"
+                class="form__field"
+                placeholder="Term"
+                required=""
+                v-model="flashcard.term"
+                @input="updateFlashcard"
             >
             <label for="term" class="form__label">Term</label>
           </div>
         </div>
         <div class="definition-section">
           <div class="form__group field">
-            <input 
-              type="input" 
-              class="form__field" 
-              placeholder="Definition" 
-              required="" 
-              v-model="flashcard.definition"
-              @input="updateFlashcard"
+            <input
+                type="input"
+                class="form__field"
+                placeholder="Definition"
+                required=""
+                v-model="flashcard.definition"
+                @input="updateFlashcard"
             >
             <label for="definition" class="form__label">Definition</label>
           </div>
@@ -43,42 +43,51 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "createPanel",
-  props: {
-    number: {
-      type: Number,
-      required: true
-    },
-    id: {
-      type: [Number, String],
-      default: null
-    }
+<script setup>
+import { ref, computed, watch, defineProps, defineEmits } from 'vue';
+
+const props = defineProps({
+  number: {
+    type: Number,
+    required: true
   },
-  data() {
-    return {
-      flashcard: {
-        term: '',
-        definition: '',
-        position: this.number || 1
-      }
-    };
-  },
-  methods: {
-    updateFlashcard() {
-      // Update position in case number prop changed
-      this.flashcard.position = this.number || 1;
-      this.$emit('update-flashcard', {
-        term: this.flashcard.term,
-        definition: this.flashcard.definition,
-        position: this.flashcard.position
-      });
-    }
+  id: {
+    type: [Number, String],
+    default: null
   }
-};
+});
+
+const emit = defineEmits(['update-flashcard', 'delete-panel']);
+
+// Create reactive flashcard data
+const flashcard = ref({
+  term: '',
+  definition: '',
+  position: props.number
+});
+
+// Watch for number changes
+watch(() => props.number, (newVal) => {
+  flashcard.value.position = newVal;
+  updateFlashcard();
+});
+
+// Update method
+function updateFlashcard() {
+  console.log('Updating flashcard:', flashcard.value);
+  emit('update-flashcard', {
+    term: flashcard.value.term,
+    definition: flashcard.value.definition,
+    position: flashcard.value.position
+  });
+}
+
+// Handle delete
+function deletePanel() {
+  emit('delete-panel', props.number);
+}
 </script>
-  
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
 
@@ -139,98 +148,98 @@ export default {
   background-color: #3a4257;
   margin: 0 0 15px 0;
 }
-  
-  .content {
-    padding: 10px 0;
-  }
-  
-  .flashcard-content {
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    margin-top: 10px;
-  }
-  
-  .term-section {
-    flex: 1.3;
-  }
-  
-  .definition-section {
-    flex: 1.5;
-  }
-  
-  /* Floating label form styles */
-  .form__group {
-    position: relative;
-    padding: 20px 0 0;
-    width: 100%;
-  }
-  
-  .term-section .form__group {
-    max-width: 100%;
-  }
-  
-  .definition-section .form__group {
-    max-width: 100%;
-  }
-  
-  .form__field {
-    font-family: inherit;
-    width: 100%;
-    border: none;
-    border-bottom: 2px solid #9b9b9b;
-    outline: 0;
-    font-size: 17px;
-    color: #fff;
-    padding: 7px 0;
-    background: transparent;
-    transition: border-color 0.2s;
-    height: 40px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .form__field::placeholder {
-    color: transparent;
-  }
-  
-  .form__field:placeholder-shown ~ .form__label {
-    font-size: 17px;
-    cursor: text;
-    top: 20px;
-  }
-  
-  .form__label {
-    position: absolute;
-    top: 0;
-    display: block;
-    transition: 0.2s;
-    font-size: 17px;
-    color: #9b9b9b;
-    pointer-events: none;
-  }
-  
-  .form__field:focus {
-    padding-bottom: 6px;
-    font-weight: 700;
-    border-width: 3px;
-    border-image: linear-gradient(to right, #116399, #ffffff);
-    border-image-slice: 1;
-  }
-  
-  .form__field:focus ~ .form__label {
-    position: absolute;
-    top: 0;
-    display: block;
-    transition: 0.2s;
-    font-size: 17px;
-    color: #ffffff;
-    font-weight: 700;
-  }
-  
-  /* reset input */
-  .form__field:required, .form__field:invalid {
-    box-shadow: none;
-  }
-  </style>
+
+.content {
+  padding: 10px 0;
+}
+
+.flashcard-content {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.term-section {
+  flex: 1.3;
+}
+
+.definition-section {
+  flex: 1.5;
+}
+
+/* Floating label form styles */
+.form__group {
+  position: relative;
+  padding: 20px 0 0;
+  width: 100%;
+}
+
+.term-section .form__group {
+  max-width: 100%;
+}
+
+.definition-section .form__group {
+  max-width: 100%;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 17px;
+  color: #fff;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+  height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form__field::placeholder {
+  color: transparent;
+}
+
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 17px;
+  cursor: text;
+  top: 20px;
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 17px;
+  color: #9b9b9b;
+  pointer-events: none;
+}
+
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, #116399, #ffffff);
+  border-image-slice: 1;
+}
+
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 17px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* reset input */
+.form__field:required, .form__field:invalid {
+  box-shadow: none;
+}
+</style>

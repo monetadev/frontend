@@ -11,38 +11,48 @@
       </div>
     </div>
   </template>
-  
-  <script>
-  export default {
-    name: "Flashcard",
-    props: {
-      number: Number,
-      username: String,
-      title: String,
-      id: {
-        type: [Number, String],
-        default: null
-      }
-    },
-    methods: {
-      handleClick() {
-        // Emit an event with the panel ID or other relevant data
-        this.$emit('panel-click', {
-          id: this.id,
-          title: this.title,
-          number: this.number
-        });
-        this.$router.push(`/define`);
 
-        /*
-        TODO: I will need to work with backend to have id of the specifc flashcard set route you to the specific flashcard View page
-        */
+<script setup>
+import { useRouter } from 'vue-router';
 
-        // this.$router.push(`/view/${this.uuuid}`);
-      }
-    }
-  };
-  </script>
+// Define props
+const props = defineProps({
+  number: Number,
+  username: String,
+  title: String,
+  description: String,
+  id: {
+    type: [Number, String],
+    default: null
+  }
+});
+
+// Define emits
+const emit = defineEmits(['panel-click']);
+
+// Setup router
+const router = useRouter();
+
+// Click handler
+const handleClick = () => {
+  console.log('Clicked flashcard set with ID:', props.id);
+
+  // Emit event with data
+  emit('panel-click', {
+    id: props.id,
+    title: props.title,
+    number: props.number
+  });
+
+  // Navigate WITH the ID
+  if (props.id) {
+    router.push(`/library/view/${props.id}`);
+  } else {
+    console.error('No ID available for this flashcard set');
+    router.push('/library/view'); // Fallback to default view
+  }
+};
+</script>
   
   <style scoped>
   @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");

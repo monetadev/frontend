@@ -1,33 +1,47 @@
 <template>
-    <svg
-      :width="width"
-      :height="height"
-      viewBox="0 0 40 40"
-      fill="none"
+  <svg
+      :class="{ 'playing': playing, 'active': active }"
+      viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-    >
-      <g clip-path="url(#clip0_425_580)">
-        <path
-          d="M20 1.66667C30.1067 1.66667 38.3333 9.89167 38.3333 20C38.3333 30.1083 30.1067 38.3333 20 38.3333C9.89333 38.3333 1.66667 30.1083 1.66667 20C1.66667 9.89167 9.89333 1.66667 20 1.66667ZM20 0C8.955 0 0 8.955 0 20C0 31.045 8.955 40 20 40C31.045 40 40 31.045 40 20C40 8.955 31.045 0 20 0Z"
-          fill="white"
-        />
-        <path
-          d="M14.1668 29.4933C14.0235 29.4933 13.8785 29.4566 13.7502 29.3816C13.4935 29.2333 13.3335 28.9583 13.3335 28.6599V11.3366C13.3335 11.0383 13.4935 10.7633 13.7502 10.6149C14.0068 10.4649 14.3268 10.4649 14.5835 10.6149L29.5835 19.2749C29.8402 19.4233 30.0002 19.6983 30.0002 19.9966C30.0002 20.2949 29.8402 20.5699 29.5835 20.7183L14.5835 29.3783C14.4552 29.4566 14.3102 29.4933 14.1668 29.4933ZM15.0002 12.7833V27.2166L27.5002 19.9999L15.0002 12.7833Z"
-          fill="white"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_425_580">
-          <rect width="40" height="40" fill="white" />
-        </clipPath>
-      </defs>
-    </svg>
-  </template>
+  >
+    <g v-if="!playing">
+      <!-- Play icon -->
+      <path d="M8 5v14l11-7z" />
+    </g>
+    <g v-else>
+      <!-- Pause icon -->
+      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+    </g>
+  </svg>
+</template>
 
 <script>
 export default {
-    props: {
-        active: Boolean,
+  props: {
+    active: {
+      type: Boolean,
+      default: false
     },
-};
+    playing: {
+      type: Boolean,
+      default: false
+    }
+  }
+}
 </script>
+
+<style scoped>
+svg {
+  fill: #777;
+  transition: fill 0.3s ease;
+}
+svg.active {
+  fill: #fff;
+}
+svg.playing {
+  fill: #5f98ef; /* Blue color when playing */
+}
+svg:hover {
+  cursor: pointer;
+}
+</style>

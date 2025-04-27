@@ -16,20 +16,15 @@ const routes = [
   { path: '/dashboard', component: Dashboard },
   { path: '/login', component: Login },
   { path: '/reset-password', component: ResetPassword },
-  {path: '/signup', component: createAccount},
-  {path: '/add-flashcard', component: AddFlashcard},
-  { path: '/quizzes', component: Quizzes},
-  {path: '/my-stuffs', component: Set, exact : true},
-  {path: '/view', component: View},
+  { path: '/register', component: createAccount},
+  { path: '/library/create', component: AddFlashcard},
+  { path: '/library/view', component: Set},
+  { path: '/library/view/:id', component: View, props: true },
   { path: '/settings', component: Settings},
   {path: '/create', component: Create},
-  {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
-  {path: "/define", component: DefineView},
-
-
-  // { path: '/:pathMatch(.*)*', redirect: '/login' } // Catch-all route to handle undefined routes
-  
-
+  {path: "/quiz/run", name: "QuizRunner", component: QuizRunner,},
+  { path: "/quiz/create", name: "Quizzes", component: Quizzes },
+  { path: "/define", name: "Define", component: DefineView }
 ];
  
 const router = createRouter({

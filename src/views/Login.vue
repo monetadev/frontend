@@ -26,7 +26,7 @@
         <PrimaryButton text="Sign-In" />
         <div class="signup">
           <p>
-            New on our platform? <router-link to="/signup">Create Account</router-link>
+            New on our platform? <router-link to="/register">Create Account</router-link>
           </p>
         </div>
       </form>

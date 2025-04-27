@@ -7,7 +7,7 @@ import Toast from "@/components/ToastFunction.vue";
 const route = useRoute();
 
 // List of routes where footer should be hidden
-const hideFooterRoutes = ['/signup','/settings' ,'/reset-password'];
+const hideFooterRoutes = ['/register','/settings' ,'/reset-password'];
 
 // Computed property to determine if footer should be shown
 const showFooter = computed(() => {

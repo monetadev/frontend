@@ -18,20 +18,13 @@ const routes = [
   { path: '/reset-password', component: ResetPassword },
   { path: '/register', component: createAccount},
   { path: '/library/create', component: AddFlashcard},
-  { path: '/flash', component: flash},
   { path: '/library/view', component: Set},
-  { path: '/set', component: Set},
   { path: '/library/view/:id', component: View, props: true },
-  {path: '/view', component: View},
   { path: '/settings', component: Settings},
   {path: '/create', component: Create},
-  {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
+  {path: "/quiz/run", name: "QuizRunner", component: QuizRunner,},
+  { path: "/quiz/create", name: "Quizzes", component: Quizzes },
   { path: "/define", name: "Define", component: DefineView }
-  
-
-
-
-
 ];
  
 const router = createRouter({

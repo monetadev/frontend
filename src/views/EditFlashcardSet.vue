@@ -776,7 +776,7 @@ async function saveChanges() {
         flashcards: validFlashcards
       }));
 
-      router.push(`/view/${setId}`);
+      router.push(`/library/view/${setId}`);
     } else {
       toastFunction("Failed to update flashcard set", "error");
     }

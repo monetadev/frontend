@@ -9,7 +9,6 @@ import Settings from './views/Settings.vue';
 import Set from './views/flashsetViewer.vue';
 import View from './views/flashcardViewer.vue';
 import Explore from "@/views/Explore.vue";
-import Create from './views/createSet.vue'
 import Quizzes from "@/views/Quizzes.vue";
 import QuizRunner from "@/views/QuizRunner.vue";
 
@@ -22,17 +21,13 @@ const routes = [
   { path: '/flash', component: flash},
   { path: '/library/view', component: Set},
   { path: '/set', component: Set},
-  { path: '/view/:id', component: View, props: true },
-  { path: '/view', component: View, props: true},
-  { path: '/quizzes', component: Quizzes},
+  { path: '/library/view/:id', component: View, props: true },
   {path: '/view', component: View},
   { path: '/settings', component: Settings},
   { path: '/', component: Login },
-  { path: '/create', component: Create },
-  {path: "/quizzes", component: Quizzes},
+  {path: "/quiz/create", component: Quizzes},
   {path: "/explore", component: Explore},
-  { path: '/library/:id/edit', name: 'EditFlashcardSet', component: () => import('@/views/EditFlashcardSet.vue'), meta: { requiresAuth: true } }
-  {path: '/create', component: Create},
+  { path: '/library/:id/edit', name: 'EditFlashcardSet', component: () => import('@/views/EditFlashcardSet.vue'), meta: { requiresAuth: true } },
   {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
 ];
 

@@ -225,7 +225,7 @@ const submitForm = async () => {
     toastFunction("Account successfully created!", "success");
 
     // Optionally update a global auth state here (e.g., via Pinia)
-    await router.push('/myLibrary'); // Redirect to a protected route
+    await router.push('/library/view'); // Redirect to a protected route
   } catch (error) {
     toastFunction("Invalid Password. Please try again.", "error");
   }

@@ -141,29 +141,6 @@
  
             </div>
 
-
-
-            <div v-if="activeTab === 'theme'" class="settings-section">
-              <h2>Theme Settings</h2>
-              <p>Change Your Theme!</p>
-
-              <label class="theme-switch">
-                <input type="checkbox" v-model="themeStore.isDarkMode" @change="toggleTheme">
-                <span class="slider"></span>
-              </label>
-
-              <p>Current Mode: <strong>{{ themeStore.isDarkMode ? "Dark Mode" : "Light Mode" }}</strong></p>
-            </div>
-            
-            <!-- Deleted Notifications to save for later
-            <div v-if="activeTab === 'notifications'" class="settings-section">
-              <h2>Notification Settings</h2>
-              <label>
-                <input type="checkbox" v-model="notifications.email" /> Email Notifications
-              </label>
-            </div>
-            -->
-
             <div v-if="activeTab === 'admin'" class="settings-section">
             <h2>Admin Settings</h2>
               <div class="table-container">
@@ -263,7 +240,6 @@
   </template>
 
 <script setup>
-import { useThemeStore } from "@/stores/themeStore";
 import SideNavigation from "@/components/SideNavigation.vue";
 import TopNavigation from "@/components/TopNavigation.vue";
 import { ref, reactive, computed, watch } from 'vue';
@@ -279,7 +255,6 @@ const isSidebarCollapsed = ref(false);
 const currentPage = ref(0);
 const pageSize = ref(10);
 const fileInput = ref(null);
-const themeStore = useThemeStore();
 const user = reactive({
   profilePicture: null,
   firstname: "",
@@ -405,10 +380,6 @@ const getTitle = computed(() => {
 // Methods
 function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
-}
-
-function toggleTheme() {
-  themeStore.toggleTheme();
 }
 
 function updateUserRole(uuid) {
@@ -1014,9 +985,3 @@ input:checked + .slider:before {
   */
 
   </style>
-  
-
-
-
-  
-

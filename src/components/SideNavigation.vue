@@ -63,10 +63,10 @@ export default {
     return {
       activeMenu: "Dashboard",
       menuItems: [
-        { name: "My Sets", icon: MyStuffsIcon, path: "/myLibrary" },
-        { name: "Create Flashcards", icon: FlashcardsIcon, path: "/add-flashcard" },
-        { name: "Quizzes", icon: QuizzesIcon, path: "/quizzes" },
-        { name: "Explore", icon: ExploreIcon, path: "/explore" },
+        { name: "My Library", icon: MyStuffsIcon, path: "/library/view" },
+        { name: "Create Set", icon: FlashcardsIcon, path: "/library/create" },
+        { name: "Create Quiz", icon: QuizzesIcon, path: "/quiz/create" },
+        { name: "Explore Sets", icon: ExploreIcon, path: "/explore" },
         { name: "Settings", icon: SettingsIcon, path: "/settings" },
       ],
     };

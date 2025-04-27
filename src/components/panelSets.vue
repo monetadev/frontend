@@ -48,7 +48,7 @@ const handleClick = () => {
 
   // Navigate WITH the ID
   if (props.id) {
-    router.push(`/view/${props.id}`);
+    router.push(`/library/view/${props.id}`);
   } else {
     console.error('No ID available for this flashcard set');
     router.push('/view'); // Fallback to default view

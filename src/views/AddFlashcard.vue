@@ -922,7 +922,7 @@ const createFlashcardSet = async () => {
     toastFunction("Flashcard set created successfully!", "success");
 
     setTimeout(() => {
-      router.push(`/view/${data.createFlashcardSet.id}`);
+      router.push(`/library/view/${data.createFlashcardSet.id}`);
     }, 1500);
 
   } catch (error) {

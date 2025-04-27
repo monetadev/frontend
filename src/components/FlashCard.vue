@@ -1,3 +1,4 @@
+
 <template>
   <div class="flashcard" @click="flip">
     <div class="flashcard-inner" :class="{ 'flipped': isFlipped }">
@@ -30,8 +31,14 @@ export default {
     }
   },
   methods: {
+    // Keep original method for click handling
     flip() {
       this.isFlipped = !this.isFlipped;
+    },
+
+    // Add this method to match what the parent component is trying to call
+    flipCard() {
+      this.flip();
     }
   },
   watch: {

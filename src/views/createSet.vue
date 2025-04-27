@@ -64,7 +64,6 @@
 <script setup>
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
 import { useRouter } from 'vue-router';
 import SideNavigation from '@/components/SideNavigation.vue';
 import TopNavigation from '@/components/TopNavigation.vue';

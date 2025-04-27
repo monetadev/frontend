@@ -151,27 +151,6 @@ export const GET_FLASHCARD_SET_BY_ID = gql`
     }
 `;
 
-//Uses default pagination values (page 0, size 10)
-export const GET_ROLES = gql`
-    query roles {
-        roles{
-            items{
-                id
-                name
-                privileges{
-                    id
-                    name
-                }
-            }
-            pageInfo{
-                totalPages
-                totalElements
-                currentPage
-            }
-        }
-    }
-`;
-
 //Custom pagination values
 
 export const GET_ROLES_PAGINATED = gql`
@@ -189,21 +168,6 @@ export const GET_ROLES_PAGINATED = gql`
                 totalPages
                 totalElements
                 currentPage
-            }
-        }
-    }
-`;
-
-
-export const ASSIGN_ROLE_TO_USER = gql`
-    mutation AssignRoleToUser($userId: UUID!, $roleId: UUID!) {
-        assignRoleToUser(userId: $userId, roleId: $roleId) {
-            id
-            username
-            creationDate
-            roles {
-                id
-                name
             }
         }
     }
@@ -305,6 +269,56 @@ export const GENERATE_FLASHCARDS = gql`
                 term
                 definition
                 position
+            }
+        }
+    }
+`;
+
+
+export const DELETE_USER = gql`
+    mutation deleteUser($id: UUID!) {
+        deleteUser(id: $id)
+    }
+`;
+
+export const GET_ROLES = gql`
+    query getRoles($page: Int, $size: Int) {
+        roles(page: $page, size: $size) {
+            items {
+                id
+                name
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+
+export const ASSIGN_ROLE_TO_USER = gql`
+    mutation assignRoleToUser($userId: UUID!, $roleId: UUID!) {
+        assignRoleToUser(userId: $userId, roleId: $roleId) {
+            id
+            username
+            roles {
+                id
+                name
+            }
+        }
+    }
+`;
+
+export const REMOVE_ROLE_FROM_USER = gql`
+    mutation removeRoleFromUser($userId: UUID!, $roleId: UUID!) {
+        removeRoleFromUser(userId: $userId, roleId: $roleId) {
+            id
+            username
+            roles {
+                id
+                name
             }
         }
     }

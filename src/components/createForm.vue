@@ -1,38 +1,40 @@
+<!-- createForm.vue -->
 <template>
-    <div class="input-container">
-      <input
-          :type="type"
-          :value="value"
-          @input="$emit('input', $event.target.value)"
-          :placeholder="placeholder"
-          :name="name"
-          :required="required"
-          :id="id"
-      />
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      label: String,
-      type: String,
-      placeholder: String,
-      name: String,
-      required: Boolean,
-      id: String,
-      value: String,
-    }
-  };
-  </script>
-  
-  <style scoped>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+  <div class="form-group">
+    <input
+        :type="type"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+        :placeholder="placeholder"
+        :name="name"
+        :id="id"
+        :required="required"
+        class="form-control"
+    />
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    modelValue: String,
+    type: String,
+    placeholder: String,
+    name: String,
+    id: String,
+    required: Boolean
+  },
+  emits: ['update:modelValue']
+}
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
 
 
-    .input-container {
-      margin-bottom: 15px;
-    }
+.input-container {
+  margin-bottom: 15px;
+}
 
 
 input {
@@ -51,9 +53,8 @@ input {
   box-sizing: border-box;
 }
 
-  input:focus {
-    background-color: #585858;
-    outline: none;
-  }
-  </style>
-  
+input:focus {
+  background-color: #585858;
+  outline: none;
+}
+</style>

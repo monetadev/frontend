@@ -32,7 +32,7 @@
       <div v-else class="quiz-container">
         <div class="question-nav" :style="navHeightStyle">
 
-        <div
+          <div
               v-for="(q, i) in questions"
               :key="i"
               class="nav-number"

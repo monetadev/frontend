@@ -2,31 +2,39 @@
   <div class="chat-header">
     <div class="chat-header-left">
       <img
-        v-if="avatarUrl"
-        :src="avatarUrl"
-        alt="Chat Avatar"
-        class="chat-avatar"
+          v-if="avatarUrl"
+          :src="avatarUrl"
+          alt="Chat Avatar"
+          class="chat-avatar"
       />
       <h2 class="chat-title">{{ title }}</h2>
     </div>
     <div class="chat-header-actions">
       <button
-        class="minimize-btn"
-        @click="$emit('minimize')"
-        title="Minimize"
+          class="action-btn minimize-btn"
+          @click="$emit('minimize')"
+          title="Minimize"
       >
-        &minus;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
       </button>
+
       <button
-        ref="clearBtn"
-        class="clear-btn"
-        @mousedown="startClearTimer"
-        @mouseup="cancelClearTimer"
-        @mouseleave="cancelClearTimer"
-        :class="{ 'clearing': isClearingActive }"
-        title="Hold to clear chat"
+          ref="clearBtn"
+          class="action-btn clear-btn"
+          @mousedown="startClearTimer"
+          @mouseup="cancelClearTimer"
+          @mouseleave="cancelClearTimer"
+          :class="{ 'clearing': isClearingActive }"
+          title="Hold to clear chat"
       >
-        Clear
+        <div class="clear-bg-animation"></div>
+        <svg class="clear-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+        </svg>
       </button>
     </div>
   </div>
@@ -49,20 +57,18 @@ defineProps({
 // Define emits for minimize and clear actions
 const emit = defineEmits(['minimize', 'clear']);
 
-// Clear button 
+// Clear button
 const clearTimer = ref(null);
 const isClearingActive = ref(false);
-const clearProgress = ref(0);
 const clearBtn = ref(null);
 
 const startClearTimer = () => {
   isClearingActive.value = true;
-  clearProgress.value = 0;
-  
+
   clearTimer.value = setTimeout(() => {
     emit('clear');
     isClearingActive.value = false;
-  }, 3000); // 3 seconds hold or change to what u want
+  }, 1500);
 };
 
 const cancelClearTimer = () => {
@@ -81,80 +87,104 @@ const cancelClearTimer = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
-  background-color: #f0f0f0;
+  padding: 12px 16px;
+  background-color: #121729;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #2a335a;
   font-family: "Outfit", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .chat-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .chat-avatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .chat-title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .chat-header-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
-.minimize-btn,
-.clear-btn {
-  background: none;
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
-  font-size: 14px;
+  border-radius: 50%;
   cursor: pointer;
-  color: #666;
-  padding: 2px 8px;
-  transition: all 0.3s ease;
-  border-radius: 3px;
-}
-
-.minimize-btn:hover,
-.clear-btn:hover {
-  color: #333;
-  background-color: #e0e0e0;
-}
-
-.clear-btn {
+  color: #9aa1b3;
+  background-color: transparent;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
-.clear-btn.clearing {
-  background-color: #ff6b6b;
+.action-btn:hover {
+  background-color: #1a2233;
   color: white;
 }
 
-.clear-btn.clearing::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 0%;
-  background-color: rgba(255, 255, 255, 0.3);
-  animation: clear-progress 3s linear forwards;
+.clear-btn {
+  position: relative;
 }
 
-@keyframes clear-progress {
-  0% { width: 0%; }
-  100% { width: 100%; }
+.clear-icon {
+  position: relative;
+  z-index: 2;
+}
+
+.clear-bg-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: #ff5e5e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes grow-bg {
+  0% {
+    width: 8px;
+    height: 8px;
+    opacity: 0.9;
+  }
+  100% {
+    width: 32px;
+    height: 32px;
+    opacity: 1;
+  }
+}
+
+.clearing .clear-bg-animation {
+  animation: grow-bg 1.5s linear forwards;
+  opacity: 1;
+}
+
+.clearing {
+  color: white;
 }
 </style>

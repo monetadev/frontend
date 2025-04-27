@@ -1,10 +1,10 @@
 <template>
   <div class="toast-container">
     <div
-      v-for="(toast, index) in toasts"
-      :key="index"
-      class="toast"
-      :class="toast.type"
+        v-for="(toast, index) in toasts"
+        :key="index"
+        class="toast"
+        :class="toast.type"
     >
       <div class="toast-left">
         <div class="icon">{{ iconMap[toast.type] }}</div>
@@ -56,7 +56,7 @@ function removeToast(index) {
 
 .toast-container {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   z-index: 9999;
   display: flex;

@@ -4,13 +4,13 @@ import ResetPassword from './views/ResetPassword.vue';
 import Login from './views/Login.vue';
 import createAccount  from './views/createAccount.vue';
 import AddFlashcard  from './views/AddFlashcard.vue';
-import flash  from './components/GeneratedFlashcard.vue';
 import Settings from './views/Settings.vue';
 import Set from './views/flashsetViewer.vue';
 import View from './views/flashcardViewer.vue';
-import Explore from "@/views/Explore.vue";
-import Quizzes from "@/views/Quizzes.vue";
+import Create from './views/createSet.vue';
+import Quizzes from './views/Quizzes.vue';
 import QuizRunner from "@/views/QuizRunner.vue";
+import DefineView from "@/views/defineView.vue";
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -24,16 +24,25 @@ const routes = [
   { path: '/library/view/:id', component: View, props: true },
   {path: '/view', component: View},
   { path: '/settings', component: Settings},
-  { path: '/', component: Login },
-  {path: "/quiz/create", component: Quizzes},
-  {path: "/explore", component: Explore},
-  { path: '/library/:id/edit', name: 'EditFlashcardSet', component: () => import('@/views/EditFlashcardSet.vue'), meta: { requiresAuth: true } },
+  {path: '/create', component: Create},
   {path: "/quiz", name: "QuizRunner", component: QuizRunner,},
-];
+  { path: "/define", name: "Define", component: DefineView }
+  
 
+
+
+
+];
+ 
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+
+router.beforeEach((to, from, next) => {
+  console.log('Attempting to navigate to:', to.path);
+  next();
 });
 
 export default router;

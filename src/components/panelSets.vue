@@ -8,7 +8,6 @@
       </div>
       <div class="content">
         <h2 class="title">{{ title }}</h2>
-        <p v-if="description" class="description">{{ description }}</p>
       </div>
     </div>
   </template>
@@ -36,7 +35,6 @@ const router = useRouter();
 
 // Click handler
 const handleClick = () => {
-
   console.log('Clicked flashcard set with ID:', props.id);
 
   // Emit event with data
@@ -51,9 +49,8 @@ const handleClick = () => {
     router.push(`/library/view/${props.id}`);
   } else {
     console.error('No ID available for this flashcard set');
-    router.push('/view'); // Fallback to default view
+    router.push('/library/view'); // Fallback to default view
   }
-
 };
 </script>
   
@@ -63,7 +60,7 @@ const handleClick = () => {
   .flashcard {
     position: relative;
     width: 95%;
-    min-height: 75px;
+    height: 75px;
     background-color: #1b2233;
     border-radius: 20px;
     padding: 20px;
@@ -119,18 +116,5 @@ const handleClick = () => {
     font-weight: 700;
     text-align: left;
     color: white;
-    margin-bottom: 4px;
-  }
-
-  .description {
-    font-size: 14px;
-    color: #b8c4e0;
-    text-align: left;
-    margin-top: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   </style>

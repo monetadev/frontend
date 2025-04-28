@@ -21,7 +21,6 @@ const showFooter = computed(() => {
       <router-view></router-view>
       <Toast />
     </div>
-    <Footer v-if="showFooter" />
   </div>
 </template>
 

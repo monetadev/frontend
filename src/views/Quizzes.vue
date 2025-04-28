@@ -1,19 +1,19 @@
 <template>
   <div class="page">
     <SidebarNavigation :isCollapsed="isSidebarCollapsed" @toggle="toggleSidebar" />
-    <div class="main-content" :class="{ 'collapsed': isSidebarCollapsed }">
+    <div class="main-content" :class="{ collapsed: isSidebarCollapsed }">
       <NavigationBar :isSidebarCollapsed="isSidebarCollapsed" />
-      <div class="content-wrapper">
+      <section class="content-wrapper">
         <div class="content-container">
-          <div class="content-header">
+          <header class="content-header">
             <div class="content-text">
               <h1>Test Your Knowledge</h1>
-              <p>Choose a flashcard set to start your quiz and challenge yourself!</p>
+              <p>Pick a flashcard set and quiz yourself!</p>
             </div>
-            <img src="@/assets/quizzes.png" class="page-icon" alt="Book Icon" />
-          </div>
+            <img src="@/assets/quizzes.png" class="page-icon" alt="Quiz Icon" />
+          </header>
 
-          <div class="modes">
+          <section class="modes">
             <ModeSelectionBox
                 v-for="mode in modes"
                 :key="mode.label"
@@ -22,41 +22,57 @@
                 :isSelected="selectedMode === mode.label"
                 @click="selectedMode = mode.label"
             />
-          </div>
+          </section>
 
-          <FilterableDropdown
-              label="Choose Flashcard Set"
-              :options="flashcardSets"
-              v-model="selectedSet"
-          />
+          <section class="settings-section">
+            <FilterableDropdown
+                label="Flashcard Set"
+                :options="flashcardSets"
+                v-model="selectedSet"
+            />
 
-          <ToggleSwitch
-              label="Set Time Limit"
-              v-model="timeEnabled"
-          />
+            <ToggleSwitch label="Enable Timer" v-model="timeEnabled" />
 
-          <div v-if="timeEnabled" class="time-limit-input">
-            <label>Time Limit (Minutes)</label>
-            <input type="number" v-model.number="timeLimit" min="1" />
-          </div>
+            <div v-if="timeEnabled" class="input-row">
+              <label>Time Limit (Minutes)</label>
+              <input type="number" v-model.number="timeLimit" min="1" />
+            </div>
 
-          <ToggleSwitch label="Locked Navigation" v-model="lockedNav" />
+            <ToggleSwitch label="Lock Navigation" v-model="lockedNav" />
 
-          <div class="number-input-row">
-            <label>Number of Questions</label>
-            <input type="number" v-model.number="questionCount" min="1" />
-          </div>
+            <div class="number-slider-row">
+              <label class="slider-label">Number of Questions: {{ questionCount }}</label>
+              <vue-slider
+                  v-model="questionCount"
+                  :min="5"
+                  :max="50"
+                  :interval="1"
+                  :adsorb="false"
+                  :marks="markLabels"
+              :process-style="{ backgroundColor: '#5F98EF' }"
+              :rail-style="{ backgroundColor: '#2a335a' }"
+              :dot-style="dotStyle"
+              :height="6"
+              :tooltip="'none'"
+              />
 
-          <div class="button-container">
+
+
+            </div>
+          </section>
+
+          <div class="start-button-container">
             <PrimaryButton text="Start Quiz" @click="goToQuiz" />
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 
+
 <script>
+import VueSlider from 'vue-3-slider-component';
 import SidebarNavigation from "@/components/SideNavigation.vue";
 import NavigationBar from "@/components/TopNavigation.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -79,6 +95,7 @@ export default {
     OneWordIcon,
     FilterableDropdown,
     ToggleSwitch,
+    VueSlider
   },
   data() {
     return {
@@ -101,8 +118,25 @@ export default {
         "Math 142 Chapter 1",
         "CSC 339 Quiz 2",
       ],
+      dotStyle: {
+        width: '20px',
+        height: '20px',
+        backgroundColor: '#5F98EF',
+        border: '2px solid #fff',
+        boxShadow: '0 0 0 2px rgba(95, 152, 239, 0.3)'
+      }
     };
   },
+  computed: {
+    markLabels() {
+      const labels = {};
+      for (let i = 5; i <= 50; i += 5) {
+        labels[i] = i.toString(); // Only multiples of 5 get a label
+      }
+      return labels;
+    }
+  },
+
   methods: {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
@@ -131,19 +165,20 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
 .page {
   display: flex;
-  background-color: #181E2E;
+  background-color: #161b29;
+  min-height: 100vh;
 }
 
 .main-content {
   flex-grow: 1;
-  transition: margin-left 0.3s ease-in-out;
   margin-left: 250px;
   width: calc(100% - 250px);
   padding-top: 80px;
+  transition: margin-left 0.3s ease;
 }
 
 .main-content.collapsed {
@@ -152,23 +187,21 @@ export default {
 }
 
 .content-wrapper {
-  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
+  padding: 30px;
 }
 
 .content-container {
-  background: #22293A;
-  padding: 50px;
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  font-family: "Outfit", sans-serif;
+  width: 100%;
+  background-color: #212837;
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
+  font-family: 'Outfit', sans-serif;
 }
 
 .content-header {
@@ -178,107 +211,142 @@ export default {
 }
 
 .content-text h1 {
+  font-size: 32px;
   color: #ffffff;
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .content-text p {
-  color: #ffffff;
   font-size: 16px;
+  color: #b0b8cc;
 }
 
 .page-icon {
-  width: 170px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
 }
 
 .modes {
   display: flex;
-  justify-content: space-between;
-  gap: 15px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-.time-limit-input {
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-row {
+  background: #1a1f2e;
+  padding: 15px 20px;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #121729;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-family: 'Outfit', sans-serif;
-  color: white;
-  margin-bottom: 16px;
 }
 
-.time-limit-input input:focus {
-  border-color: #5f98ef;
-  outline: none;
-}
-
-.time-limit-input label {
+.input-row label {
+  color: #ffffff;
   font-size: 15px;
   font-weight: 500;
 }
 
-.time-limit-input input {
-  width: 100px;
-  padding: 8px;
+.input-row input {
+  width: 80px;
+  padding: 8px 12px;
   border-radius: 8px;
+  background-color: #2a3147;
   border: none;
+  color: #ffffff;
   font-size: 15px;
-  font-family: inherit;
-  background-color: #252939;
-  color: white;
-  text-align: right;
-}
-
-.number-input-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #121729;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-family: 'Outfit', sans-serif;
-  color: white;
-  margin-bottom: 16px;
-}
-
-.number-input-row label {
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.number-input-row input {
-  width: 100px;
-  padding: 8px;
-  border-radius: 8px;
-  border: 2px solid transparent;
-  font-size: 15px;
-  font-family: inherit;
-  background-color: #252939;
-  color: white;
-  text-align: right;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.number-input-row input:focus {
-  border-color: #5f98ef;
+  text-align: center;
   outline: none;
+}
+
+.input-row input:focus {
+  background-color: #2f3a57;
   box-shadow: 0 0 0 2px rgba(95, 152, 239, 0.3);
 }
 
-.button-container {
-  width: 100%;
+.start-button-container {
   display: flex;
   justify-content: flex-end;
-  padding: 20px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
-.button-container >>> .primary-button {
-  width: 30%;
-  max-width: 200px;
+.start-button-container >>> .primary-button {
+  width: 200px;
 }
+.number-slider-row {
+  background: #121729;
+  padding: 20px;
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.slider-label {
+  display: block;
+  margin-bottom: 15px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* VueSlider deep styles */
+:deep(.vue-slider) {
+  margin-bottom: 10px;
+}
+
+:deep(.vue-slider-mark) {
+  top: auto;
+  bottom: -18px;
+  width: 1px;
+}
+
+:deep(.vue-slider-mark-step) {
+  width: 1px;
+  height: 5px;
+  background-color: #666;
+  opacity: 0.7;
+}
+
+:deep(.vue-slider-mark.vue-slider-mark-active .vue-slider-mark-step) {
+  background-color: #5F98EF;
+}
+
+:deep(.vue-slider-mark[data-value="5"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="10"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="15"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="20"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="25"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="30"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="35"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="40"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="45"] .vue-slider-mark-step),
+:deep(.vue-slider-mark[data-value="50"] .vue-slider-mark-step) {
+  width: 2px;
+  height: 10px;
+  background-color: #aaa;
+}
+
+:deep(.vue-slider-mark-label) {
+  font-size: 12px;
+  color: #aaa;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+:deep(.vue-slider-mark[data-value="5"] .vue-slider-mark-label) {
+  transform: translateX(0);
+  left: 0;
+}
+
+:deep(.vue-slider-mark[data-value="50"] .vue-slider-mark-label) {
+  transform: translateX(-100%);
+  right: 0;
+}
+
 </style>

@@ -11,6 +11,7 @@ import Create from './views/createSet.vue';
 import Quizzes from './views/Quizzes.vue';
 import QuizRunner from "@/views/QuizRunner.vue";
 import DefineView from "@/views/defineView.vue";
+import QuizHistory from './views/QuizHistory.vue';
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -24,7 +25,8 @@ const routes = [
   {path: '/create', component: Create},
   {path: "/quiz/run", name: "QuizRunner", component: QuizRunner,},
   { path: "/quiz/create", name: "Quizzes", component: Quizzes },
-  { path: "/define", name: "Define", component: DefineView }
+  { path: "/define", name: "Define", component: DefineView },
+  { path: '/quiz/history', name: 'QuizHistory', component: QuizHistory }
 ];
  
 const router = createRouter({

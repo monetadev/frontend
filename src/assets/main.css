@@ -25,3 +25,10 @@
 /*    --button-hover: #4169e1;*/
 /*    --shadow-color: rgba(0, 0, 0, 0.1);*/
 /*}*/
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }

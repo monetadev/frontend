@@ -3,18 +3,18 @@
         <div class="text-content">
           <h2 class="section-title">About Our Project</h2>
           <p class="about-text">
-            This project started from a simple idea: make the process of learning and building software faster and more intuitive. We saw students and developers spending too much time on boilerplate and repetitive tasks, hindering the creative flow.
+            This project started from a simple idea: make the process of learning faster and more intuitive. We saw students spending too much time on reading and studying, and we wanted to change that. By harnessing the power of AI, we aim to revolutionize the way you learn and interact with information.
+        </p>
+            <p class="about-text">
+            Our tool leverages cutting-edge AI to understand your needs and generate high-quality flashcards, quizzes, and study materials tailored just for you. Whether you're preparing for an exam or just want to learn something new, our platform is designed to make your studying experience more efficient and enjoyable.
           </p>
           <p class="about-text">
-            Our tool leverages cutting-edge AI to understand your needs and generate high-quality code snippets, components, or even entire application structures instantly. Whether you're designing a UI, developing an algorithm, or just exploring possibilities, we aim to be your intelligent coding partner.
-          </p>
-          <p class="about-text">
-            We are passionate about bridging the gap between concept and creation, empowering you to focus on innovation.
+            We are passionate about bridging the gap between technology and education. Our mission is to empower learners everywhere with the tools they need to succeed. We believe that with the right resources, anyone can achieve their learning goals, and we are here to help you every step of the way.
           </p>
           </div>
   
         <div class="image-content">
-           <img src="https://via.placeholder.com/450x350/2D3748/E2E8F0?text=Project+Image" alt="Illustration or photo related to the project" class="about-image">
+           <img src="/Users/marac/Developer/moneta/frontend/src/assets/about_us.png" alt="Illustration or photo related to the project" class="about-image">
         </div>
       </div>
     </section>

@@ -7,6 +7,7 @@
         <p class="sub-headline">Generate, preview, and edit flashcards instantly.</p>
       </HeroText>
 
+
       <FeatureList />
 
       <HeroText

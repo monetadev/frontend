@@ -14,20 +14,18 @@
         <li class="dropdown">
           <span>Resources</span>
           <ul class="dropdown-content">
-            <li><a href="#">Resource 1</a></li>
-            <li><a href="#">Resource 2</a></li>
-            <li><a href="#">Resource 3</a></li>
+            <li><a href="#"></a></li>
+            <li><a href="#">Academy</a></li>
+            <li><a href="#">Get Help</a></li>
           </ul>
         </li>
         <li class="dropdown">
           <span>Community</span>
           <ul class="dropdown-content">
-            <li><a href="#">Forum</a></li>
             <li><a href="#">Discord</a></li>
-            <li><a href="#">Blog</a></li>
           </ul>
         </li>
-        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Tech</a></li>
       </ul>
       <div class="auth-buttons">
         <PrimaryButton text="Sign In" />

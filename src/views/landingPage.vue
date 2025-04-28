@@ -11,6 +11,8 @@
           mainText="Breaking the boundaries between AI and Studying"
           class="bottom-hero"
         />
+
+        <AboutSection />
   
       </div>
     </div>
@@ -20,7 +22,8 @@
   // Ensure the paths to your components are correct
   import NavigationBar from '@/components/landingNav.vue';
   import HeroText from '@/components/landinglargeText.vue';
-  import FeatureList from '@/components/FeatureList.vue'; // *** Import FeatureList ***
+  import FeatureList from '@/components/FeatureList.vue';
+  import AboutSection from '@/components/aboutSection.vue';
   
   </script>
   

@@ -30,8 +30,7 @@
         <li><a href="#">Pricing</a></li>
       </ul>
       <div class="auth-buttons">
-        <PrimaryButton text="Log In" />
-        <PrimaryButton text="Sign Up" />
+        <PrimaryButton text="Sign In" />
       </div>
     </nav>
   </template>

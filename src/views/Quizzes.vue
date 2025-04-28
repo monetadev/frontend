@@ -135,6 +135,7 @@ export default {
 
 .page {
   display: flex;
+  background-color: #181E2E;
 }
 
 .main-content {

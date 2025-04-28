@@ -222,8 +222,8 @@ export default {
 }
 
 .page-icon {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 120px;
 }
 
 .modes {

@@ -246,7 +246,7 @@ export default {
     };
 
     const backToDeck = () => {
-      router.push(`/view/${flashcardSetId}`);
+      router.push(`/library/view/${flashcardSetId}`);
     };
 
     const startGame = () => {

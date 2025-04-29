@@ -263,7 +263,7 @@ function toastFunction(message, type) {
 }
 
 function editSet(set) {
-  router.push(`/edit-flashcard-set/${set.id}`);
+  router.push(`/library/view/${set.id}/edit`);
 }
 
 </script>

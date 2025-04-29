@@ -35,6 +35,8 @@
                       :description="set.description"
                       :id="set.id"
                       :creationDate="set.creationDate"
+                      :authorId="set.author.id"
+                      :showProfilePic = "true"
                   />
                 </div>
               </div>

@@ -45,6 +45,8 @@
               <PromptGenerator
                   v-model:prompt="generationPrompt"
                   v-model:count="flashcardCount"
+                  :isGenerating="isGenerating"
+                  :generationProgress="generationProgress"
               />
             </div>
 
@@ -285,6 +287,7 @@ const isSidebarCollapsed = ref(false);
 const progressStep = ref(1);
 const flashcards = ref([]);
 const isPublic = ref(true);
+const generationProgress = ref(0);
 
 // Document upload state
 const isUploading = ref(false);
@@ -732,7 +735,32 @@ const deleteFlashcard = (index) => {
 const handleContinue = async () => {
   if (generationPrompt.value.trim().length > 0) {
     // If there's text in the prompt, generate flashcards
-    await generateFlashcards();
+    isGenerating.value = true;
+    generationProgress.value = 0;
+
+    // Start progress simulation for generation
+    const progressInterval = setInterval(() => {
+      if (generationProgress.value < 85) {
+        generationProgress.value += 5;
+      }
+    }, 300);
+
+    try {
+      await generateFlashcards();
+    } finally {
+      clearInterval(progressInterval);
+
+      // Complete the progress
+      const finalInterval = setInterval(() => {
+        generationProgress.value += 5;
+        if (generationProgress.value >= 100) {
+          clearInterval(finalInterval);
+          setTimeout(() => {
+            isGenerating.value = false;
+          }, 500);
+        }
+      }, 100);
+    }
   } else {
     // Otherwise, just continue to review step with default empty cards
     progressStep.value = 2;
@@ -829,13 +857,13 @@ const handleFileSelected = async (file) => {
   }
 };
 
+
 const generateFlashcards = async () => {
   if (!generationPrompt.value.trim()) {
     toastFunction("Please enter what flashcards you want to generate", "error");
     return;
   }
 
-  isGenerating.value = true;
   generationError.value = null;
 
   try {
@@ -846,10 +874,14 @@ const generateFlashcards = async () => {
       kQuestions: flashcardCount.value
     };
 
-    const {data} = await apolloClient.mutate({
+    const { data } = await apolloClient.mutate({
       mutation: GENERATE_FLASHCARDS,
-      variables: {options}
+      variables: { options }
     });
+
+    // Set progress to indicate processing stage
+    generationProgress.value = 90;
+    toastFunction("Processing generated content...", "info");
 
     const result = data.generateFlashcardSet;
     console.log("Flashcard generation successful:", result);
@@ -882,8 +914,6 @@ const generateFlashcards = async () => {
     console.error("Flashcard generation error:", error);
     generationError.value = error.message || "Failed to generate flashcards";
     toastFunction("Failed to generate flashcards", "error");
-  } finally {
-    isGenerating.value = false;
   }
 };
 

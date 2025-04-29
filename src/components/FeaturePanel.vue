@@ -12,7 +12,6 @@
   import { defineProps } from 'vue';
   
   defineProps({
-    // Icon class name (e.g., 'fas fa-bolt' for Font Awesome) or potentially an image URL/SVG path
     icon: {
       type: String,
       default: '', // Make icon optional

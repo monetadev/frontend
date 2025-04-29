@@ -9,7 +9,7 @@
           :title="feature.title"
           :description="feature.description"
           v-scroll-animation 
-          :style="{ transitionDelay: `${index * 0.1}s` }" 
+          :style="{ transitionDelay: `${index * 0.15}s` }" 
         />
       </div>
     </div>

@@ -11,9 +11,10 @@ import Create from './views/createSet.vue';
 import Quizzes from './views/Quizzes.vue';
 import QuizRunner from "@/views/QuizRunner.vue";
 import DefineView from "@/views/defineView.vue";
-import landing from "@/views/landingPage.vue";
+import landing from "@/views/landingPage.vue"; // Your landing page component
 
 const routes = [
+ { path: '/', component: landing }, // <<< Add this route for the root path
   { path: '/dashboard', component: Dashboard },
   { path: '/login', component: Login },
   { path: '/reset-password', component: ResetPassword },
@@ -26,12 +27,11 @@ const routes = [
   {path: "/quiz/run", name: "QuizRunner", component: QuizRunner,},
   { path: "/quiz/create", name: "Quizzes", component: Quizzes },
   { path: "/define", name: "Define", component: DefineView },
-  {path: '/landing', component: landing},
 ];
- 
+
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes // Use the updated routes array
 });
 
 

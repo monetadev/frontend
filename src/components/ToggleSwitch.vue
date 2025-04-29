@@ -1,11 +1,16 @@
 <template>
   <div class="toggle-container">
     <label class="toggle-label">{{ label }}</label>
-    <div class="switch" @click="toggle">
+    <div
+        class="switch"
+        :class="{ active: modelValue }"
+        @click="toggle"
+    >
       <div :class="['slider', { active: modelValue }]"></div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -43,10 +48,15 @@ export default {
 .switch {
   width: 50px;
   height: 26px;
-  background-color: #5f98ef;
+  background-color: #252939; /* OFF background */
   border-radius: 15px;
   position: relative;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.switch.active {
+  background-color: #5f98ef; /* ON background */
 }
 
 .slider {

@@ -25,10 +25,25 @@
           id="prompt"
           v-model="localPrompt"
           class="prompt-input"
+          :disabled="isGenerating"
           placeholder="Example: Key concepts of quantum physics, Important dates in World War II, Spanish vocabulary for beginners..."
           rows="3"
           @input="updatePrompt"
       ></textarea>
+    </div>
+
+    <div v-if="isGenerating" class="generation-progress">
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: `${generationProgress}%` }"></div>
+        </div>
+      </div>
+      <div class="progress-status">
+        <span class="progress-percentage">{{ Math.round(generationProgress) }}%</span>
+        <span class="progress-message">
+          {{ generationProgress < 90 ? 'Generating flashcards...' : 'Processing content...' }}
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -49,6 +64,14 @@ export default {
     count: {
       type: Number,
       default: 15
+    },
+    isGenerating: {
+      type: Boolean,
+      default: false
+    },
+    generationProgress: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -154,8 +177,57 @@ export default {
   border-color: #5F98EF;
 }
 
+.prompt-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .prompt-input::placeholder {
   color: #646b7c;
+}
+
+.generation-progress {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: #1a2233;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #5F98EF;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #a4aabf;
+  font-size: 14px;
+  font-family: "Outfit", sans-serif;
+}
+
+.progress-percentage {
+  font-weight: bold;
+  color: #5F98EF;
+}
+
+.progress-message {
+  font-style: italic;
 }
 
 /* Vue Slider Component Styling */

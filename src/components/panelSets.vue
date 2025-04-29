@@ -1,19 +1,28 @@
 <template>
-    <div class="flashcard" @click="handleClick" :class="{ 'clickable': true }">
-      <div class="header">
-        <div class="left-section">
-          <span class="number">{{ number }} terms | </span>
-          <span class="username">{{ username }}</span>
-        </div>
-      </div>
-      <div class="content">
-        <h2 class="title">{{ title }}</h2>
+  <div class="flashcard" @click="handleClick" :class="{ 'clickable': true }">
+    <div class="header">
+      <div class="left-section">
+        <!-- Only show the profile picture if showProfilePic is true -->
+        <img
+            v-if="showProfilePic && authorId"
+            :src="profilePictureUrl"
+            alt="Author"
+            class="profile-picture"
+            @error="handleImageError"
+        />
+        <span class="number">{{ number }} terms | </span>
+        <span class="username">{{ username }}</span>
       </div>
     </div>
-  </template>
+    <div class="content">
+      <h2 class="title">{{ title }}</h2>
+    </div>
+  </div>
+</template>
 
 <script setup>
 import { useRouter } from 'vue-router';
+import {computed} from "vue";
 
 // Define props
 const props = defineProps({
@@ -24,6 +33,11 @@ const props = defineProps({
   id: {
     type: [Number, String],
     default: null
+  },
+  authorId: String,
+  showProfilePic: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -33,10 +47,13 @@ const emit = defineEmits(['panel-click']);
 // Setup router
 const router = useRouter();
 
+// Compute profile picture URL
+const profilePictureUrl = computed(() => {
+  return props.authorId ? `http://localhost:8080/profile/${props.authorId}` : '/path/to/default-avatar.png';
+});
+
 // Click handler
 const handleClick = () => {
-  console.log('Clicked flashcard set with ID:', props.id);
-
   // Emit event with data
   emit('panel-click', {
     id: props.id,
@@ -47,10 +64,14 @@ const handleClick = () => {
   // Navigate WITH the ID
   if (props.id) {
     router.push(`/library/view/${props.id}`);
-  } else {
-    console.error('No ID available for this flashcard set');
-    router.push('/library/view'); // Fallback to default view
   }
+};
+
+
+
+const handleImageError = (e) => {
+  // Simple colored circle as default avatar
+  e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="%235F98EF"/><text x="50%" y="50%" font-size="20" text-anchor="middle" dominant-baseline="middle" font-family="Arial" fill="white">' + (props.username ? props.username[0].toUpperCase() : '?') + '</text></svg>';
 };
 </script>
   
@@ -94,6 +115,15 @@ const handleClick = () => {
   .left-section {
     display: flex;
     align-items: center;
+  }
+
+  .profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid #2a335a;
   }
   
   .number {

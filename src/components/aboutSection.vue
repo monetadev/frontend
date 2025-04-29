@@ -65,22 +65,7 @@
     border-radius: 8px; /* Soften corners */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Subtle shadow */
   }
-  
-  /* Optional Link/Button Style */
-  /*
-  .learn-more-link {
-    display: inline-block;
-    margin-top: 1rem;
-    color: #3182CE;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-  }
-  .learn-more-link:hover {
-    color: #63B3ED;
-    text-decoration: underline;
-  }
-  */
+
   
   /* Responsive adjustments */
   @media (max-width: 768px) {

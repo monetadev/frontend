@@ -49,10 +49,9 @@ import TechStackSection from '@/components/techSection.vue';
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  width: 100%; /* Ensure it takes full width */
+  width: 100%; 
 }
 
-/* Styles from previous examples (.sub-headline, .content, .bottom-hero, etc.) */
 .sub-headline {
   font-size: clamp(1rem, 2.5vw, 1.5rem);
   color: #A0AEC0;
@@ -64,23 +63,11 @@ import TechStackSection from '@/components/techSection.vue';
   margin-right: auto;
 }
 
-/* Remove .content styles if it's truly unused now */
-/*
-.content {
-  padding: 40px 20px;
-  text-align: center;
-  color: #CBD5E0;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-*/
+
 
 .bottom-hero {
-  margin-top: auto; /* This will push the bottom hero down after all content */
-  padding-top: 60px; /* Increased padding for better spacing */
+  margin-top: auto; 
+  padding-top: 60px; 
   padding-bottom: 60px;
 }
 

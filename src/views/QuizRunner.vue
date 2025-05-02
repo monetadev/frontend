@@ -409,6 +409,7 @@ export default {
 
 <style scoped>
 .quiz-runner {
+  background-color: #121729;
   padding: 30px;
   font-family: 'Outfit', sans-serif;
   color: white;

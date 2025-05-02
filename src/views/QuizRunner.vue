@@ -12,6 +12,7 @@
       <div v-if="quizOptions.lockedNav">
         <div v-if="currentIndex < questions.length">
           <QuizQuestion
+              :key="currentIndex"
               :question="questions[currentIndex]"
               :mode="quizOptions.mode"
               :reviewMode="quizOptions.reviewMode"

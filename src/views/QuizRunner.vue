@@ -297,25 +297,25 @@ export default {
       const oneWordQuestions = [
         {
           questionNo: 1,
-          text: "One-word: What planet is known as the Red Planet?",
+          text: "What planet is known as the Red Planet?",
           correctAnswer: "Mars",
           options: []
         },
         {
           questionNo: 2,
-          text: "One-word: Chemical symbol for Gold?",
+          text: "Chemical symbol for Gold?",
           correctAnswer: "Au",
           options: []
         },
         {
           questionNo: 3,
-          text: "One-word: First element on the periodic table?",
+          text: "First element on the periodic table?",
           correctAnswer: "Hydrogen",
           options: []
         },
         {
           questionNo: 4,
-          text: "One-word: Author of 'Romeo and Juliet'?",
+          text: "Author of 'Romeo and Juliet'?",
           correctAnswer: "Shakespeare",
           options: []
         }

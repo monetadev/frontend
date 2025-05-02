@@ -32,7 +32,6 @@
             />
 
             <ToggleSwitch label="Enable Timer" v-model="timeEnabled" />
-
             <div v-if="timeEnabled" class="input-row">
               <label>Time Limit (Minutes)</label>
               <input type="number" v-model.number="timeLimit" min="1" />
@@ -350,5 +349,4 @@ export default {
   transform: translateX(-100%);
   right: 0;
 }
-
 </style>

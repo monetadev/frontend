@@ -29,8 +29,16 @@
 
 
     <div v-else-if="mode === 'One-word'">
-      <input type="text" v-model="userAnswer" :disabled="reviewMode && answered"/>
-      <button :disabled="answered" @click="checkAnswer(userAnswer)">Submit</button>
+      <div class="short-answer-container">
+        <input
+            type="text"
+            v-model="userAnswer"
+            :disabled="reviewMode && answered"
+            placeholder="Type your answer..."
+            class="short-answer-input"
+        />
+        <button :disabled="answered" @click="checkAnswer(userAnswer)">Submit</button>
+      </div>
     </div>
 
     <p v-if="answered && reviewMode">
@@ -157,6 +165,47 @@ input[type="radio"]:checked + .custom-radio::after {
   color: white;
   line-height: 1.6;
   padding-top: 20px;
+}
+.short-answer-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.short-answer-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: #1e2238;
+  border: 2px solid transparent;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.short-answer-input:focus {
+  border-color: #5f98ef;
+}
+
+button {
+  background-color: #5f98ef;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #4a82c8;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 </style>

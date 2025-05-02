@@ -40,6 +40,8 @@
 
             <ToggleSwitch label="Lock Navigation" v-model="lockedNav" />
 
+            <ToggleSwitch label="Review Mode" v-model="reviewMode" />
+
             <div class="number-slider-row">
               <label class="slider-label">Number of Questions: {{ questionCount }}</label>
               <vue-slider

@@ -57,6 +57,9 @@ body {
     overflow: hidden; /* Crucial: Prevent body scroll */
 }
 
+body.scroll-enabled {
+    overflow: auto;
+}
 *, *:before, *:after {
     box-sizing: inherit;
     font-family: inherit;

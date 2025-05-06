@@ -40,6 +40,8 @@ import TechSection from '@/components/landing/TechSection.vue';
   min-height: 100vh;
   background-color: #22293A;
   overflow-x: hidden;
+  overflow-y: auto;
+  flex-direction: column;
 }
 
 .main-content {

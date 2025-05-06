@@ -1,19 +1,27 @@
 <script setup>
 import MainLayout from '@/layouts/MainLayout.vue';
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Toast from "@/components/ui/Toast.vue";
 
 const route = useRoute();
 
-const layout = computed(() => {
-  const noLayoutRoutes = ['/login', '/register'];
-  if (noLayoutRoutes.includes(route.path)) {
-    return null;
-  }
+const noLayoutRoutes = ['/', '/login', '/register'];
 
-  return MainLayout;
+const layout = computed(() => {
+  return noLayoutRoutes.includes(route.path) ? null : MainLayout;
 });
+
+const updateBodyScroll = () => {
+  if (route.path === '/') {
+    document.body.classList.add('scroll-enabled');
+  } else {
+    document.body.classList.remove('scroll-enabled');
+  }
+};
+
+onMounted(updateBodyScroll);
+watch(() => route.path, updateBodyScroll);
 </script>
 
 <template>

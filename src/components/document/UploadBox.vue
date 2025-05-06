@@ -488,8 +488,8 @@ watch(() => props.isUploading, (newValue, oldValue) => {
 }
 
 .upload-box {
-  background: #121729;
-  border: 3px dashed #5F98EF;
+  background: var(--bg-primary);
+  border: 2px dashed var(--primary-color);
   padding: 50px;
   border-radius: 12px;
   text-align: center;
@@ -642,7 +642,7 @@ h2, h3 {
 }
 
 .browse-btn:hover {
-  background: #4a7dd6;
+  background: var(--primary-hover-color);
 }
 
 .upload-box.drag-over {

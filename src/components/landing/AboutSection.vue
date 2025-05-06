@@ -14,7 +14,7 @@
           </div>
   
         <div class="image-content">
-           <img src="/Users/marac/Developer/moneta/frontend/src/assets/about_us.png" alt="Illustration or photo related to the project" class="about-image">
+           <img src="" alt="Illustration or photo related to the project" class="about-image">
         </div>
       </div>
     </section>

@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import QuizQuestion from "@/components/QuizQuestion.vue";
+import QuizQuestion from "@/components/quiz/QuizQuestion.vue";
 
 export default {
   name: "QuizRunner",
-  components: { QuizQuestion },
+  components: {QuizQuestion},
   data() {
     return {
       quizOptions: {},
@@ -376,7 +376,7 @@ export default {
     scrollToQuestion(index) {
       const el = this.$refs['question-' + index]?.[0];
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
     },
     goToNextQuestion() {
@@ -390,9 +390,9 @@ export default {
     navHeightStyle() {
       if (this.questions.length <= 10) {
         const height = this.questions.length * 40 + (this.questions.length - 1) * 10;
-        return { maxHeight: `${height}px` };
+        return {maxHeight: `${height}px`};
       }
-      return { maxHeight: '490px' };
+      return {maxHeight: '490px'};
     },
     timeProgress() {
       if (!this.quizOptions.timeEnabled) return 100;
@@ -413,6 +413,7 @@ export default {
   font-family: 'Outfit', sans-serif;
   color: white;
 }
+
 .timer-bar {
   position: sticky;
   top: 0;
@@ -443,6 +444,7 @@ export default {
   line-height: 24px;
   font-weight: bold;
 }
+
 .toast {
   position: fixed;
   bottom: 30px;
@@ -489,6 +491,7 @@ export default {
     transform: translateY(20px);
   }
 }
+
 .quiz-container {
   display: flex;
   gap: 20px;
@@ -551,6 +554,7 @@ export default {
   align-self: flex-end;
   cursor: pointer;
 }
+
 .next-btn-wrapper {
   margin-top: 20px;
   display: flex;

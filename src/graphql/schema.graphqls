@@ -1,546 +1,776 @@
-# Scalar Types
-"""Custom scalar representing an ISO-8601 formatted date and time"""
-scalar DateTime
+# This file was generated. Do not edit manually.
 
-"""Custom scalar representing a universally unique identifier (UUID)"""
-scalar UUID
-
-"""Custom scalar representing a file upload, compatible with multipart form data"""
-scalar Upload
-
-# Common and Pagination Types
-"""Pagination metadata"""
-type PageInfo {
-    """Total number of pages available"""
-    totalPages: Int!
-
-    """Total count of elements across all pages"""
-    totalElements: Int!
-
-    """Current page number (zero-based)"""
-    currentPage: Int!
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
 }
 
-"""Paginated collection of User objects"""
-type PaginatedUser {
-    """User items on the current page"""
-    items: [User!]!
+directive @extends on OBJECT | INTERFACE
 
-    """Pagination metadata"""
-    pageInfo: PageInfo!
-}
+directive @external on FIELD_DEFINITION
 
-"""Paginated collection of FlashcardSet objects"""
-type PaginatedFlashcardSet {
-    """FlashcardSet items on the current page"""
-    items: [FlashcardSet!]!
+directive @key(fields: _FieldSet!) on OBJECT | INTERFACE
 
-    """Pagination metadata"""
-    pageInfo: PageInfo!
-}
+"Indicates an Input Object is a OneOf Input Object."
+directive @oneOf on INPUT_OBJECT
 
-"""Paginated collection of Role objects"""
-type PaginatedRole {
-    """Role items on the current page"""
-    items: [Role!]!
+directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
 
-    """Pagination metadata"""
-    pageInfo: PageInfo!
-}
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
 
-"""Result of an image upload operation"""
-type ImageUploadResult {
-    """System-generated filename on the server"""
-    filename: String!
-
-    """Original filename from the user's system"""
-    originalFilename: String!
-
-    """File size in bytes"""
-    size: Int!
-
-    """MIME type of the uploaded image"""
-    contentType: String!
-
-    """Server path where the image is stored"""
-    path: String!
-}
-
-"""Result of a document upload operation"""
+"Result of a document upload operation"
 type DocumentUploadResult {
-    """System-generated filename on the server"""
-    filename: String!
-
-    """Original filename from the user's system"""
-    originalFilename: String!
-
-    """File size in bytes"""
-    size: Int!
-
-    """MIME type of the uploaded document"""
+    "MIME type of the uploaded document"
     contentType: String!
-
-    """Server path where the document is stored"""
+    "System-generated filename on the server"
+    filename: String!
+    "Original filename from the user's system"
+    originalFilename: String!
+    "Server path where the document is stored"
     path: String!
+    "File size in bytes"
+    size: Int!
 }
 
-# User Domain Types
-"""User account information"""
-type User {
-    """Unique identifier for the user"""
-    id: UUID!
-
-    """Unique username for authentication and identification"""
-    username: String!
-
-    """User's email address"""
-    email: String!
-
-    """User's first name"""
-    firstName: String!
-
-    """User's last name"""
-    lastName: String!
-
-    """Timestamp when the user account was created"""
-    creationDate: DateTime!
-
-    """Timestamp when the user account was last updated"""
-    lastUpdated: DateTime
-
-    """Collection of flashcard sets created by this user"""
-    flashcardSets: [FlashcardSet]
-
-    """Collection of files uploaded by this user"""
-    files: [File]
-
-    """Collection of roles assigned to this user"""
-    roles: [Role]
-}
-
-"""Metadata for an uploaded file"""
+"Metadata for an uploaded file"
 type File {
-    """Unique identifier for the file"""
-    id: UUID!
-
-    """System-generated filename on the server"""
-    filename: String!
-
-    """Original filename from the user's system"""
-    originalFilename: String!
-
-    """MIME type of the file"""
+    "MIME type of the file"
     contentType: String!
-
-    """Server path where the file is stored"""
+    "Server path where the file is stored"
     filePath: String!
-
-    """MD5 checksum for file integrity verification"""
-    md5Sum: String!
-
-    """Timestamp when the file was uploaded"""
-    uploadedDate: DateTime!
-
-    """Size of the file in bytes"""
+    "Size of the file in bytes"
     fileSize: Int!
-
-    """User who uploaded this file"""
+    "System-generated filename on the server"
+    filename: String!
+    "Unique identifier for the file"
+    id: UUID!
+    "MD5 checksum for file integrity verification"
+    md5Sum: String!
+    "Original filename from the user's system"
+    originalFilename: String!
+    "Timestamp when the file was uploaded"
+    uploadedDate: DateTime!
+    "User who uploaded this file"
     uploader: User!
 }
 
-# Flashcard Domain Types
-"""Individual flashcard containing a term and definition pair"""
+"Individual flashcard containing a term and definition pair"
 type Flashcard {
-    """Unique identifier for the flashcard"""
-    id: UUID!
-
-    """Reference to the flashcard set this card belongs to"""
-    setID: UUID!
-
-    """The term or front side of the flashcard"""
-    term: String!
-
-    """The definition or back side of the flashcard"""
-    definition: String!
-
-    """Order position within the flashcard set (zero-based)"""
-    position: Int!
-
-    """Timestamp when the flashcard was created"""
+    "Timestamp when the flashcard was created"
     creationDate: DateTime!
-
-    """Timestamp when the flashcard was last modified"""
+    "The definition or back side of the flashcard"
+    definition: String!
+    "Unique identifier for the flashcard"
+    id: UUID!
+    "Order position within the flashcard set (zero-based)"
+    position: Int!
+    "Reference to the flashcard set this card belongs to"
+    setID: UUID!
+    "The term or front side of the flashcard"
+    term: String!
+    "Timestamp when the flashcard was last modified"
     updatedAt: DateTime
 }
 
-"""Collection of related flashcards created by a user"""
+"Collection of related flashcards created by a user"
 type FlashcardSet {
-    """Unique identifier for the flashcard set"""
-    id: UUID!
-
-    """User who created this flashcard set"""
+    "User who created this flashcard set"
     author: User!
-
-    """Title of the flashcard set"""
-    title: String
-
-    """Description of the flashcard set"""
-    description: String
-
-    """Whether the flashcard set is visible to all users"""
-    isPublic: Boolean!
-
-    """Timestamp when the flashcard set was created"""
+    "Timestamp when the flashcard set was created"
     creationDate: DateTime!
-
-    """Timestamp when the flashcard set was last modified"""
-    lastUpdated: DateTime
-
-    """Collection of flashcards contained in this set"""
+    "Description of the flashcard set"
+    description: String
+    "Collection of flashcards contained in this set"
     flashcards: [Flashcard]
-}
-
-"""Flashcard generated through AI processing"""
-type GeneratedFlashcard {
-    """The term or front side of the flashcard"""
-    term: String!
-
-    """The definition or back side of the flashcard"""
-    definition: String!
-
-    """Suggested position within the flashcard set"""
-    position: Int!
-}
-
-"""Collection of AI-generated flashcards"""
-type GeneratedFlashcardSet {
-    """Suggested title for the flashcard set"""
-    title: String
-
-    """Suggested description for the flashcard set"""
-    description: String
-
-    """Collection of AI-generated flashcards"""
-    generatedFlashcards: [GeneratedFlashcard]
-}
-
-# Authorization Domain Types
-"""Role that determines a user's permissions"""
-type Role {
-    """Unique identifier for the role"""
+    "Unique identifier for the flashcard set"
     id: UUID!
-
-    """Name of the role (e.g., Admin, User, Moderator)"""
-    name: String!
-
-    """Collection of privileges granted by this role"""
-    privileges: [Privilege]
-}
-
-"""Individual permission that can be assigned to roles"""
-type Privilege {
-    """Unique identifier for the privilege"""
-    id: UUID!
-
-    """Name of the privilege (e.g., READ_USERS, CREATE_FLASHCARDS)"""
-    name: String!
-}
-
-# Input Types
-"""Input for user registration"""
-input UserRegInput {
-    """Desired username (must be unique)"""
-    username: String!
-
-    """User's email address (must be unique)"""
-    email: String!
-
-    """User's first name"""
-    firstName: String!
-
-    """User's last name"""
-    lastName: String!
-
-    """User's password (will be securely hashed)"""
-    password: String!
-}
-
-"""Input for creating or updating a flashcard"""
-input FlashcardInput {
-    """The term or front side of the flashcard"""
-    term: String!
-
-    """The term or back side of the flashcard"""
-    definition: String!
-
-    """Order position within the flashcard set (zero-based)"""
-    position: Int!
-}
-
-"""Input for creating or updating a flashcard set"""
-input FlashcardSetInput {
-    """Title of the flashcard set"""
-    title: String
-
-    """Description of the flashcard set"""
-    description: String
-
-    """Whether the flashcard set should be visible to all users"""
+    "Whether the flashcard set is visible to all users"
     isPublic: Boolean!
-
-    """Collection of flashcards to include in this set"""
-    flashcards: [FlashcardInput]!
+    "Timestamp when the flashcard set was last modified"
+    lastUpdated: DateTime
+    "Title of the flashcard set"
+    title: String
 }
 
-"""Options for AI-powered flashcard generation"""
-input FlashcardGenOptions {
-    """Number of flashcards to generate"""
-    kQuestions: Int!
-
-    """Topic or content to generate flashcards from"""
-    query: String!
+"Flashcard generated through AI processing"
+type GeneratedFlashcard {
+    "The definition or back side of the flashcard"
+    definition: String!
+    "Suggested position within the flashcard set"
+    position: Int!
+    "The term or front side of the flashcard"
+    term: String!
 }
 
-"""Filtering options for flashcard set queries"""
-input FlashcardSetFilterInput {
-    """Text to search in title and description fields"""
-    searchTerm: String
-
-    """Filter by public/private status"""
-    isPublic: Boolean
-
-    """Filter sets created after this timestamp"""
-    createdAfter: DateTime
-
-    """Filter sets created before this timestamp"""
-    createdBefore: DateTime
+"Collection of AI-generated flashcards"
+type GeneratedFlashcardSet {
+    "Suggested description for the flashcard set"
+    description: String
+    "Collection of AI-generated flashcards"
+    generatedFlashcards: [GeneratedFlashcard]
+    "Suggested title for the flashcard set"
+    title: String
 }
 
-# Operations
-type Query {
-    # User Queries
-    """Returns the currently authenticated user"""
-    me: User
-
-    """Find a user by their UUID"""
-    findUserById(id: UUID): User
-
-    """Find a user by their username"""
-    findUserByUsername(username: String!): User
-
-    """Find a user by their email address"""
-    findUserByEmail(email: String!): User
-
-    """Returns a paginated list of all users"""
-    findAllUsers(page: Int!, size: Int!): PaginatedUser
-
-    # Flashcard Queries
-    """Find a flashcard set by its UUID"""
-    findFlashcardSetById(id: UUID!): FlashcardSet
-
-    """Find flashcard sets created by a specific user"""
-    findFlashcardSetByAuthorId(
-        """UUID of the author"""
-        id: UUID!,
-        """Page number (zero-based)"""
-        page: Int = 0,
-        """Number of items per page"""
-        size: Int = 10
-    ): PaginatedFlashcardSet
-
-    """Find publicly accessible flashcard sets based on filters"""
-    findPublicFlashcardSets(
-        """Filtering criteria"""
-        filter: FlashcardSetFilterInput,
-        """Page number (zero-based)"""
-        page: Int = 0,
-        """Number of items per page"""
-        size: Int = 10
-    ): PaginatedFlashcardSet
-
-    # Role Queries
-    """Find a role by its UUID"""
-    findRoleById(id: UUID!): Role
-
-    """Find a role by its name"""
-    findRoleByName(name: String!): Role
-
-    """Returns a paginated list of all roles"""
-    roles(
-        """Page number (zero-based)"""
-        page: Int = 0,
-        """Number of items per page"""
-        size: Int = 10
-    ): PaginatedRole
-
-    """Returns a list of all available privileges"""
-    privileges: [Privilege!]!
+"Result of an image upload operation"
+type ImageUploadResult {
+    "MIME type of the uploaded image"
+    contentType: String!
+    "System-generated filename on the server"
+    filename: String!
+    "Original filename from the user's system"
+    originalFilename: String!
+    "Server path where the image is stored"
+    path: String!
+    "File size in bytes"
+    size: Int!
 }
 
 type Mutation {
-    # User Mutations
-    """Register a new standard user account"""
-    register(input: UserRegInput!): User!
-
-    """Register a new admin user account (requires administrator secret)"""
-    registerAdmin(
-        """User registration details"""
-        input: UserRegInput!,
-        """Administrator secret key for authorization"""
-        secret: String!
+    "Add a privilege to a role"
+    assignPrivilegeToRole(
+        "UUID of the privilege to assign"
+        privilegeId: UUID!,
+        "UUID of the role"
+        roleId: UUID!
+    ): Role!
+    "Assign a role to a user"
+    assignRoleToUser(
+        "UUID of the role to assign"
+        roleId: UUID!,
+        "UUID of the user"
+        userId: UUID!
     ): User!
-
-    """Authenticate a user and establish a session"""
-    login(
-        """Username for authentication"""
-        username: String!,
-        """User's password"""
-        password: String!
-    ): User!
-
-    """Update a user's profile information"""
-    updateUser(
-        """UUID of the user to update"""
-        id: UUID!,
-        """New username (optional)"""
-        username: String,
-        """New email address (optional)"""
-        email: String,
-        """New first name (optional)"""
-        firstName: String,
-        """New last name (optional)"""
-        lastName: String
-    ): User!
-
-    """Delete a user account"""
-    deleteUser(
-        """UUID of the user to delete"""
-        id: UUID!
-    ): UUID!
-
-    # Flashcard Mutations
-    """Generate a flashcard set using AI based on a topic"""
-    generateFlashcardSet(
-        """Configuration options for flashcard generation"""
-        options: FlashcardGenOptions!
-    ): GeneratedFlashcardSet
-
-    """Create a new flashcard set"""
+    "Create a new flashcard set"
     createFlashcardSet(
-        """Details of the flashcard set to create"""
+        "Details of the flashcard set to create"
         flashcardSetInput: FlashcardSetInput!
     ): FlashcardSet!
-
-    """Update an existing flashcard set"""
-    updateFlashcardSet(
-        """UUID of the flashcard set to update"""
-        id: UUID!,
-        """New details for the flashcard set"""
-        flashcardSetInput: FlashcardSetInput
-    ): FlashcardSet!
-
-    """Delete a flashcard set"""
-    deleteFlashcardSet(
-        """UUID of the user who owns the set"""
-        userId: UUID!,
-        """UUID of the flashcard set to delete"""
-        setId: UUID!
-    ): String!
-
-    # Role Mutations
-    """Create a new role"""
+    "Create a new role"
     createRole(
-        """Name of the role to create"""
+        "Name of the role to create"
         name: String!
     ): Role!
-
-    """Update an existing role"""
-    updateRole(
-        """UUID of the role to update"""
-        id: UUID,
-        """New name for the role"""
-        name: String
-    ): Role!
-
-    """Delete a role"""
-    deleteRole(
-        """UUID of the role to delete"""
-        id: UUID!
-    ): UUID!
-
-    """Assign a role to a user"""
-    assignRoleToUser(
-        """UUID of the user"""
-        userId: UUID!,
-        """UUID of the role to assign"""
-        roleId: UUID!
-    ): User!
-
-    """Remove a role from a user"""
-    removeRoleFromUser(
-        """UUID of the user"""
-        userId: UUID!,
-        """UUID of the role to remove"""
-        roleId: UUID!
-    ): User!
-
-    """Add a privilege to a role"""
-    assignPrivilegeToRole(
-        """UUID of the role"""
-        roleId: UUID!,
-        """UUID of the privilege to assign"""
-        privilegeId: UUID!
-    ): Role!
-
-    """Remove a privilege from a role"""
-    removePrivilegeFromRole(
-        """UUID of the role"""
-        roleId: UUID!,
-        """UUID of the privilege to remove"""
-        privilegeId: UUID!
-    ): Role!
-
-    # File Upload Mutations
-    """Upload a profile picture for the current user"""
-    uploadProfilePicture(
-        """File to upload"""
-        input: Upload!
-    ): ImageUploadResult!
-
-    """Upload a document file"""
-    uploadDocument(
-        """File to upload"""
-        input: Upload!
-    ): DocumentUploadResult!
-
-    """Delete a document by its UUID"""
-    deleteDocument(
-        """UUID of the document to delete"""
-        id: UUID!
-    ): UUID!
-
-    """Delete the current authenticated user's profile picture"""
+    "Delete the current authenticated user's profile picture"
     deleteCurrentUserProfilePicture: Boolean!
-
-    """Delete a specific user's profile picture (admin only)"""
+    "Delete a document by its UUID"
+    deleteDocument(
+        "UUID of the document to delete"
+        id: UUID!
+    ): UUID!
+    "Delete a flashcard set"
+    deleteFlashcardSet(
+        "UUID of the flashcard set to delete"
+        setId: UUID!,
+        "UUID of the user who owns the set"
+        userId: UUID!
+    ): String!
+    "Delete a role"
+    deleteRole(
+        "UUID of the role to delete"
+        id: UUID!
+    ): UUID!
+    "Delete a user account"
+    deleteUser(
+        "UUID of the user to delete"
+        id: UUID!
+    ): UUID!
+    "Delete a specific user's profile picture (admin only)"
     deleteUserProfilePicture(
-        """UUID of the user whose profile picture should be deleted"""
+        "UUID of the user whose profile picture should be deleted"
         id: UUID!
     ): Boolean!
+    "Generate a flashcard set using AI based on a topic"
+    generateFlashcardSet(
+        "Configuration options for flashcard generation"
+        options: FlashcardGenOptions!
+    ): GeneratedFlashcardSet
+    "Authenticate a user and establish a session"
+    login(
+        "User's password"
+        password: String!,
+        "Username for authentication"
+        username: String!
+    ): User!
+    "Register a new standard user account"
+    register(input: UserRegInput!): User!
+    "Register a new admin user account (requires administrator secret)"
+    registerAdmin(
+        "User registration details"
+        input: UserRegInput!,
+        "Administrator secret key for authorization"
+        secret: String!
+    ): User!
+    "Remove a privilege from a role"
+    removePrivilegeFromRole(
+        "UUID of the privilege to remove"
+        privilegeId: UUID!,
+        "UUID of the role"
+        roleId: UUID!
+    ): Role!
+    "Remove a role from a user"
+    removeRoleFromUser(
+        "UUID of the role to remove"
+        roleId: UUID!,
+        "UUID of the user"
+        userId: UUID!
+    ): User!
+    "Update an existing flashcard set"
+    updateFlashcardSet(
+        "New details for the flashcard set"
+        flashcardSetInput: FlashcardSetInput,
+        "UUID of the flashcard set to update"
+        id: UUID!
+    ): FlashcardSet!
+    "Update an existing role"
+    updateRole(
+        "UUID of the role to update"
+        id: UUID,
+        "New name for the role"
+        name: String
+    ): Role!
+    "Update a user's profile information"
+    updateUser(
+        "New email address (optional)"
+        email: String,
+        "New first name (optional)"
+        firstName: String,
+        "UUID of the user to update"
+        id: UUID!,
+        "New last name (optional)"
+        lastName: String,
+        "New username (optional)"
+        username: String
+    ): User!
+    "Upload a document file"
+    uploadDocument(
+        "File to upload"
+        input: Upload!
+    ): DocumentUploadResult!
+    "Upload a profile picture for the current user"
+    uploadProfilePicture(
+        "File to upload"
+        input: Upload!
+    ): ImageUploadResult!
+}
+
+"Pagination metadata"
+type PageInfo {
+    "Current page number (zero-based)"
+    currentPage: Int!
+    "Total count of elements across all pages"
+    totalElements: Int!
+    "Total number of pages available"
+    totalPages: Int!
+}
+
+"Paginated collection of FlashcardSet objects"
+type PaginatedFlashcardSet {
+    "FlashcardSet items on the current page"
+    items: [FlashcardSet!]!
+    "Pagination metadata"
+    pageInfo: PageInfo!
+}
+
+"Paginated collection of Role objects"
+type PaginatedRole {
+    "Role items on the current page"
+    items: [Role!]!
+    "Pagination metadata"
+    pageInfo: PageInfo!
+}
+
+"Paginated collection of User objects"
+type PaginatedUser {
+    "User items on the current page"
+    items: [User!]!
+    "Pagination metadata"
+    pageInfo: PageInfo!
+}
+
+"Paginated collection of UserLogin objects"
+type PaginatedUserLogin {
+    "UserLogin items on the current page"
+    items: [UserLogin!]!
+    "Pagination metadata"
+    pageInfo: PageInfo!
+}
+
+"Individual permission that can be assigned to roles"
+type Privilege {
+    "Unique identifier for the privilege"
+    id: UUID!
+    "Name of the privilege (e.g., READ_USERS, CREATE_FLASHCARDS)"
+    name: String!
+}
+
+" Operations"
+type Query {
+    _service: _Service!
+    "Returns a paginated list of all users"
+    findAllUsers(page: Int!, size: Int!): PaginatedUser
+    "Find flashcard sets created by a specific user"
+    findFlashcardSetByAuthorId(
+        "UUID of the author"
+        id: UUID!,
+        "Page number (zero-based)"
+        page: Int = 0,
+        "Number of items per page"
+        size: Int = 10
+    ): PaginatedFlashcardSet
+    "Find a flashcard set by its UUID"
+    findFlashcardSetById(id: UUID!): FlashcardSet
+    "Find publicly accessible flashcard sets based on filters"
+    findPublicFlashcardSets(
+        "Filtering criteria"
+        filter: FlashcardSetFilterInput,
+        "Page number (zero-based)"
+        page: Int = 0,
+        "Number of items per page"
+        size: Int = 10
+    ): PaginatedFlashcardSet
+    "Find a role by its UUID"
+    findRoleById(id: UUID!): Role
+    "Find a role by its name"
+    findRoleByName(name: String!): Role
+    "Find a user by their email address"
+    findUserByEmail(email: String!): User
+    "Find a user by their UUID"
+    findUserById(id: UUID): User
+    "Find a user by their username"
+    findUserByUsername(username: String!): User
+    "Returns the currently authenticated user"
+    me: User
+    "Returns a paginated list of login records for the currently authenticated user"
+    myLoginHistory(
+        "Page number (zero-based)"
+        page: Int = 0,
+        "Number of items per page"
+        size: Int = 10
+    ): PaginatedUserLogin!
+    "Returns a paginated list of login records for the currently authenticated user within a specified date range"
+    myLoginHistoryBetweenDates(
+        "End date/time (inclusive)"
+        end: DateTime!,
+        "Page number (zero-based)"
+        page: Int = 0,
+        "Number of items per page"
+        size: Int = 10,
+        "Start date/time (inclusive)"
+        start: DateTime!
+    ): PaginatedUserLogin!
+    "Returns the current authenticated user's login streak (consecutive 24-hour periods with at least one login)"
+    myLoginStreak: Int!
+    "Returns a list of all available privileges"
+    privileges: [Privilege!]!
+    "Returns a paginated list of all roles"
+    roles(
+        "Page number (zero-based)"
+        page: Int = 0,
+        "Number of items per page"
+        size: Int = 10
+    ): PaginatedRole
+    "Find publicly accessible flashcard sets based on filters and search query"
+    searchPublicFlashcardSets(
+        "Filtering criteria"
+        filter: FlashcardSetFilterInput,
+        "Page number (zero-based)"
+        page: Int = 0,
+        "User query to compare against both title and description."
+        query: String!,
+        "Number of items per page"
+        size: Int = 10
+    ): PaginatedFlashcardSet
+}
+
+"Role that determines a user's permissions"
+type Role {
+    "Unique identifier for the role"
+    id: UUID!
+    "Name of the role (e.g., Admin, User, Moderator)"
+    name: String!
+    "Collection of privileges granted by this role"
+    privileges: [Privilege]
 }
 
 type Subscription {
     """
+
     Subscribe to an AI chat agent interaction about a flashcard set.
     Users must generate and maintain their own conversationId to track the chat session.
     Returns AI-generated responses to user messages about the flashcard set.
     """
     flashcardSetChat(
-        """UUID of the conversation thread (user-generated and tracked)"""
+        "UUID of the conversation thread (user-generated and tracked)"
         conversationId: UUID!,
-        """UUID of the relevant flashcard set being discussed"""
-        setId: UUID!,
-        """Message content to send to the AI chat agent"""
-        message: String!
+        "Message content to send to the AI chat agent"
+        message: String!,
+        "UUID of the relevant flashcard set being discussed"
+        setId: UUID!
     ): String
+}
+
+"User account information"
+type User {
+    "Timestamp when the user account was created"
+    creationDate: DateTime!
+    "User's email address"
+    email: String!
+    "Collection of files uploaded by this user"
+    files: [File]
+    "User's first name"
+    firstName: String!
+    "Collection of flashcard sets created by this user"
+    flashcardSets: [FlashcardSet]
+    "Unique identifier for the user"
+    id: UUID!
+    "User's last name"
+    lastName: String!
+    "Timestamp when the user account was last updated"
+    lastUpdated: DateTime
+    "Collection of roles assigned to this user"
+    roles: [Role]
+    "Unique username for authentication and identification"
+    username: String!
+}
+
+"User login record, automatically created upon (re-)authentication"
+type UserLogin {
+    "Unique identifier for the successful (re-)authentication"
+    id: UUID!
+    "Timestamp generated when successfully (re-)authenticated"
+    loginDateTime: DateTime!
+    "User successfully (re-)authenticated"
+    user: User!
+}
+
+type _Service {
+    sdl: String!
+}
+
+enum ErrorDetail {
+    """
+
+    The deadline expired before the operation could complete.
+
+    For operations that change the state of the system, this error
+    may be returned even if the operation has completed successfully.
+    For example, a successful response from a server could have been
+    delayed long enough for the deadline to expire.
+
+    HTTP Mapping: 504 Gateway Timeout
+    Error Type: UNAVAILABLE
+    """
+    DEADLINE_EXCEEDED
+    """
+
+    The server detected that the client is exhibiting a behavior that
+    might be generating excessive load.
+
+    HTTP Mapping: 429 Too Many Requests or 420 Enhance Your Calm
+    Error Type: UNAVAILABLE
+    """
+    ENHANCE_YOUR_CALM
+    """
+
+    The requested field is not found in the schema.
+
+    This differs from `NOT_FOUND` in that `NOT_FOUND` should be used when a
+    query is valid, but is unable to return a result (if, for example, a
+    specific video id doesn't exist). `FIELD_NOT_FOUND` is intended to be
+    returned by the server to signify that the requested field is not known to exist.
+    This may be returned in lieu of failing the entire query.
+    See also `PERMISSION_DENIED` for cases where the
+    requested field is invalid only for the given user or class of users.
+
+    HTTP Mapping: 404 Not Found
+    Error Type: BAD_REQUEST
+    """
+    FIELD_NOT_FOUND
+    """
+
+    The client specified an invalid argument.
+
+    Note that this differs from `FAILED_PRECONDITION`.
+    `INVALID_ARGUMENT` indicates arguments that are problematic
+    regardless of the state of the system (e.g., a malformed file name).
+
+    HTTP Mapping: 400 Bad Request
+    Error Type: BAD_REQUEST
+    """
+    INVALID_ARGUMENT
+    """
+
+    The provided cursor is not valid.
+
+    The most common usage for this error is when a client is paginating
+    through a list that uses stateful cursors. In that case, the provided
+    cursor may be expired.
+
+    HTTP Mapping: 404 Not Found
+    Error Type: NOT_FOUND
+    """
+    INVALID_CURSOR
+    """
+
+    Unable to perform operation because a required resource is missing.
+
+    Example: Client is attempting to refresh a list, but the specified
+    list is expired. This requires an action by the client to get a new list.
+
+    If the user is simply trying GET a resource that is not found,
+    use the NOT_FOUND error type. FAILED_PRECONDITION.MISSING_RESOURCE
+    is to be used particularly when the user is performing an operation
+    that requires a particular resource to exist.
+
+    HTTP Mapping: 400 Bad Request or 500 Internal Server Error
+    Error Type: FAILED_PRECONDITION
+    """
+    MISSING_RESOURCE
+    """
+
+    Service Error.
+
+    There is a problem with an upstream service.
+
+    This may be returned if a gateway receives an unknown error from a service
+    or if a service is unreachable.
+    If a request times out which waiting on a response from a service,
+    `DEADLINE_EXCEEDED` may be returned instead.
+    If a service returns a more specific error Type, the specific error Type may
+    be returned instead.
+
+    HTTP Mapping: 502 Bad Gateway
+    Error Type: UNAVAILABLE
+    """
+    SERVICE_ERROR
+    """
+
+    Request failed due to network errors.
+
+    HTTP Mapping: 503 Unavailable
+    Error Type: UNAVAILABLE
+    """
+    TCP_FAILURE
+    """
+
+    Request throttled based on server concurrency limits.
+
+    HTTP Mapping: 503 Unavailable
+    Error Type: UNAVAILABLE
+    """
+    THROTTLED_CONCURRENCY
+    """
+
+    Request throttled based on server CPU limits
+
+    HTTP Mapping: 503 Unavailable.
+    Error Type: UNAVAILABLE
+    """
+    THROTTLED_CPU
+    """
+
+    The operation is not implemented or is not currently supported/enabled.
+
+    HTTP Mapping: 501 Not Implemented
+    Error Type: BAD_REQUEST
+    """
+    UNIMPLEMENTED
+    """
+
+    Unknown error.
+
+    This error should only be returned when no other error detail applies.
+    If a client sees an unknown errorDetail, it will be interpreted as UNKNOWN.
+
+    HTTP Mapping: 500 Internal Server Error
+    """
+    UNKNOWN
+}
+
+enum ErrorType {
+    """
+
+    Bad Request.
+
+    There is a problem with the request.
+    Retrying the same request is not likely to succeed.
+    An example would be a query or argument that cannot be deserialized.
+
+    HTTP Mapping: 400 Bad Request
+    """
+    BAD_REQUEST
+    """
+
+    The operation was rejected because the system is not in a state
+    required for the operation's execution.  For example, the directory
+    to be deleted is non-empty, an rmdir operation is applied to
+    a non-directory, etc.
+
+    Service implementers can use the following guidelines to decide
+    between `FAILED_PRECONDITION` and `UNAVAILABLE`:
+
+    - Use `UNAVAILABLE` if the client can retry just the failing call.
+    - Use `FAILED_PRECONDITION` if the client should not retry until
+    the system state has been explicitly fixed.  E.g., if an "rmdir"
+    fails because the directory is non-empty, `FAILED_PRECONDITION`
+    should be returned since the client should not retry unless
+    the files are deleted from the directory.
+
+    HTTP Mapping: 400 Bad Request or 500 Internal Server Error
+    """
+    FAILED_PRECONDITION
+    """
+
+    Internal error.
+
+    An unexpected internal error was encountered. This means that some
+    invariants expected by the underlying system have been broken.
+    This error code is reserved for serious errors.
+
+    HTTP Mapping: 500 Internal Server Error
+    """
+    INTERNAL
+    """
+
+    The requested entity was not found.
+
+    This could apply to a resource that has never existed (e.g. bad resource id),
+    or a resource that no longer exists (e.g. cache expired.)
+
+    Note to server developers: if a request is denied for an entire class
+    of users, such as gradual feature rollout or undocumented allowlist,
+    `NOT_FOUND` may be used. If a request is denied for some users within
+    a class of users, such as user-based access control, `PERMISSION_DENIED`
+    must be used.
+
+    HTTP Mapping: 404 Not Found
+    """
+    NOT_FOUND
+    """
+
+    The caller does not have permission to execute the specified
+    operation.
+
+    `PERMISSION_DENIED` must not be used for rejections
+    caused by exhausting some resource or quota.
+    `PERMISSION_DENIED` must not be used if the caller
+    cannot be identified (use `UNAUTHENTICATED`
+    instead for those errors).
+
+    This error Type does not imply the
+    request is valid or the requested entity exists or satisfies
+    other pre-conditions.
+
+    HTTP Mapping: 403 Forbidden
+    """
+    PERMISSION_DENIED
+    """
+
+    The request does not have valid authentication credentials.
+
+    This is intended to be returned only for routes that require
+    authentication.
+
+    HTTP Mapping: 401 Unauthorized
+    """
+    UNAUTHENTICATED
+    """
+
+    Currently Unavailable.
+
+    The service is currently unavailable.  This is most likely a
+    transient condition, which can be corrected by retrying with
+    a backoff.
+
+    HTTP Mapping: 503 Unavailable
+    """
+    UNAVAILABLE
+    """
+
+    Unknown error.
+
+    For example, this error may be returned when
+    an error code received from another address space belongs to
+    an error space that is not known in this address space.  Also
+    errors raised by APIs that do not return enough error information
+    may be converted to this error.
+
+    If a client sees an unknown errorType, it will be interpreted as UNKNOWN.
+    Unknown errors MUST NOT trigger any special behavior. These MAY be treated
+    by an implementation as being equivalent to INTERNAL.
+
+    When possible, a more specific error should be provided.
+
+    HTTP Mapping: 520 Unknown Error
+    """
+    UNKNOWN
+}
+
+"A slightly refined version of RFC-3339 compliant DateTime Scalar"
+scalar DateTime
+
+"A universally unique identifier compliant UUID Scalar"
+scalar UUID
+
+"Custom scalar representing a file upload, compatible with multipart form data"
+scalar Upload
+
+scalar _FieldSet
+
+"Options for AI-powered flashcard generation"
+input FlashcardGenOptions {
+    "Number of flashcards to generate"
+    kQuestions: Int!
+    "Topic or content to generate flashcards from"
+    query: String!
+}
+
+"Input for creating or updating a flashcard"
+input FlashcardInput {
+    "The term or back side of the flashcard"
+    definition: String!
+    "Order position within the flashcard set (zero-based)"
+    position: Int!
+    "The term or front side of the flashcard"
+    term: String!
+}
+
+"Filtering options for flashcard set queries"
+input FlashcardSetFilterInput {
+    "Filter sets created after this timestamp"
+    createdAfter: DateTime
+    "Filter sets created before this timestamp"
+    createdBefore: DateTime
+    "Filter by public/private status"
+    isPublic: Boolean
+    "Text to search in title and description fields"
+    searchTerm: String
+}
+
+"Input for creating or updating a flashcard set"
+input FlashcardSetInput {
+    "Description of the flashcard set"
+    description: String
+    "Collection of flashcards to include in this set"
+    flashcards: [FlashcardInput]!
+    "Whether the flashcard set should be visible to all users"
+    isPublic: Boolean!
+    "Title of the flashcard set"
+    title: String
+}
+
+"Input for user registration"
+input UserRegInput {
+    "User's email address (must be unique)"
+    email: String!
+    "User's first name"
+    firstName: String!
+    "User's last name"
+    lastName: String!
+    "User's password (will be securely hashed)"
+    password: String!
+    "Desired username (must be unique)"
+    username: String!
 }

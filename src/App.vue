@@ -1,37 +1,35 @@
 <script setup>
-import Footer from './components/Footer.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import Toast from "@/components/ToastFunction.vue";
+import Toast from "@/components/ui/Toast.vue";
 
 const route = useRoute();
 
-// List of routes where footer should be hidden
-const hideFooterRoutes = ['/register','/settings' ,'/reset-password'];
+const layout = computed(() => {
+  const noLayoutRoutes = ['/login', '/register'];
+  if (noLayoutRoutes.includes(route.path)) {
+    return null;
+  }
 
-// Computed property to determine if footer should be shown
-const showFooter = computed(() => {
-  return !hideFooterRoutes.includes(route.path);
+  return MainLayout;
 });
 </script>
 
 <template>
-  <div class="app-container">
-    <div class="content-wrapper">
-      <router-view></router-view>
-      <Toast />
-    </div>
+  <component :is="layout" v-if="layout">
+    <router-view></router-view>
+  </component>
+
+  <div v-else class="plain-content-wrapper">
+    <router-view></router-view>
   </div>
+
+  <Toast />
 </template>
 
 <style>
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.content-wrapper {
-  flex: 1;
+.plain-content-wrapper {
+  height: 100%;
 }
 </style>

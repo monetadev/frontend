@@ -28,21 +28,127 @@ export const REGISTER_USER = gql`
 export const ME_QUERY = gql`
     query Me {
         me {
-            id
+            id # UUID!
             username
             email
             firstName
             lastName
             creationDate
             lastUpdated
-            files{
+            roles {
+                id # UUID!
+                name
+            }
+            flashcardSets { # Returns [FlashcardSet]
+                id # UUID!
+                # Add other fields if needed directly here, e.g., title
+            }
+            files { # Returns [File]
+                id # UUID!
+                filename
+                originalFilename
+                contentType
+                fileSize
+                uploadedDate
+            }
+        }
+    }
+`;
+
+export const MY_LOGIN_STREAK_QUERY = gql`
+    query MyLoginStreak {
+        myLoginStreak
+    }
+`;
+
+export const FIND_MY_SETS_QUERY = gql`
+    query FindMySets($id: UUID!, $page: Int, $size: Int) {
+        # Use 'id' for the argument name as per the schema
+        findFlashcardSetByAuthorId(id: $id, page: $page, size: $size) {
+            items { # Array of FlashcardSet
+                id # UUID!
+                title
+                description
+                creationDate
+                isPublic
+                flashcards { # Array of Flashcard
+                    id # UUID!
+                }
+                author { # User type
+                    id # UUID!
+                    username
+                    firstName
+                    lastName
+                    files {
+                        id
+                        filename
+                        contentType
+                    }
+                }
+            }
+            pageInfo { # Subselection required for PageInfo type
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const FIND_MY_RECENT_SETS_QUERY = gql`
+    query FindMyRecentSets($id: UUID!, $page: Int, $size: Int) {
+        # Use 'id' for the argument name as per the schema
+        findFlashcardSetByAuthorId(id: $id, page: $page, size: $size) {
+            items { # Array of FlashcardSet
+                id # UUID!
+                title
+                description
+                creationDate
+                flashcards { # Array of Flashcard
+                    id # UUID!
+                }
+                author { # User type
+                    id # UUID!
+                    username
+                    firstName
+                    lastName
+                    files { # Array of File
+                        id # UUID!
+                        filename
+                        contentType
+                    }
+                }
+            }
+            pageInfo { # Subselection required for PageInfo type
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const FIND_USER_BY_USERNAME = gql`
+    query FindUserByUsername($username: String!) {
+        findUserByUsername(username: $username) {
+            id # Needed for subsequent queries like finding sets
+            username
+            email
+            firstName
+            lastName
+            creationDate
+            lastUpdated
+            roles {
+                id
+                name
+            }
+            flashcardSets { # Only need count here
+                id
+            }
+            files { # For profile picture
                 id
                 filename
-                filePath
                 contentType
-            }
-            roles{
-                name
             }
         }
     }
@@ -232,11 +338,52 @@ export const FIND_PUBLIC_FLASHCARD_SETS = gql`
                 author {
                     id
                     username
+                    firstName
+                    lastName
+                    files {
+                        id
+                        filename
+                        contentType
+                    }
                 }
                 flashcards {
                     id
                     term
                     definition
+                }
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const SEARCH_PUBLIC_FLASHCARD_SETS = gql`
+    query SearchPublicFlashcardSets($query: String!, $page: Int, $size: Int) {
+        # Note: Filter argument removed as per schema provided in prompt
+        # If backend schema includes filter, add it back: filter: FlashcardSetFilterInput
+        searchPublicFlashcardSets(query: $query, page: $page, size: $size) {
+            items {
+                id
+                title
+                description
+                creationDate
+                author {
+                    id
+                    username
+                    firstName
+                    lastName
+                    files {
+                        id
+                        filename
+                        contentType
+                    }
+                }
+                flashcards {
+                    id # Just need count, so id is sufficient
                 }
             }
             pageInfo {
@@ -257,6 +404,12 @@ export const UPLOAD_DOCUMENT = gql`
             contentType
             path
         }
+    }
+`;
+
+export const DELETE_DOCUMENT = gql`
+    mutation DeleteDocument($id: UUID!) {
+        deleteDocument(id: $id)
     }
 `;
 

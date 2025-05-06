@@ -24,7 +24,7 @@
   </template>
   
   <script>
-  import PrimaryButton from "@/components/PrimaryButton.vue"; 
+  import PrimaryButton from "@/components/ui/PrimaryButton.vue";
   export default {
     name: "NavigationBar",
     components: {

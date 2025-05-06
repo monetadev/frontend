@@ -60,13 +60,13 @@
 import { ref, watch, nextTick, onBeforeUnmount, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { gql } from '@apollo/client/core'
-import ChatHeader from '@/components/ChatHeader.vue'
-import ChatBubble from '@/components/ChatBubble.vue'
-import ChatInput from '@/components/ChatInput.vue'
-import TypingIndicator from '@/components/TypingIndicator.vue'
+import ChatHeader from '@/components/chat-agent/ChatHeader.vue'
+import ChatBubble from '@/components/chat-agent/ChatBubble.vue'
+import ChatInput from '@/components/chat-agent/ChatInput.vue'
+import TypingIndicator from '@/components/chat-agent/TypingIndicator.vue'
 import { v4 as uuidv4 } from 'uuid'
-import { FLASHCARD_SET_CHAT } from '@/graphql/auth'
-import apolloClient from '@/plugins/apollo'
+import { FLASHCARD_SET_CHAT } from '@/graphql/auth.js'
+import apolloClient from '@/plugins/apollo.js'
 
 const props = defineProps({
   currentCardTerm: {

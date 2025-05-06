@@ -1,8 +1,8 @@
-schema: ./path/to/schema.graphql
+schema: ./src/graphql/schema.graphqls
 extensions:
   endpoints:
     Default GraphQL Endpoint:
-      url: http://url/to/the/graphql/api
+      url: ${meta.env.VITE_GRAPHQL_HTTP_URL:-"http://localhost:8080/graphql"}
       headers:
         user-agent: JS GraphQL
-      introspect: false
+      introspect: true

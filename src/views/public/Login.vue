@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="illustration-container">
-      <img src="@/assets/login.svg" alt="Illustration" class="illustration" />
+      <FlashcardAnimation/>
     </div>
 
     <div class="form-container">
@@ -9,24 +9,22 @@
       <p class="subtitle">Sign in to your account and start your learning adventure.</p>
 
       <form @submit.prevent="handleLogin">
-        <InputWithIcon iconName="user" label="Username" type="text" v-model="username" />
-        <InputWithIcon iconName="lock" label="Password" :type="showPassword ? 'text' : 'password'" v-model="password" />
+        <InputWithIcon icon="user" label="Username" type="text" v-model="username"/>
+        <InputWithIcon icon="lock" label="Password" :type="showPassword ? 'text' : 'password'" v-model="password"/>
 
         <div class="remember-container">
           <label class="checkbox-label">
-            <input type="checkbox" id="rememberMe" v-model="showPassword" />
+            <input type="checkbox" id="rememberMe" v-model="showPassword"/>
             <span class="checkmark"></span>
             Show Password
           </label>
-          <router-link to="/reset-password" class="forgot-password">
-            Forgot Password?
-          </router-link>
         </div>
 
-        <PrimaryButton text="Sign-In" />
+        <PrimaryButton text="Sign-In"/>
         <div class="signup">
           <p>
-            New on our platform? <router-link to="/register">Create Account</router-link>
+            New on our platform?
+            <router-link to="/register">Create Account</router-link>
           </p>
         </div>
       </form>
@@ -35,46 +33,65 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
-import { useRouter } from 'vue-router';
-import InputWithIcon from "@/components/InputWithIcon.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import { LOGIN_USER } from '@/graphql/auth';
-import eventBus from "@/eventBus.js";
+import {ref} from 'vue';
+import {useMutation, useApolloClient} from '@vue/apollo-composable';
+import {useRouter} from 'vue-router';
+import InputWithIcon from "@/components/ui/InputWithIcon.vue";
+import PrimaryButton from "@/components/ui/PrimaryButton.vue";
+import FlashcardAnimation from "@/components/auth/FlashcardAnimation.vue";
+import {LOGIN_USER, ME_QUERY} from '@/graphql/auth.js';
+import {useToast} from "@/composables/useToast.js";
 
 const username = ref('');
 const password = ref('');
 const showPassword = ref(false);
 const router = useRouter();
+const {client: apolloClient} = useApolloClient();
+const {addToast} = useToast();
 
-const { mutate: loginMutate } = useMutation(LOGIN_USER);
+const {mutate: loginMutate, loading: isLoggingIn, error: loginError} = useMutation(LOGIN_USER, () => ({
+}));
 
 const handleLogin = async () => {
+  loginError.value = null;
+
   try {
     const variables = {
       username: username.value,
       password: password.value
     };
-    await loginMutate(variables);
+    const result = await loginMutate(variables);
 
-    toastFunction("Login successful!", "success");
+    if (result?.data?.login) {
+      addToast({msg: "Login successful!", type: "success", duration: 4000});
 
-    //after successful log in, go to dashboard
-    await router.push('/library/view');
+      try {
+        sessionStorage.setItem('app_auth_status', 'logged_in');
+      } catch (e) {
+        console.error("Failed to library sessionStorage:", e);
+        addToast({msg: "Failed to save session status.", type: "warning", duration: 4000});
+      }
+      try {
+        await apolloClient.resetStore();
+      } catch (cacheError) {
+      }
+
+      await router.push({name: 'privateProfileLibrary'});
+    } else {
+      throw new Error("Login mutation completed but returned unexpected data.");
+    }
+
   } catch (error) {
-
-    toastFunction("Invalid username/Password. Please try again.", "error");
+    const message = error.graphQLErrors?.[0]?.message || error.networkError?.message || "Invalid username/password or connection issue.";
+    // TODO: Look into this.
+    addToast({msg: message, type: "error", duration: 4000});
+    try {
+      sessionStorage.removeItem('app_auth_status');
+    } catch (e) {
+      console.error("Failed to remove sessionStorage:", e);
+    }
   }
 };
-
-function toastFunction(message, type) {
-  eventBus.emit('toast', {
-    msg: message,
-    type: type,
-    duration: 3000
-  })
-}
 </script>
 
 <style scoped>
@@ -99,10 +116,6 @@ function toastFunction(message, type) {
   align-items: center;
   justify-content: center;
   background: #121729;
-}
-
-.illustration {
-  max-width: 500px;
 }
 
 .form-container {
@@ -154,13 +167,6 @@ form {
   margin-bottom: 10px;
 }
 
-
-.forgot-password {
-  color: #5F98EF;
-  text-decoration: none;
-  font-weight: 500;
-}
-
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -174,7 +180,7 @@ form {
   accent-color: #5F98EF;
 }
 
-/* Responsive Design */
+/* --- Responsive Design --- */
 @media (max-width: 1024px) {
   .login-container {
     flex-direction: column;
@@ -193,5 +199,4 @@ form {
     padding: 30px;
   }
 }
-
 </style>

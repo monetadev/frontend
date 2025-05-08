@@ -20,7 +20,6 @@ export const REGISTER_USER = gql`
             email
             firstName
             lastName
-            
         }
     }
 `;
@@ -28,7 +27,7 @@ export const REGISTER_USER = gql`
 export const ME_QUERY = gql`
     query Me {
         me {
-            id # UUID!
+            id
             username
             email
             firstName
@@ -36,15 +35,14 @@ export const ME_QUERY = gql`
             creationDate
             lastUpdated
             roles {
-                id # UUID!
+                id
                 name
             }
-            flashcardSets { # Returns [FlashcardSet]
-                id # UUID!
-                # Add other fields if needed directly here, e.g., title
+            flashcardSets {
+                id
             }
-            files { # Returns [File]
-                id # UUID!
+            files {
+                id
                 filename
                 originalFilename
                 contentType
@@ -63,19 +61,18 @@ export const MY_LOGIN_STREAK_QUERY = gql`
 
 export const FIND_MY_SETS_QUERY = gql`
     query FindMySets($id: UUID!, $page: Int, $size: Int) {
-        # Use 'id' for the argument name as per the schema
         findFlashcardSetByAuthorId(id: $id, page: $page, size: $size) {
-            items { # Array of FlashcardSet
-                id # UUID!
+            items {
+                id
                 title
                 description
                 creationDate
                 isPublic
-                flashcards { # Array of Flashcard
-                    id # UUID!
+                flashcards {
+                    id
                 }
-                author { # User type
-                    id # UUID!
+                author {
+                    id
                     username
                     firstName
                     lastName
@@ -86,7 +83,7 @@ export const FIND_MY_SETS_QUERY = gql`
                     }
                 }
             }
-            pageInfo { # Subselection required for PageInfo type
+            pageInfo {
                 totalPages
                 totalElements
                 currentPage
@@ -97,29 +94,28 @@ export const FIND_MY_SETS_QUERY = gql`
 
 export const FIND_MY_RECENT_SETS_QUERY = gql`
     query FindMyRecentSets($id: UUID!, $page: Int, $size: Int) {
-        # Use 'id' for the argument name as per the schema
         findFlashcardSetByAuthorId(id: $id, page: $page, size: $size) {
-            items { # Array of FlashcardSet
-                id # UUID!
+            items {
+                id
                 title
                 description
                 creationDate
-                flashcards { # Array of Flashcard
-                    id # UUID!
+                flashcards {
+                    id
                 }
-                author { # User type
-                    id # UUID!
+                author {
+                    id
                     username
                     firstName
                     lastName
-                    files { # Array of File
-                        id # UUID!
+                    files {
+                        id
                         filename
                         contentType
                     }
                 }
             }
-            pageInfo { # Subselection required for PageInfo type
+            pageInfo {
                 totalPages
                 totalElements
                 currentPage
@@ -131,7 +127,7 @@ export const FIND_MY_RECENT_SETS_QUERY = gql`
 export const FIND_USER_BY_USERNAME = gql`
     query FindUserByUsername($username: String!) {
         findUserByUsername(username: $username) {
-            id # Needed for subsequent queries like finding sets
+            id
             username
             email
             firstName
@@ -142,10 +138,10 @@ export const FIND_USER_BY_USERNAME = gql`
                 id
                 name
             }
-            flashcardSets { # Only need count here
+            flashcardSets {
                 id
             }
-            files { # For profile picture
+            files {
                 id
                 filename
                 contentType
@@ -167,21 +163,21 @@ export const UPDATE_USER = gql`
 `;
 
 export const UPLOAD_PROFILE_PICTURE = gql`
-  mutation UploadProfilePicture($input: Upload!) {
-    uploadProfilePicture(input: $input) {
-        filename
-        originalFilename
-        size
-        contentType
-        path
+    mutation UploadProfilePicture($input: Upload!) {
+        uploadProfilePicture(input: $input) {
+            filename
+            originalFilename
+            size
+            contentType
+            path
+        }
     }
-  }
 `;
 
 export const DELETE_PROFILE_PICTURE = gql`
-  mutation DeleteCurrentUserProfilePicture {
-    deleteCurrentUserProfilePicture
-  }
+    mutation DeleteCurrentUserProfilePicture {
+        deleteCurrentUserProfilePicture
+    }
 `;
 
 export const FIND_ALL_USERS = gql`
@@ -257,8 +253,6 @@ export const GET_FLASHCARD_SET_BY_ID = gql`
     }
 `;
 
-//Custom pagination values
-
 export const GET_ROLES_PAGINATED = gql`
     query GetRolesPaginated($page: Int, $size: Int) {
         roles(page: $page, size: $size) {
@@ -297,9 +291,9 @@ export const CREATE_FLASHCARD_SET = gql`
 
 export const DELETE_FLASHCARD_SET = gql`
     mutation DeleteFlashcardSet($userId: UUID!, $setId: UUID!) {
-        deleteFlashcardSet(userId: $userId, setId: $setId) 
-}`
-
+        deleteFlashcardSet(userId: $userId, setId: $setId)
+    }
+`;
 
 export const UPDATE_FLASHCARD_SET = gql`
     mutation UpdateFlashcardSet($id: UUID!, $flashcardSetInput: FlashcardSetInput!) {
@@ -319,7 +313,6 @@ export const UPDATE_FLASHCARD_SET = gql`
         }
     }
 `;
-
 
 export const FLASHCARD_SET_CHAT = gql`
     subscription FlashcardSetChat($conversationId: UUID!, $setId: UUID!, $message: String!) {
@@ -363,8 +356,6 @@ export const FIND_PUBLIC_FLASHCARD_SETS = gql`
 
 export const SEARCH_PUBLIC_FLASHCARD_SETS = gql`
     query SearchPublicFlashcardSets($query: String!, $page: Int, $size: Int) {
-        # Note: Filter argument removed as per schema provided in prompt
-        # If backend schema includes filter, add it back: filter: FlashcardSetFilterInput
         searchPublicFlashcardSets(query: $query, page: $page, size: $size) {
             items {
                 id
@@ -383,7 +374,7 @@ export const SEARCH_PUBLIC_FLASHCARD_SETS = gql`
                     }
                 }
                 flashcards {
-                    id # Just need count, so id is sufficient
+                    id
                 }
             }
             pageInfo {
@@ -427,7 +418,6 @@ export const GENERATE_FLASHCARDS = gql`
     }
 `;
 
-
 export const DELETE_USER = gql`
     mutation deleteUser($id: UUID!) {
         deleteUser(id: $id)
@@ -449,7 +439,6 @@ export const GET_ROLES = gql`
         }
     }
 `;
-
 
 export const ASSIGN_ROLE_TO_USER = gql`
     mutation assignRoleToUser($userId: UUID!, $roleId: UUID!) {
@@ -474,6 +463,181 @@ export const REMOVE_ROLE_FROM_USER = gql`
                 name
             }
         }
+    }
+`;
+
+export const GENERATE_QUIZ_MUTATION = gql`
+    mutation GenerateQuiz($options: QuizGenOptions!) {
+        generateQuiz(options: $options) {
+            id
+            title
+            description
+            questions {
+                content
+                position
+                questionType
+                options {
+                    content
+                    position
+                }
+            }
+        }
+    }
+`;
+
+export const GET_MY_QUIZZES = gql`
+    query GetMyQuizzes($page: Int, $size: Int) {
+        getMyQuizzes(page: $page, size: $size) {
+            items {
+                id
+                title
+                description
+                creationDate
+                author {
+                    id
+                    username
+                    firstName
+                    lastName
+                    files {
+                        id
+                        filename
+                        contentType
+                    }
+                }
+                flashcardSet {
+                    id
+                    title
+                    author {
+                        id
+                        username
+                        firstName
+                        lastName
+                        files {
+                            id
+                            filename
+                            contentType
+                        }
+                    }
+                }
+                questions {
+                    id
+                }
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const GET_QUIZ_BY_ID = gql`
+    query GetQuizById($id: UUID!) {
+        findQuizById(id: $id) {
+            id
+            title
+            description
+            creationDate
+            author {
+                id
+                username
+                # Consider adding firstName, lastName for more complete author display
+            }
+            flashcardSet {
+                id
+                title
+            }
+            questions {
+                id
+                content
+                position
+                questionType
+                options {
+                    id
+                    content
+                    position
+                    isCorrect
+                }
+            }
+        }
+    }
+`;
+
+export const GRADE_QUIZ_MUTATION = gql`
+    mutation GradeQuiz($quiz: QuizAttemptInput!) {
+        gradeQuiz(quiz: $quiz) {
+            id
+            score
+            quiz {
+                id
+                title
+            }
+            user {
+                id
+                username
+            }
+        }
+    }
+`;
+
+export const GET_USER_QUIZ_ATTEMPTS_BY_QUIZ = gql`
+    query GetUserQuizAttemptsByQuizId($userId: UUID, $quizId: UUID, $page: Int, $size: Int) {
+        # Fetches attempts made by a specific user on a specific quiz
+        getUserQuizAttemptsByQuizId(userId: $userId, quizId: $quizId, page: $page, size: $size) {
+            items {
+                id
+                score
+                attemptDate
+            }
+            pageInfo {
+                totalPages
+                totalElements
+                currentPage
+            }
+        }
+    }
+`;
+
+export const GET_QUIZ_ATTEMPT = gql`
+    query GetQuizAttempt($attemptId: UUID!) {
+        getQuizAttempt(attemptId: $attemptId) {
+            id
+            score
+            attemptDate
+            quiz { id title }
+            user { id username }
+            responses {
+                id
+                response
+                isCorrect
+                feedback
+                question {
+                    id
+                    position
+                    questionType
+                    content
+                    options {
+                        id
+                        content
+                        position
+                        isCorrect
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export const DELETE_QUIZ_MUTATION = gql`
+    mutation DeleteQuiz($userId: UUID!, $quizId: UUID!) {
+        deleteQuiz(userId: $userId, quizId: $quizId) # Ensure return type matches schema
+    }
+`;
+
+export const DELETE_QUIZ_ATTEMPT_MUTATION = gql`
+    mutation DeleteQuizAttempt($attemptId: UUID!) {
+        deleteQuizAttempt(attemptId: $attemptId) # Ensure return type matches schema
     }
 `;
 

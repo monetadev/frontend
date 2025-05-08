@@ -23,6 +23,8 @@ const NotFound = () => import('@/views/public/NotFound.vue');
 const Register = () => import('@/views/public/Register.vue');
 
 // Quiz Components
+const QuizLibrary = () => import('@/views/quiz/QuizLibrary.vue');
+const QuizOverview = () => import('@/views/quiz/QuizOverview.vue');
 const CreateQuiz = () => import('@/views/quiz/CreateQuiz.vue');
 const TakeQuiz = () => import('@/views/quiz/TakeQuiz.vue');
 
@@ -127,13 +129,32 @@ const routes = [
 
     // --- Quizzes ---
     {
-        path: "/quiz/:id",
+        path: "/quiz/:id/take",
         name: "takeQuiz",
         component: TakeQuiz,
         props: true,
         meta: {requiresAuth: true}
     },
-
+    {
+        path: "/quiz/:id",
+        name: "quizOverview",
+        component: QuizOverview,
+        props: true,
+        meta: {requiresAuth: true}
+    },
+    {
+        path: "/quiz",
+        name: "quizLibrary",
+        component: QuizLibrary,
+        meta: {requiresAuth: true}
+    },
+    {
+        path: "/quiz/:id/take/:attempt",
+        name: "quizAttemptResult",
+        component: TakeQuiz,
+        props: true,
+        meta: {requiresAuth: true}
+    },
     // --- User Profile & Settings ---
     {
         path: "/profile",

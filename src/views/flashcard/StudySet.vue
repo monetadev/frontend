@@ -35,15 +35,15 @@
           class="flashcard-area"
           @wheel.prevent.stop="handleScroll"
       >
-        <Transition name="card-transition" mode="out-in" @after-leave="onCardAnimationComplete">
-          <div class="flashcard-container" :key="currIndex">
+        <Transition name="card-transition" mode="out-in" @after-enter="onCardAnimationComplete">
+          <div class="flashcard-container" :key="currentFlashcard.id || currIndex">
             <FlashCard
                 :term="currentFlashcard.term"
                 :definition="currentFlashcard.definition"
                 ref="flashcardRef"
             />
             <div v-if="isProgressVisible" class="border-progress-container">
-              <svg class="border-progress" viewBox="0 0 1071 584">
+              <svg class="border-progress" :viewBox="`0 0 ${svgViewBoxWidth} ${svgViewBoxHeight}`">
                 <path
                     :d="borderPath"
                     fill="none"
@@ -69,7 +69,7 @@
           >
             <font-awesome-icon :icon="getIcon('chevron-left')"/>
           </button>
-          <CounterDisplay :current="currIndex + 1" :total="flashcards.length"/>
+          <CounterDisplay :current="flashcards.length > 0 ? currIndex + 1 : 0" :total="flashcards.length"/>
           <button
               class="control-button icon-button"
               :disabled="isAtLastCard || isNavigating || isAnimatingCardTransition"
@@ -93,7 +93,7 @@
               class="control-button icon-button play-pause-button"
               @click="togglePlay"
               :aria-label="isPlaying ? 'Pause Autoplay' : 'Start Autoplay'"
-              :disabled="isAnimatingCardTransition"
+              :disabled="isAnimatingCardTransition || flashcards.length === 0"
           >
             <font-awesome-icon :icon="getIcon(isPlaying ? 'pause' : 'play')"/>
           </button>
@@ -107,7 +107,7 @@
           >
             <font-awesome-icon :icon="getIcon('rotate-left')"/>
           </button>
-          <div class="speed-control" v-if="!isAtLastCard || isAtStart">
+          <div class="speed-control" v-if="flashcards.length > 0 && (!isAtLastCard || isAtStart)">
             <span class="speed-label">{{ (playSpeed / 1000).toFixed(1) }}s</span>
             <input
                 type="range" min="3" max="10" step="0.5"
@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, onBeforeUnmount, watch} from 'vue';
+import {ref, computed, onMounted, onBeforeUnmount, watch, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {useQuery} from '@vue/apollo-composable';
 import {GET_FLASHCARD_SET_BY_ID} from "@/graphql/auth.js";
@@ -147,7 +147,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {
   faChevronLeft, faChevronRight, faPlay, faPause, faShuffle,
   faSpinner, faTriangleExclamation, faQuestionCircle, faRotateLeft,
-  faArrowLeft // Added Back Arrow Icon
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -166,7 +166,6 @@ function getIcon(iconName) {
   return icons[iconName] || faQuestionCircle;
 }
 
-// Route, Query, State refs
 const route = useRoute();
 const router = useRouter();
 const flashcardSetId = ref(route.params.id);
@@ -190,8 +189,12 @@ const flashcardRef = ref(null);
 const scrollTimeout = ref(null);
 const isAnimatingCardTransition = ref(false);
 
-// Computed Properties
+// SVG Dimensions (should match FlashCard.vue's explicit dimensions if fixed)
+const svgViewBoxWidth = 1071;
+const svgViewBoxHeight = 584.44;
+
 const currentDeck = computed(() => flashcardSetResult.value?.findFlashcardSetById ?? null);
+
 const flashcards = computed(() => {
   const originalCards = (currentDeck.value?.flashcards ?? [])
       .slice()
@@ -200,95 +203,121 @@ const flashcards = computed(() => {
   if (isShuffled.value) {
     const originalIds = new Set(originalCards.map(c => c.id));
     const validShuffled = shuffledCards.value.filter(c => originalIds.has(c.id));
-
     const shuffledIds = new Set(validShuffled.map(c => c.id));
-    const newCards = originalCards.filter(c => !shuffledIds.has(c.id));
-
-    // Fisher-Yates shuffle
-    for (let i = newCards.length - 1; i > 0; i--) {
+    const newCardsToAppend = originalCards.filter(c => !shuffledIds.has(c.id));
+    for (let i = newCardsToAppend.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [newCards[i], newCards[j]] = [newCards[j], newCards[i]];
+      [newCardsToAppend[i], newCardsToAppend[j]] = [newCardsToAppend[j], newCardsToAppend[i]];
     }
-
-    return [...validShuffled, ...newCards];
+    const result = [...validShuffled, ...newCardsToAppend];
+    return result.length > 0 ? result : originalCards;
   } else {
     return originalCards;
   }
 });
-const currentFlashcard = computed(() => flashcards.value[currIndex.value] || {term: "", definition: ""});
+
+const currentFlashcard = computed(() => {
+  if (flashcards.value.length === 0) {
+    return {id: 'empty-placeholder', term: "No cards", definition: "Please add cards to this set."};
+  }
+  return flashcards.value[currIndex.value] || {id: `empty-${currIndex.value}`, term: "Error", definition: "Card not found"};
+});
+
 const isAtStart = computed(() => currIndex.value === 0);
 const isAtLastCard = computed(() => flashcards.value.length > 0 && currIndex.value === flashcards.value.length - 1);
 
-// Progress Bar Calc. & Visibility
+const borderPathOffset = 4; // Center of 6px stroke is 4px from edge (1px card border + 3px half stroke)
+const borderPathRadius = 20; // Should match FlashCard's border-radius
+
 const borderPath = computed(() => {
-  // TODO: Questionable way to get the border path, but it works for now. Replace with maintainable logic at some point. (Thank you, Gemini 2.5 Pro!)
-  const w = 1071, h = 584, r = 20;
-  return `M ${w / 2} 3 H ${w - r - 3} A ${r} ${r} 0 0 1 ${w - 3} ${r + 3} V ${h - r - 3} A ${r} ${r} 0 0 1 ${w - r - 3} ${h - 3} H ${r + 3} A ${r} ${r} 0 0 1 3 ${h - r - 3} V ${r + 3} A ${r} ${r} 0 0 1 ${r + 3} 3 H ${w / 2}`;
+  const w = svgViewBoxWidth;
+  const h = svgViewBoxHeight;
+  const r = borderPathRadius;
+  const o = borderPathOffset; // Use the defined offset
+
+  // Path starts from top-center, moves right, top-right arc, down, bottom-right arc, left, bottom-left arc, up, top-left arc, to center
+  return `M ${w / 2} ${o} ` +
+      `H ${w - r - o} A ${r} ${r} 0 0 1 ${w - o} ${r + o} ` +
+      `V ${h - r - o} A ${r} ${r} 0 0 1 ${w - r - o} ${h - o} ` +
+      `H ${r + o} A ${r} ${r} 0 0 1 ${o} ${h - r - o} ` +
+      `V ${r + o} A ${r} ${r} 0 0 1 ${r + o} ${o} ` +
+      `H ${w / 2}`;
 });
 
 const borderLength = computed(() => {
-  const w = 1071, h = 584;
-  return 2 * w + 2 * h;
+  const w = svgViewBoxWidth;
+  const h = svgViewBoxHeight;
+  const r = borderPathRadius;
+  const o = borderPathOffset;
+  // Perimeter of a rounded rectangle: 2 * (width_straight + height_straight) + 2 * PI * r
+  const straightWidth = w - 2 * r - 2 * o;
+  const straightHeight = h - 2 * r - 2 * o;
+  if (straightWidth < 0 || straightHeight < 0) { // If offset/radius too large for dimensions
+    return 2 * (w - 2*o) + 2 * (h - 2*o); // Fallback to simple perimeter of the offset box
+  }
+  return 2 * straightWidth + 2 * straightHeight + 2 * Math.PI * r;
 });
 
 const borderDashOffset = computed(() => borderLength.value * (1 - (progress.value / 100)));
-const isProgressVisible = computed(() => isPlaying.value && !isTransitioning.value && (progressInterval.value !== null || progress.value > 0));
+const isProgressVisible = computed(() => isPlaying.value && !isAnimatingCardTransition.value && !isTransitioning.value && (progressInterval.value !== null || progress.value > 0));
 
-// --- Methods ---
+
 function goBackToSetView() {
   if (flashcardSetId.value) {
-    router.push({name: 'readSet', params: {id: flashcardSetId.value}})
+    router.push({name: 'readSet', params: {id: flashcardSetId.value}});
   } else {
-    // Fallback to private library if ID is somehow missing
     router.push({name: 'privateProfileLibrary'});
   }
 }
 
 function triggerNextCard() {
-  if (isNavigating.value || isAnimatingCardTransition.value || isAtLastCard.value) return;
+  if (isNavigating.value || isAnimatingCardTransition.value || isAtLastCard.value || flashcards.value.length === 0) return;
   isNavigating.value = true;
   isAnimatingCardTransition.value = true;
   nextCard();
-  setTimeout(() => {
-    isNavigating.value = false;
-  }, 300);
+  setTimeout(() => { isNavigating.value = false; }, 300);
 }
 
 function triggerPrevCard() {
-  if (isNavigating.value || isAnimatingCardTransition.value || isAtStart.value) return;
+  if (isNavigating.value || isAnimatingCardTransition.value || isAtStart.value || flashcards.value.length === 0) return;
   isNavigating.value = true;
   isAnimatingCardTransition.value = true;
   prevCard();
-  setTimeout(() => {
-    isNavigating.value = false;
-  }, 300);
+  setTimeout(() => { isNavigating.value = false; }, 300);
 }
 
-/* --- Card Logic --- */
 function nextCard() {
-  if (currIndex.value < flashcards.value.length - 1) currIndex.value++;
+  if (currIndex.value < flashcards.value.length - 1) {
+    currIndex.value++;
+  }
 }
 
 function prevCard() {
-  if (currIndex.value > 0) currIndex.value--;
+  if (currIndex.value > 0) {
+    currIndex.value--;
+  }
 }
 
 function goToBeginning() {
-  if (isAnimatingCardTransition.value) return;
+  if (isAnimatingCardTransition.value || flashcards.value.length === 0) return;
   if (isPlaying.value) stopAutoPlay();
+  if (currIndex.value === 0) return;
   isAnimatingCardTransition.value = true;
   currIndex.value = 0;
 }
 
-function shuffleCards() {
+async function shuffleCards() {
   if (isAnimatingCardTransition.value || flashcards.value.length < 2) return;
   if (isPlaying.value) stopAutoPlay();
 
-  isAnimatingCardTransition.value = true;
+  const originalCardsBasis = (currentDeck.value?.flashcards ?? [])
+      .slice()
+      .sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
 
-  const cardsToShuffle = [...flashcards.value];
+  if (originalCardsBasis.length < 2) return;
 
-  // Fisher-Yates shuffle
+  const cardsToShuffle = [...originalCardsBasis];
+
   for (let i = cardsToShuffle.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [cardsToShuffle[i], cardsToShuffle[j]] = [cardsToShuffle[j], cardsToShuffle[i]];
@@ -296,63 +325,54 @@ function shuffleCards() {
 
   shuffledCards.value = cardsToShuffle;
   isShuffled.value = true;
-  currIndex.value = 0;
+  isAnimatingCardTransition.value = true;
 
-  setTimeout(() => {
-    if (flashcardRef.value && flashcardRef.value.isFlipped) {
-      flashcardRef.value.flip();
-    }
-  }, 50);
+  if (currIndex.value === 0) {
+    currIndex.value = -1;
+    await nextTick();
+    currIndex.value = 0;
+  } else {
+    currIndex.value = 0;
+  }
 }
 
-// Scroll navigation
+
 function handleScroll(event) {
-  if (isPlaying.value || isTransitioning.value || isNavigating.value || isAnimatingCardTransition.value) return;
+  if (isPlaying.value || isTransitioning.value || isNavigating.value || isAnimatingCardTransition.value || flashcards.value.length === 0) return;
   if (scrollTimeout.value) return;
   const delta = event.deltaY;
   const scrollThreshold = 20;
+
   if (Math.abs(delta) > scrollThreshold) {
     let triggered = false;
-    if (delta < 0 && !isAtLastCard.value) { // SCROLL UP = NEXT
-      isAnimatingCardTransition.value = true;
-      nextCard();
-      triggered = true;
-    } else if (delta > 0 && !isAtStart.value) { // SCROLL DOWN = PREV
-      isAnimatingCardTransition.value = true;
-      prevCard();
-      triggered = true;
+    if (delta < 0 && !isAtLastCard.value) {
+      isAnimatingCardTransition.value = true; nextCard(); triggered = true;
+    } else if (delta > 0 && !isAtStart.value) {
+      isAnimatingCardTransition.value = true; prevCard(); triggered = true;
     }
     if (triggered) {
-      scrollTimeout.value = setTimeout(() => {
-        scrollTimeout.value = null;
-      }, 500);
+      scrollTimeout.value = setTimeout(() => { scrollTimeout.value = null; }, 500);
     }
   }
 }
 
-// Keyboard navigation
 function handleKeydown(event) {
   if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target.isContentEditable) return;
-  if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
   if (isAnimatingCardTransition.value || isTransitioning.value) return;
 
   let handled = false;
   switch (event.key) {
     case 'ArrowLeft':
-      if (!isAtStart.value && !isAnimatingCardTransition.value) {
-        triggerPrevCard();
-        handled = true;
-      }
+      if (!event.shiftKey && !isAtStart.value && flashcards.value.length > 0) { triggerPrevCard(); handled = true; }
       break;
     case 'ArrowRight':
-      if (!isAtLastCard.value && !isAnimatingCardTransition.value) {
-        triggerNextCard();
-        handled = true;
-      }
+      if (!event.shiftKey && !isAtLastCard.value && flashcards.value.length > 0) { triggerNextCard(); handled = true; }
       break;
     case 'ArrowUp':
     case 'ArrowDown':
-      if (flashcardRef.value?.flip) {
+    case ' ': // Space bar also flips
+      if (flashcards.value.length > 0 && flashcardRef.value?.flip) {
         flashcardRef.value.flip();
         handled = true;
       }
@@ -361,28 +381,36 @@ function handleKeydown(event) {
   if (handled) event.preventDefault();
 }
 
-/* --- Autoplay Controls --- */
 function togglePlay() {
-  if (isAnimatingCardTransition.value) return;
-  if (isPlaying.value) stopAutoPlay(); else startAutoPlay();
+  if (isAnimatingCardTransition.value || flashcards.value.length === 0) return;
+  if (isPlaying.value) {
+    stopAutoPlay();
+  } else {
+    startAutoPlay();
+  }
 }
 
 function startAutoPlay() {
-  if (!flashcardRef.value || flashcards.value.length === 0) return;
-  if (isAtLastCard.value) {
+  if (flashcards.value.length === 0) return;
+  if (isAtLastCard.value && autoPlayStep.value === 'definition') {
+    isAnimatingCardTransition.value = true;
     currIndex.value = 0;
-    setTimeout(() => {
-      if (flashcardRef.value && flashcardRef.value.isFlipped) flashcardRef.value.flip();
-    }, 50);
   }
+
   isPlaying.value = true;
   autoPlayStep.value = 'term';
   progress.value = 0;
   isTransitioning.value = false;
-  if (flashcardRef.value && flashcardRef.value.isFlipped) flashcardRef.value.flip();
-  setTimeout(() => {
-    if (isPlaying.value) startProgressBar();
-  }, flashcardRef.value.isFlipped ? 800 : 50);
+
+  if (flashcardRef.value && flashcardRef.value.isFlipped) {
+    flashcardRef.value.flip();
+    clearTimeout(playInterval.value);
+    playInterval.value = setTimeout(() => {
+      if (isPlaying.value && !isAnimatingCardTransition.value) startProgressBar();
+    }, 800);
+  } else {
+    if (isPlaying.value && !isAnimatingCardTransition.value) startProgressBar();
+  }
 }
 
 function stopAutoPlay() {
@@ -396,10 +424,15 @@ function stopAutoPlay() {
 }
 
 function startProgressBar() {
-  if (isTransitioning.value || !isPlaying.value || isAnimatingCardTransition.value) return;
+  if (isTransitioning.value || !isPlaying.value || isAnimatingCardTransition.value || flashcards.value.length === 0) return;
   progress.value = 0;
   clearInterval(progressInterval.value);
-  const updateFrequency = 30, totalDuration = playSpeed.value, step = (100 * updateFrequency) / totalDuration;
+
+  const updateFrequency = 30;
+  const totalDuration = playSpeed.value;
+  if (totalDuration <= 0) return;
+  const step = (100 * updateFrequency) / totalDuration;
+
   progressInterval.value = setInterval(() => {
     if (!isPlaying.value) {
       clearInterval(progressInterval.value);
@@ -411,38 +444,37 @@ function startProgressBar() {
       progress.value = 100;
       clearInterval(progressInterval.value);
       progressInterval.value = null;
-      if (isAtLastCard.value) {
-        stopAutoPlay();
-      } else {
-        processNextStep();
-      }
+      processNextStep();
     }
   }, updateFrequency);
 }
 
 function processNextStep() {
   if (!isPlaying.value || isAnimatingCardTransition.value) return;
+
   isTransitioning.value = true;
+
   if (autoPlayStep.value === 'term') {
     autoPlayStep.value = 'definition';
-    if (flashcardRef.value && !flashcardRef.value.isFlipped) flashcardRef.value.flip();
+    if (flashcardRef.value && !flashcardRef.value.isFlipped) {
+      flashcardRef.value.flip();
+    }
+    clearTimeout(playInterval.value);
     playInterval.value = setTimeout(() => {
       isTransitioning.value = false;
-      if (isPlaying.value) startProgressBar();
+      if (isPlaying.value && !isAnimatingCardTransition.value) startProgressBar();
     }, 800);
   } else if (autoPlayStep.value === 'definition') {
     autoPlayStep.value = 'term';
     if (isAtLastCard.value) {
-      stopAutoPlay();
+      isAnimatingCardTransition.value = true;
+      currIndex.value = 0;
       isTransitioning.value = false;
       return;
     }
     isAnimatingCardTransition.value = true;
     nextCard();
-    playInterval.value = setTimeout(() => {
-      isTransitioning.value = false;
-      if (flashcardRef.value && flashcardRef.value.isFlipped) flashcardRef.value.flip();
-    }, 50);
+    isTransitioning.value = false;
   }
 }
 
@@ -450,9 +482,9 @@ function adjustSpeed(newSpeedValue) {
   const newSpeedMs = parseFloat(newSpeedValue) * 1000;
   if (newSpeedMs >= 3000 && newSpeedMs <= 10000) {
     playSpeed.value = newSpeedMs;
-    if (isPlaying.value && !isTransitioning.value && progressInterval.value !== null) {
-      clearInterval(progressInterval.value);
+    if (isPlaying.value && !isTransitioning.value && !isAnimatingCardTransition.value && progressInterval.value !== null) {
       progress.value = 0;
+      clearInterval(progressInterval.value);
       startProgressBar();
     }
   }
@@ -462,27 +494,32 @@ function onCardAnimationComplete() {
   isAnimatingCardTransition.value = false;
 
   if (isPlaying.value && autoPlayStep.value === 'term' && !isTransitioning.value && progressInterval.value === null) {
-    startProgressBar();
-  }
-
-  if (!isPlaying.value && flashcardRef.value && flashcardRef.value.isFlipped) {
-  } else if (isPlaying.value && autoPlayStep.value === 'term' && flashcardRef.value && flashcardRef.value.isFlipped) {
-    flashcardRef.value.flip();
+    if (flashcardRef.value && flashcardRef.value.isFlipped) {
+      flashcardRef.value.flip();
+      clearTimeout(playInterval.value);
+      playInterval.value = setTimeout(() => {
+        if (isPlaying.value) startProgressBar();
+      }, 800);
+    } else {
+      if (isPlaying.value) startProgressBar();
+    }
   }
 }
 
-/* --- Lifecycle Hooks --- */
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
+  const mainContainer = document.querySelector('.flashcard-viewer-content');
+  if (mainContainer) mainContainer.focus();
 });
+
 onBeforeUnmount(() => {
   stopAutoPlay();
   clearTimeout(scrollTimeout.value);
   window.removeEventListener('keydown', handleKeydown);
 });
 
-watch(() => route.params.id, (newId) => {
-  if (newId && newId !== flashcardSetId.value) {
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
     stopAutoPlay();
     flashcardSetId.value = newId;
     currIndex.value = 0;
@@ -490,8 +527,10 @@ watch(() => route.params.id, (newId) => {
     shuffledCards.value = [];
     isAnimatingCardTransition.value = false;
     isNavigating.value = false;
+    isTransitioning.value = false;
   }
 });
+
 watch(currentDeck, (newDeck, oldDeck) => {
   if (newDeck && (!oldDeck || newDeck.id !== oldDeck.id)) {
     currIndex.value = 0;
@@ -500,11 +539,12 @@ watch(currentDeck, (newDeck, oldDeck) => {
     stopAutoPlay();
     isAnimatingCardTransition.value = false;
     isNavigating.value = false;
-    setTimeout(() => {
+    isTransitioning.value = false;
+    nextTick(() => {
       if (flashcardRef.value && flashcardRef.value.isFlipped) {
         flashcardRef.value.flip();
       }
-    }, 50);
+    });
   } else if (newDeck && oldDeck && newDeck.flashcards.length !== oldDeck.flashcards.length) {
     if (isShuffled.value) {
       const originalCards = (newDeck.flashcards ?? [])
@@ -513,12 +553,12 @@ watch(currentDeck, (newDeck, oldDeck) => {
       const originalIds = new Set(originalCards.map(c => c.id));
       const validShuffled = shuffledCards.value.filter(c => originalIds.has(c.id));
       const shuffledIds = new Set(validShuffled.map(c => c.id));
-      const newCards = originalCards.filter(c => !shuffledIds.has(c.id));
-      for (let i = newCards.length - 1; i > 0; i--) {
+      const newCardsToAppend = originalCards.filter(c => !shuffledIds.has(c.id));
+      for (let i = newCardsToAppend.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [newCards[i], newCards[j]] = [newCards[j], newCards[i]];
+        [newCardsToAppend[i], newCardsToAppend[j]] = [newCardsToAppend[j], newCardsToAppend[i]];
       }
-      shuffledCards.value = [...validShuffled, ...newCards];
+      shuffledCards.value = [...validShuffled, ...newCardsToAppend];
     }
     if (currIndex.value >= newDeck.flashcards.length) {
       currIndex.value = Math.max(0, newDeck.flashcards.length - 1);
@@ -614,7 +654,6 @@ watch(currentDeck, (newDeck, oldDeck) => {
   box-sizing: border-box;
 }
 
-/* --- Loading/Error/Info States --- */
 .loading-indicator, .error-message, .info-state {
   display: flex;
   flex-direction: column;
@@ -681,28 +720,29 @@ watch(currentDeck, (newDeck, oldDeck) => {
   color: var(--text-primary, #E0E0E0);
 }
 
-
-/* --- Flashcard Area & Transition --- */
 .flashcard-area {
   position: relative;
   width: 100%;
   max-width: 1071px;
   display: flex;
   justify-content: center;
-  cursor: ns-resize;
+  align-items: center;
+  cursor: default;
   perspective: 2000px;
   height: 584.44px;
   margin-bottom: 5px;
+  overflow: hidden;
 }
 
 .flashcard-container {
-  position: relative;
-  width: 1071px;
-  height: 584.44px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   transform-style: preserve-3d;
 }
 
-/* --- Card Transition Keyframes & Styles --- */
 @keyframes cardEnterOvershoot {
   0% {
     opacity: 0;
@@ -718,6 +758,33 @@ watch(currentDeck, (newDeck, oldDeck) => {
   }
 }
 
+.card-transition-enter-active,
+.card-transition-leave-active {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-transition-leave-active {
+  transition: transform 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.35s ease-out;
+  z-index: 1;
+}
+
+.card-transition-leave-to {
+  opacity: 0;
+  transform: scale(0.85) translateX(-120px) rotateY(25deg);
+}
+
+.card-transition-enter-active {
+  animation: cardEnterOvershoot 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 2;
+}
+
 .border-progress-container {
   position: absolute;
   top: 0;
@@ -729,6 +796,7 @@ watch(currentDeck, (newDeck, oldDeck) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* Match the FlashCard's border-radius (assuming 20px from FlashCard.vue styles) */
   clip-path: inset(0 0 0 0 round 20px);
 }
 
@@ -738,7 +806,7 @@ watch(currentDeck, (newDeck, oldDeck) => {
 }
 
 .border-progress path {
-  transition: stroke-dashoffset 0.05s linear;
+  transition: stroke-dashoffset 0.03s linear;
   shape-rendering: geometricPrecision;
 }
 
@@ -769,7 +837,6 @@ watch(currentDeck, (newDeck, oldDeck) => {
   flex-wrap: wrap;
 }
 
-/* --- Responsive Design --- */
 @media (max-width: 768px) {
   .controls-container {
     flex-direction: column;
@@ -781,7 +848,7 @@ watch(currentDeck, (newDeck, oldDeck) => {
   .navigation-controls, .action-controls {
     width: 100%;
     justify-content: center;
-    gap: 20px;
+    gap: 10px;
   }
 
   .top-left-controls {
@@ -804,6 +871,10 @@ watch(currentDeck, (newDeck, oldDeck) => {
   .flashcard-viewer-content {
     padding-top: 60px;
   }
+  .flashcard-area {
+    height: auto;
+    min-height: 45vh;
+  }
 }
 
 @media (max-width: 480px) {
@@ -813,13 +884,13 @@ watch(currentDeck, (newDeck, oldDeck) => {
 
   .flashcard-area {
     height: auto;
-    min-height: 400px;
+    min-height: 300px;
+  }
+  .flashcard-container {
+    width: 95%;
+    height: auto;
   }
 
-  .flashcard-container {
-    height: auto;
-    width: 95%;
-  }
 
   .viewer-layout {
     padding: 0 10px 10px 10px;
@@ -827,6 +898,18 @@ watch(currentDeck, (newDeck, oldDeck) => {
 
   .controls-container {
     padding: 10px;
+    gap: 15px;
+  }
+  .navigation-controls, .action-controls {
+    gap: 5px;
+  }
+  .control-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.3em;
+  }
+  .speed-slider {
+    width: 80px;
   }
 }
 
@@ -934,4 +1017,5 @@ watch(currentDeck, (newDeck, oldDeck) => {
 .speed-slider:disabled::-moz-range-thumb {
   cursor: not-allowed;
 }
+
 </style>

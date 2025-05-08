@@ -39,7 +39,6 @@
           <InputWithIcon v-if="!showPassword" icon="lock" label="Confirm Password" type="password"
                          v-model="confirmPasswordInput"/>
 
-          <!-- Password Validation Section -->
           <div v-if="passwordInput.length > 0" class="password-validation">
             <div :class="['validation-item', { valid: lengthValid }]">
               Between 8 and 64 characters in length.
@@ -141,16 +140,17 @@ const hasNumber = computed(() => {
 });
 
 const passwordsMatch = computed(() => {
-  return passwordInput.value === confirmPasswordInput.value && passwordInput.value.length > 0;
+  // Ensure passwords match only if passwordInput has content, preventing match on two empty strings
+  return passwordInput.value.length > 0 && passwordInput.value === confirmPasswordInput.value;
 });
 
 const isPasswordValid = computed(() => {
+  const commonRules = lengthValid.value && hasUppercase.value && hasLowercase.value &&
+      hasSpecialChar.value && hasNumber.value;
   if (showPassword.value) {
-    return lengthValid.value && hasUppercase.value && hasLowercase.value &&
-        hasSpecialChar.value && hasNumber.value;
+    return commonRules;
   } else {
-    return lengthValid.value && hasUppercase.value && hasLowercase.value &&
-        hasSpecialChar.value && hasNumber.value && passwordsMatch.value;
+    return commonRules && passwordsMatch.value;
   }
 });
 
@@ -159,19 +159,18 @@ const {mutate: registerMutate} = useMutation(REGISTER_USER);
 const moveToStep = (step) => {
   if (step === 2) {
     if (!isStep1Valid.value) {
-      if (!usernameInput.value) {
+      if (!usernameInput.value.trim()) {
         addToast({msg: "Username is required", type: "error", duration: 4000});
-      } else if (!emailInput.value) {
+      } else if (!emailInput.value.trim()) {
         addToast({msg: "Email is required", type: "error", duration: 4000});
-      } else if (!firstnameInput.value) {
+      } else if (!firstnameInput.value.trim()) {
         addToast({msg: "First Name is required", type: "error", duration: 4000});
-      } else if (!lastnameInput.value) {
+      } else if (!lastnameInput.value.trim()) {
         addToast({msg: "Last Name is required", type: "error", duration: 4000});
       }
       return;
     }
   }
-
   currentStep.value = step;
 };
 
@@ -200,11 +199,15 @@ const submitForm = async () => {
     try {
       await apolloClient.resetStore();
     } catch (error) {
+      // Silently handle resetStore error or log if necessary
+      console.error("Error resetting Apollo store:", error);
     }
 
     await router.push({name: 'privateProfileLibrary'});
   } catch (error) {
-    addToast({msg: "Registration failed. Please try again.", type: "error", duration: 4000});
+    // Check for specific GraphQL error messages if available
+    const errorMessage = error.graphQLErrors?.[0]?.message || "Registration failed. Please try again.";
+    addToast({msg: errorMessage, type: "error", duration: 4000});
   } finally {
     isSubmitting.value = false;
   }
@@ -244,6 +247,8 @@ const submitForm = async () => {
   flex-direction: column;
   justify-content: center;
   color: #ffffff;
+  /* transition for potential future animations if needed */
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 h1 {
@@ -292,14 +297,15 @@ form {
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* Adjusted from margin-bottom: 10px to provide space before buttons */
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px; /* Increased gap for better spacing */
   cursor: pointer;
+  user-select: none; /* Prevents text selection on click */
 }
 
 .checkbox-label input {
@@ -307,6 +313,8 @@ form {
   height: 16px;
   accent-color: #5F98EF;
 }
+
+/* Removed .checkmark span as native checkbox is styled directly with accent-color */
 
 .step-indicator {
   margin: 20px 0;
@@ -322,27 +330,39 @@ form {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #333a4d;
+  background-color: #333a4d; /* Default color */
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   transition: all 0.3s ease;
+  border: 2px solid #333a4d; /* Default border */
+}
+
+.circle.active {
+  background-color: #5F98EF; /* Active color */
+  border-color: #5F98EF; /* Active border color */
+  color: #ffffff;
 }
 
 .line {
   width: 60px;
   height: 2px;
-  background-color: #333a4d;
+  background-color: #333a4d; /* Default color */
   margin: 0 10px;
   transition: all 0.3s ease;
 }
 
+.line.active {
+  background-color: #5F98EF; /* Active color */
+}
+
+
 .button-group {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 10px; /* Reduced margin-top as remember-container now has margin-bottom */
 }
 
 .back-button {
@@ -366,14 +386,16 @@ form {
   border-radius: 6px;
   padding: 15px;
   font-size: 14px;
-  margin-top: -10px;
+  margin-top: -10px; /* Pulls it closer to the password field */
+  margin-bottom: 10px; /* Adds some space before the "Show Password" checkbox */
 }
 
 .validation-item {
   margin-bottom: 8px;
-  color: #ff5151;
+  color: #ff5151; /* Red for invalid by default */
   display: flex;
   align-items: center;
+  transition: color 0.3s ease;
 }
 
 .validation-item:last-child {
@@ -381,10 +403,20 @@ form {
 }
 
 .validation-item:before {
-  content: "✕";
+  content: "✕"; /* Cross for invalid by default */
   margin-right: 8px;
   font-weight: bold;
+  /* transition for content might not be smooth, color transition is primary */
 }
+
+.validation-item.valid {
+  color: #4CAF50; /* Green for valid */
+}
+
+.validation-item.valid:before {
+  content: "✓"; /* Checkmark for valid */
+}
+
 
 .button-disabled {
   opacity: 0.6;
@@ -392,18 +424,27 @@ form {
 }
 
 :deep(.button-disabled button) {
-  background-color: #5F98EF80 !important;
+  background-color: #5F98EF80 !important; /* Use RGBA for opacity */
   cursor: not-allowed !important;
   border-color: transparent !important;
 }
 
 /* --- Responsive Design --- */
+@media (min-width: 1025px) {
+  .form-container {
+    /* Add a subtle shadow to the left when illustration is visible */
+    box-shadow: -4px 0px 12px rgba(0, 0, 0, 0.25);
+  }
+}
+
 @media (max-width: 1024px) {
   .login-container {
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 30px;
+    justify-content: flex-start; /* Align to top for scrollability if content overflows */
+    padding: 30px 15px; /* Adjust padding for smaller screens */
+    height: auto; /* Allow height to adjust to content */
+    min-height: 100vh; /* Ensure it still takes at least full viewport height */
   }
 
   .illustration-container {
@@ -412,8 +453,17 @@ form {
 
   .form-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 400px; /* Keep max-width for form readability */
     padding: 30px;
+    box-shadow: none; /* Remove shadow on mobile if it was applied generally */
+  }
+
+  h1 {
+    font-size: 30px; /* Slightly smaller h1 for mobile */
+  }
+
+  .subtitle {
+    font-size: 15px; /* Slightly smaller subtitle for mobile */
   }
 }
 </style>

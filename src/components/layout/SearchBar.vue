@@ -142,5 +142,4 @@ input::placeholder {
   color: #ffffff; /* Brighten clear icon on hover */
 }
 
-/* Dropdown styles removed */
 </style>
